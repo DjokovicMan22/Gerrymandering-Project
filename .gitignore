@@ -29,3 +29,7 @@ outputs/models/
 
 # Downloaded raw datasets
 data/raw/
+
+# Large regenerable ensemble outputs
+outputs/chains/week4/*_district_metrics.csv
+outputs/chains/week4/*_assignments.json
