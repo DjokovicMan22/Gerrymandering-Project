@@ -1,0 +1,31 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Packaging
+*.egg-info/
+build/
+dist/
+
+# macOS / editors
+.DS_Store
+.vscode/
+.idea/
+
+# Large source data: retain retrieval instructions, not bulky local copies
+# Uncomment these after confirming your repository should not track raw data.
+data/raw/*.zip
+# data/raw/mi/
+# data/raw/mo/
+
+# Large generated artifacts
+outputs/chains/
+outputs/models/
+
+# Downloaded raw datasets
+data/raw/

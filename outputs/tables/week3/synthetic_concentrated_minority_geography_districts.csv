@@ -1,0 +1,6 @@
+scenario,CD,dem_votes,rep_votes,precinct_count,two_party_votes,dem_share,rep_share,dem_wasted_votes,rep_wasted_votes,winner
+Concentrated minority geography,1,350,650,1,1000,0.35,0.65,350.0,149.0,Republican
+Concentrated minority geography,2,350,650,1,1000,0.35,0.65,350.0,149.0,Republican
+Concentrated minority geography,3,350,650,1,1000,0.35,0.65,350.0,149.0,Republican
+Concentrated minority geography,4,350,650,1,1000,0.35,0.65,350.0,149.0,Republican
+Concentrated minority geography,5,350,650,1,1000,0.35,0.65,350.0,149.0,Republican

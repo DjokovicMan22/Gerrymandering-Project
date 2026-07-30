@@ -1,0 +1,6 @@
+scenario,CD,dem_votes,rep_votes,precinct_count,two_party_votes,dem_share,rep_share,dem_wasted_votes,rep_wasted_votes,winner
+Distributed competitive support,1,520,480,1,1000,0.52,0.48,19.0,480.0,Democratic
+Distributed competitive support,2,520,480,1,1000,0.52,0.48,19.0,480.0,Democratic
+Distributed competitive support,3,520,480,1,1000,0.52,0.48,19.0,480.0,Democratic
+Distributed competitive support,4,100,900,1,1000,0.1,0.9,100.0,399.0,Republican
+Distributed competitive support,5,90,910,1,1000,0.09,0.91,90.0,409.0,Republican

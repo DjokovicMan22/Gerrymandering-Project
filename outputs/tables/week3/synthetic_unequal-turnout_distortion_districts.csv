@@ -1,0 +1,6 @@
+scenario,CD,dem_votes,rep_votes,precinct_count,two_party_votes,dem_share,rep_share,dem_wasted_votes,rep_wasted_votes,winner
+Unequal-turnout distortion,1,280,120,1,400,0.7,0.30000000000000004,79.0,120.0,Democratic
+Unequal-turnout distortion,2,315,135,1,450,0.7,0.30000000000000004,89.0,135.0,Democratic
+Unequal-turnout distortion,3,882,918,1,1800,0.49,0.51,882.0,17.0,Republican
+Unequal-turnout distortion,4,931,969,1,1900,0.49,0.51,931.0,18.0,Republican
+Unequal-turnout distortion,5,980,1020,1,2000,0.49,0.51,980.0,19.0,Republican

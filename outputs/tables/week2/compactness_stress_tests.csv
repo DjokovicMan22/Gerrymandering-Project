@@ -1,0 +1,5 @@
+shape,note,polsby_popper,reock,convex_hull_ratio
+Long thin rectangle,"Hull ratio stays high, but Polsby–Popper and Reock punish elongation.",0.23552131513792696,0.11228962177968117,1.0
+Smooth coastline-hugger,Follows a wavy edge; perimeter grows while hull remains similar.,0.4312266194707161,0.29657526550924995,0.887102611395434
+Jagged coastline / fractal-ish boundary,Polsby–Popper drops sharply because perimeter explodes.,0.23480322173469217,0.2692193039125047,0.9698506235439223
+Simple square,Reference shape: compact under all three metrics.,0.7853981633974483,0.6366197723675813,1.0

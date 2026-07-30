@@ -1,0 +1,5 @@
+scenario,dem_vote_share_pct,dem_seats,total_districts,dem_seat_share_pct,efficiency_gap_exact_pct,efficiency_gap_shortcut_pct,shortcut_minus_exact_pp,mean_median_difference_pp
+Concentrated minority geography,35.0,0,5,0.0,-20.1,-19.999999999999996,0.10000000000000564,0.0
+Distributed competitive support,35.0,3,5,60.0,40.02,40.0,-0.019999999999997797,17.0
+Unequal-turnout distortion,51.725190839694655,2,5,40.0,-40.48854961832061,-13.450381679389311,27.038167938931302,-8.400000000000007
+Packing and cracking pattern,56.2,2,5,40.0,-22.42,-22.40000000000001,0.019999999999992246,-9.200000000000008
