@@ -1,0 +1,5 @@
+selection,chain,step,plan_csv,typical_distance,dem_seats,efficiency_gap,mean_median,cut_edges,max_population_deviation
+enacted,mi_2016_chain1_7000steps_seed101,0,outputs/chains/week4/mi_2016_chain1_7000steps_seed101_plan_metrics.csv,,6.0,-0.038749497891198,-0.0214466626413144,681.0,0.0040193182103474
+typical,mi_2016_chain3_7000steps_seed303,3850,outputs/chains/week4/mi_2016_chain3_7000steps_seed303_plan_metrics.csv,0.04202480087436935,5.0,-0.1164734120335059,-0.0400730236202371,841.0,0.0185741641313559
+minimum_efficiency_gap,mi_2016_chain3_7000steps_seed303,3365,outputs/chains/week4/mi_2016_chain3_7000steps_seed303_plan_metrics.csv,3.875209233197797,3.0,-0.2803137951906165,-0.0170122218205264,939.0,0.0190940438495074
+maximum_efficiency_gap,mi_2016_chain2_7000steps_seed202,2759,outputs/chains/week4/mi_2016_chain2_7000steps_seed202_plan_metrics.csv,5.699711034982051,7.0,0.0425111090541842,0.0041631272342548,849.0,0.0177077640895193
