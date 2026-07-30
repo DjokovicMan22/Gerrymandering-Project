@@ -33,3 +33,6 @@ data/raw/
 # Large regenerable ensemble outputs
 outputs/chains/week4/*_district_metrics.csv
 outputs/chains/week4/*_assignments.json
+
+# Regenerable Week 5 selected assignments
+outputs/chains/week5/*_selected_assignments.json

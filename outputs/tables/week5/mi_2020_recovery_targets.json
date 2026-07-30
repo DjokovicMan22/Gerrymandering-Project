@@ -1,0 +1,50 @@
+[
+  {
+    "selection": "enacted",
+    "chain": "mi_2020_chain1_7000steps_seed101",
+    "step": 0,
+    "plan_csv": "outputs/chains/week4/mi_2020_chain1_7000steps_seed101_plan_metrics.csv",
+    "typical_distance": NaN,
+    "dem_seats": 7.0,
+    "efficiency_gap": 0.0033332049850474,
+    "mean_median": -0.0140197480146642,
+    "cut_edges": 681.0,
+    "max_population_deviation": 0.0040193182103474
+  },
+  {
+    "selection": "typical",
+    "chain": "mi_2020_chain1_7000steps_seed101",
+    "step": 2424,
+    "plan_csv": "outputs/chains/week4/mi_2020_chain1_7000steps_seed101_plan_metrics.csv",
+    "typical_distance": 0.031097031266139535,
+    "dem_seats": 6.0,
+    "efficiency_gap": -0.0818948240803387,
+    "mean_median": -0.0316214629281815,
+    "cut_edges": 842.0,
+    "max_population_deviation": 0.018974071606857
+  },
+  {
+    "selection": "minimum_efficiency_gap",
+    "chain": "mi_2020_chain2_7000steps_seed202",
+    "step": 6924,
+    "plan_csv": "outputs/chains/week4/mi_2020_chain2_7000steps_seed202_plan_metrics.csv",
+    "typical_distance": 3.1265977768413897,
+    "dem_seats": 3.0,
+    "efficiency_gap": -0.3052763980337042,
+    "mean_median": -0.0384079665127612,
+    "cut_edges": 818.0,
+    "max_population_deviation": 0.0197661464131723
+  },
+  {
+    "selection": "maximum_efficiency_gap",
+    "chain": "mi_2020_chain1_7000steps_seed101",
+    "step": 5474,
+    "plan_csv": "outputs/chains/week4/mi_2020_chain1_7000steps_seed101_plan_metrics.csv",
+    "typical_distance": 3.746003898834188,
+    "dem_seats": 9.0,
+    "efficiency_gap": 0.1604067540535139,
+    "mean_median": -0.0132222973723807,
+    "cut_edges": 906.0,
+    "max_population_deviation": 0.0173349471204229
+  }
+]
