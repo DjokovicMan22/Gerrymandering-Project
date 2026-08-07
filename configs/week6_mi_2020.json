@@ -1,0 +1,29 @@
+{
+  "state": "mi",
+  "state_name": "Michigan",
+  "election": "2020",
+  "election_label": "2020 presidential election",
+  "ensembles": [
+    {
+      "label": "1% tolerance",
+      "epsilon": 0.01,
+      "burn_in": 300,
+      "glob": "outputs/chains/week6/mi_2020_eps1pct_chain*_3000steps_seed*_plan_metrics.csv",
+      "baseline": false
+    },
+    {
+      "label": "2% tolerance",
+      "epsilon": 0.02,
+      "burn_in": 700,
+      "glob": "outputs/chains/week4/mi_2020_chain[123]_7000steps_seed*_plan_metrics.csv",
+      "baseline": true
+    },
+    {
+      "label": "3% tolerance",
+      "epsilon": 0.03,
+      "burn_in": 300,
+      "glob": "outputs/chains/week6/mi_2020_eps3pct_chain*_3000steps_seed*_plan_metrics.csv",
+      "baseline": false
+    }
+  ]
+}

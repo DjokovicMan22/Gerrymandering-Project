@@ -1,0 +1,2 @@
+district_count,statewide_dem_share,proportional_dem_seats,enacted_dem_seats,ensemble_mean_dem_seats,ensemble_median_dem_seats,ensemble_q05_dem_seats,ensemble_q95_dem_seats,geographic_gap_mean_minus_proportional,enacted_minus_proportional,enacted_minus_ensemble_mean,democratic_majority_threshold,ensemble_dem_majority_probability,sample_count
+13,0.5141349967271187,6.683754957452543,7.0,5.7149206349206345,6.0,4.0,7.0,-0.9688343225319089,0.31624504254745656,1.2850793650793655,7,0.1393121693121693,18900
