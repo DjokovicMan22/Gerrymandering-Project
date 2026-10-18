@@ -20,6 +20,7 @@ DIAGNOSTICS = ROOT / "scripts" / "research_audit" / "analyze_chains.py"
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--execute", action="store_true")
+    ap.add_argument("--overwrite", action="store_true", help="Explicitly allow replacing existing experiment outputs")
     ap.add_argument("--steps", type=int, default=8000)
     ap.add_argument("--burn-in", type=int, default=2000)
     ap.add_argument("--snapshot-interval", type=int, default=10)
@@ -39,6 +40,7 @@ def main() -> int:
         ap.error(f"Required local graph missing: {graph}")
 
     print("MODEL: GerryChain ReCom; contiguity + population only; not legally certified.")
+    any_diagnostic_failure = False
     for epsilon in args.epsilons:
         names = []
         for seed in args.seeds:
@@ -57,6 +59,10 @@ def main() -> int:
         out = ROOT / "outputs" / "research_audit" / f"epsilon_{epsilon}"
         assignment_files = [chain_dir / (s + "_assignments.json") for s in names]
         metric_files = [chain_dir / (s + "_plan_metrics.csv") for s in names]
+        if args.execute and not args.overwrite:
+            existing = [p for p in assignment_files + metric_files if p.exists()]
+            if existing:
+                raise FileExistsError("Refusing to overwrite existing experiment artifacts. Use --overwrite after review: " + ", ".join(map(str, existing)))
         verification = [sys.executable, str(VERIFIER), "--graph", str(graph),
                         "--epsilon", str(epsilon), "--assignments",
                         *map(str, assignment_files), "--output",
@@ -70,11 +76,14 @@ def main() -> int:
                 # Diagnostic exit 2 denotes inadequate mixing; save results and
                 # continue to other conditions rather than hiding the failure.
                 result = subprocess.run(cmd, cwd=ROOT, check=False)
+                if cmd[1] == str(DIAGNOSTICS) and result.returncode == 2:
+                    any_diagnostic_failure = True
+                    print("NOT CERTIFIED: chain diagnostics did not pass for epsilon", epsilon, file=sys.stderr)
                 if result.returncode not in (0, 2):
                     raise RuntimeError(f"Subprocess failed: {result.returncode}: {cmd}")
     if not args.execute:
         print("DRY RUN ONLY. Pass --execute to run. No simulations performed.")
-    return 0
+    return 2 if any_diagnostic_failure else 0
 
 
 if __name__ == "__main__":
