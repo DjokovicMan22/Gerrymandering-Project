@@ -12,7 +12,7 @@ import pandas as pd
 from gerrychain import MarkovChain, accept
 
 from .constraints import build_constraints
-from .geographic import GeographicCaps, GeographicEvaluator
+from .geographic import GeographicCaps, GeographicEvaluator, GeographicHoldingProposal
 from .partition import ideal_population, max_population_deviation
 from .proposals import make_recom_proposal
 
@@ -145,6 +145,9 @@ def run_recom_chain(initial_partition, config: ChainConfig) -> tuple[pd.DataFram
         epsilon=config.epsilon,
         node_repeats=config.node_repeats,
     )
+    holding_proposal = GeographicHoldingProposal(proposal, geography) if geography is not None else None
+    if holding_proposal is not None:
+        proposal = holding_proposal
     chain = MarkovChain(
         proposal=proposal,
         constraints=build_constraints(initial_partition, config.epsilon,
@@ -171,6 +174,8 @@ def run_recom_chain(initial_partition, config: ChainConfig) -> tuple[pd.DataFram
                          for node in current_assignment))
             plan_row["nodes_changed_since_previous"] = moved
             plan_row["state_changed_since_previous"] = int(moved > 0)
+            plan_row["geographic_proposals_attempted_total"] = holding_proposal.attempted
+            plan_row["geographic_proposals_rejected_total"] = holding_proposal.geographic_rejected
             previous_assignment = current_assignment
         plan_rows.append(plan_row)
         district_rows.extend(current_district_rows)
