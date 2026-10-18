@@ -9,7 +9,7 @@ import networkx as nx
 import pytest
 
 from redistricting.ensemble.geographic import (
-    GeographicCaps, GeographicEvaluator, count_split_groups,
+    GeographicCaps, GeographicEvaluator, GeographicHoldingProposal, count_split_groups,
 )
 
 
@@ -110,3 +110,35 @@ def test_geographic_caps_on_actual_gerrychain_partition_rustworkx_backend():
     assert evaluator.validate_reference(partition) == {
         "cut_edges": 1, "split_counties": 1, "split_county_mcd": 0
     }
+
+
+def test_holding_proposal_counts_rejection_as_unchanged_state():
+    graph = graph_with_group_keys()
+    initial = FakePartition(graph, {0:"A",1:"A",2:"B",3:"B",4:"B",5:"B"})
+    invalid = FakePartition(graph, {0:"A",1:"B",2:"B",3:"B",4:"A",5:"B"})
+    evaluator = GeographicEvaluator(graph, GeographicCaps(max_cut_edges=1))
+    callback_calls = []
+
+    def candidate(_, *, rng=None):
+        callback_calls.append(rng)
+        return invalid
+
+    holding = GeographicHoldingProposal(candidate, evaluator)
+    assert holding(initial, rng=17) is initial
+    assert holding(initial, rng=19) is initial
+    assert holding.attempted == 2
+    assert holding.geographic_rejected == 2
+    assert callback_calls == [17, 19]
+
+
+def test_holding_proposal_accepts_valid_candidate():
+    graph = graph_with_group_keys()
+    initial = FakePartition(graph, {0:"A",1:"A",2:"B",3:"B",4:"B",5:"B"})
+    valid = FakePartition(graph, {0:"A",1:"A",2:"A",3:"B",4:"B",5:"B"})
+    holding = GeographicHoldingProposal(
+        lambda current, *, rng=None: valid,
+        GeographicEvaluator(graph, GeographicCaps(max_cut_edges=1)),
+    )
+    assert holding(initial) is valid
+    assert holding.attempted == 1
+    assert holding.geographic_rejected == 0
