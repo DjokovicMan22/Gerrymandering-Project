@@ -65,7 +65,8 @@ def main() -> int:
         metric_files = [chain_dir / (s + "_plan_metrics.csv") for s in names]
         verification = [sys.executable, str(VERIFIER), "--graph", str(graph),
                         "--epsilon", str(epsilon), "--assignments",
-                        *map(str, assignment_files), "--output",
+                        *map(str, assignment_files), "--metric-files",
+                        *map(str, metric_files), "--output",
                         str(out / "validated_snapshots.csv")]
         diagnostics = [sys.executable, str(DIAGNOSTICS), "--chains",
                        *map(str, metric_files), "--burn-in", str(args.burn_in),
