@@ -131,6 +131,7 @@ def warm_endpoint(reference: Any, seed: int, config: WarmStartConfig) -> tuple[d
         accept=accept.always_accept,
         initial_state=reference,
         total_steps=config.steps_including_reference,
+        rng=seed,  # GerryChain 2026+ owns its RNG; random.seed alone does NOT seed ReCom.
     )
     changed_steps = 0
     last_assignment: dict | None = None
