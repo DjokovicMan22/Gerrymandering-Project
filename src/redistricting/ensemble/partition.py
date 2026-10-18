@@ -37,7 +37,7 @@ def _connect_components_within_district(graph: Graph, district_field: str = "CD"
         for component in components[1:]:
             component_nodes_by_district: dict[str, list] = {}
             for node in component:
-                district = str(graph.nodes[node].get(district_field))
+                district = str(nx_graph.nodes[node].get(district_field))
                 component_nodes_by_district.setdefault(district, []).append(node)
 
             shared_districts = sorted(
@@ -64,7 +64,7 @@ def _connect_components_within_district(graph: Graph, district_field: str = "CD"
 
         if not connected_one:
             component_sizes = sorted(
-                (len(c) for c in nx.connected_components(graph)),
+                (len(c) for c in nx.connected_components(nx_graph)),
                 reverse=True,
             )
             raise ValueError(
@@ -89,7 +89,7 @@ def load_graph(path: str | Path) -> Graph:
     nx_graph = graph.get_nx_graph()
     if not nx.is_connected(nx_graph):
         component_sizes_before = sorted(
-            (len(c) for c in nx.connected_components(graph)),
+            (len(c) for c in nx.connected_components(nx_graph)),
             reverse=True,
         )
 
