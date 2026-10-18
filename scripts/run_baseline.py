@@ -32,6 +32,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--epsilon", type=float, default=0.02)
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--node-repeats", type=int, default=2)
+    parser.add_argument("--max-cut-edges", type=int, default=None,
+                        help="EXPLORATORY: maximum graph edges crossing districts")
+    parser.add_argument("--max-split-counties", type=int, default=None,
+                        help="EXPLORATORY: cap precinct COUNTYFIPS groups split between districts")
+    parser.add_argument("--max-split-county-mcd", type=int, default=None,
+                        help="EXPLORATORY: cap COUNTYFIPS+MCDFIPS groups split")
     parser.add_argument("--election", choices=("2020", "2016"), default="2020")
     parser.add_argument("--chain-id", default="chain1")
     parser.add_argument(
@@ -71,6 +77,9 @@ def main() -> None:
         node_repeats=args.node_repeats,
         seed=args.seed,
         snapshot_interval=args.snapshot_interval,
+        max_cut_edges=args.max_cut_edges,
+        max_split_counties=args.max_split_counties,
+        max_split_county_mcd=args.max_split_county_mcd,
     )
     plan_metrics, district_metrics, snapshots = run_recom_chain(partition, config)
 
@@ -87,10 +96,15 @@ def main() -> None:
         "steps_including_initial_plan": args.steps,
         "epsilon": args.epsilon,
         "node_repeats": args.node_repeats,
+        "geographic_proxy_caps": {
+            "max_cut_edges": args.max_cut_edges,
+            "max_split_counties": args.max_split_counties,
+            "max_split_county_mcd": args.max_split_county_mcd,
+        },
         "seed": args.seed,
         "ideal_population": target_population,
         "created_utc": datetime.now(timezone.utc).isoformat(),
-        "note": "Step 0 is the enacted starting plan. These diagnostics do not prove mixing.",
+        "note": "Step 0 is the enacted starting plan. Geographic proxies do not imply legal plan validity or stationary sampling.",
     }
     paths = save_chain_outputs(
         plan_metrics,
