@@ -157,6 +157,7 @@ def run_recom_chain(initial_partition, config: ChainConfig) -> tuple[pd.DataFram
     plan_rows: list[dict] = []
     district_rows: list[dict] = []
     snapshots: dict[int, dict] = {}
+    previous_assignment: dict | None = None
 
     for step, partition in enumerate(chain):
         plan_row, current_district_rows = partition_statistics(
@@ -164,6 +165,13 @@ def run_recom_chain(initial_partition, config: ChainConfig) -> tuple[pd.DataFram
         )
         if geography is not None:
             plan_row.update(geography.score(partition))
+            current_assignment = dict(partition.assignment.items())
+            moved = (0 if previous_assignment is None else
+                     sum(current_assignment[node] != previous_assignment[node]
+                         for node in current_assignment))
+            plan_row["nodes_changed_since_previous"] = moved
+            plan_row["state_changed_since_previous"] = int(moved > 0)
+            previous_assignment = current_assignment
         plan_rows.append(plan_row)
         district_rows.extend(current_district_rows)
 
