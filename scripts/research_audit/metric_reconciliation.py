@@ -34,6 +34,8 @@ def crosscheck_metrics(verified: pd.DataFrame, metric_files: list[Path],
         archived = pd.read_csv(metric_path)
         needed = {"step", "dem_seats", "efficiency_gap", "cut_edges",
                   "max_population_deviation"}
+        geo_columns = {"split_counties", "split_county_mcd"}
+        needed |= geo_columns.intersection(archived.columns)
         if not needed.issubset(archived.columns):
             raise ValueError(f"{metric_path}: missing columns {sorted(needed - set(archived.columns))}")
         if archived["step"].duplicated().any():
