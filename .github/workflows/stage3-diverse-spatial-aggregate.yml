@@ -6,6 +6,7 @@ on:
       - research/stages-1-3-validation
     paths:
       - .github/workflows/stage3-diverse-spatial-aggregate.yml
+      - scripts/research_audit/analyze_diversified_spatial.py
   workflow_dispatch:
 
 permissions:
