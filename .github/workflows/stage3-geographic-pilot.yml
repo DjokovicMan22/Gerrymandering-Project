@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/stage3-geographic-pilot.yml
       - src/redistricting/ensemble/geographic.py
+      - src/redistricting/ensemble/chain.py
   workflow_dispatch:
 
 permissions:
@@ -88,9 +89,13 @@ jobs:
                      "post_burnin_states":len(post),
                      "distinct_metric_tuples":len(post[cols[:-1]].drop_duplicates())}
           summary.update({f"mean_{x}":float(post[x].mean()) for x in cols})
+          summary["geographic_attempts"] = int(df["geographic_proposals_attempted_total"].iloc[-1])
+          summary["geographic_rejections"] = int(df["geographic_proposals_rejected_total"].iloc[-1])
+          summary["geographic_rejection_fraction"] = (summary["geographic_rejections"] / summary["geographic_attempts"]
+                                                     if summary["geographic_attempts"] else float("nan"))
           summary.update({f"max_{x}":int(df[x].max()) for x in
                           ("cut_edges","split_counties","split_county_mcd")})
-          summary["source_note"] = "Short seeded pilot; same enacted start; not convergence or legal validity."
+          summary["source_note"] = "One proposal per counted transition; geographic rejection is self-loop; fixed enacted start; not convergence or legal validity."
           print(summary)
           out=Path(f"outputs/research_audit/geopilot_{condition}_seed{seed}_summary.csv")
           out.parent.mkdir(parents=True,exist_ok=True)
