@@ -1,0 +1,60 @@
+name: Stage 3 Michigan empirical smoke test
+
+on:
+  push:
+    branches:
+      - research/stages-1-3-validation
+    paths:
+      - .github/workflows/stage3-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-source-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install research dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]" arviz
+      - name: Obtain pinned noncommercial public-source graph
+        run: |
+          python scripts/research_audit/download_source.py --acknowledge-source-terms
+          python scripts/research_audit/verify_graph.py \
+            --graph data/raw/mi/mi/mi.json \
+            --expected-git-blob a4dfe70818f87b97924781216f3d86a672cfc66a \
+            --expected-nodes 4756 --expected-population 10077331 \
+            --output outputs/research_audit/smoke_source_manifest.json
+      - name: Run two short genuine constrained GerryChain paths
+        shell: bash
+        run: |
+          set +e
+          python scripts/research_audit/run_experiment_matrix.py \
+            --execute --steps 35 --burn-in 10 \
+            --snapshot-interval 5 --seeds 101 202 --epsilons 0.005
+          exitcode=$?
+          set -e
+          echo "Experiment return code: $exitcode"
+          if [ "$exitcode" -ne 0 ] && [ "$exitcode" -ne 2 ]; then
+            exit "$exitcode"
+          fi
+          echo "Smoke run complete; exit 2 means diagnostic thresholds failed, NOT scientific convergence."
+      - name: Upload derived validation and diagnostics (no source precinct graph)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage3-smoke-derived-reports
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            outputs/research_audit/**
+            outputs/chains/week4/mi_2020_stage3eps*_plan_metrics.csv
+            outputs/chains/week4/mi_2020_stage3eps*_metadata.json
