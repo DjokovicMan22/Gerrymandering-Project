@@ -40,7 +40,7 @@ def analyze_spatial(paths: list[Path], expected_steps: tuple[int, ...] =
                 raise ValueError(f"{path}: invalid finite fractional distances in {key}")
         if abs(float(df.iloc[0]["warm_start_fraction_different"])) > 1e-12:
             raise ValueError(f"{path}: checkpoint zero must be identical to the warm start")
-        if df["assignment_sha256"].str.fullmatch(r"[0-9a-f]{64}").fillna(False).all() is False:
+        if not bool(df["assignment_sha256"].str.fullmatch(r"[0-9a-f]{64}").fillna(False).all()):
             raise ValueError(f"{path}: invalid assignment hash")
         df = df.assign(chain=path.name)
         frames.append(df)
