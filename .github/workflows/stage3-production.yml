@@ -5,7 +5,7 @@ on:
     branches:
       - research/stages-1-3-validation
     paths:
-      - .github/workflows/stage3-production.yml
+      - docs/research_audit/trigger_stage3_production.txt
   workflow_dispatch:
 
 permissions:
@@ -107,7 +107,7 @@ jobs:
           failed=0
           for epsilon in 0.005 0.02; do
             eps_tag="${epsilon//./p}"
-            mapfile -t files < <(find downloaded/chains/week4 -name "mi_2020_stage3eps${eps_tag}_chain*_plan_metrics.csv" -type f | sort)
+            mapfile -t files < <(find downloaded/outputs/chains/week4 -name "mi_2020_stage3eps${eps_tag}_chain*_plan_metrics.csv" -type f | sort)
             if [ "${#files[@]}" -ne 4 ]; then
               echo "Expected four chain scores for epsilon $epsilon, found ${#files[@]}" >&2
               exit 1
