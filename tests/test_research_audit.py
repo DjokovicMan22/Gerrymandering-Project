@@ -145,3 +145,23 @@ def test_reconciliation_rejects_missing_archived_snapshot(tmp_path):
     verified.iloc[:1].drop(columns=["chain"]).to_csv(archived, index=False)
     with pytest.raises(ValueError, match="missing recorded steps"):
         crosscheck_metrics(verified, [archived])
+
+
+def test_reconciliation_accepts_real_paired_year_snapshot_schema(tmp_path):
+    archive = tmp_path / "mi_2020_demo_plan_metrics.csv"
+    pd.DataFrame({
+        "step": [0, 10], "dem_seats": [7, 6],
+        "efficiency_gap": [0.1, -0.2],
+        "cut_edges": [681, 720],
+        "max_population_deviation": [0.004, 0.003],
+    }).to_csv(archive, index=False)
+    verified = pd.DataFrame({
+        "chain": ["mi_2020_demo_assignments.json"] * 2,
+        "step": [0, 10],
+        "dem_seats_16": [6, 6], "dem_seats_20": [7, 6],
+        "efficiency_gap_16": [0.09, -0.1],
+        "efficiency_gap_20": [0.1, -0.2],
+        "cut_edges": [681, 720],
+        "max_population_deviation": [0.004, 0.003],
+    })
+    crosscheck_metrics(verified, [archive])
