@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "geopandas>=1.0",
-  "gerrychain>=0.3",
+  "gerrychain==1.0.0",
   "matplotlib>=3.8",
   "networkx>=3.2",
   "numpy>=1.26",
