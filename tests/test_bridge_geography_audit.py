@@ -32,6 +32,6 @@ def test_consistent_county_is_still_not_gis_certification():
 def test_different_counties_are_detected_not_silently_treated_as_valid():
     audit=bridge_audit_from_graph(disconnected_graph(False))
     assert audit["artificial_bridges"][0]["same_source_county"] is False
-    assert audit["county_label_audit_status"].startswith("AT_LEAST_ONE")
+    assert audit["county_label_audit_status"] == "ARTIFICIAL_EDGES_CROSS_COUNTY_OR_MISSING_LABELS"
     assert audit["artificial_bridges"][0]["same_enacted_district"] is True
     assert audit["artificial_bridges"][0]["county_legal_contiguity_verified"] is False
