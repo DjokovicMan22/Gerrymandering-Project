@@ -86,6 +86,9 @@ def execute(args: argparse.Namespace) -> dict:
     target = ideal_population(reference)
     plan_rows, district_rows = [], []
     snapshots = {}
+    enacted_reference_row, _ = partition_statistics(reference, 0, target)
+    spatial_probe_rows = []
+    spatial_checkpoints = set(range(0, args.states, args.spatial_interval)) | {args.states-1}
     # The first state is the independently regenerated *warmed* map.
     for step in range(args.states):
         if step > 0:
@@ -121,6 +124,16 @@ def execute(args: argparse.Namespace) -> dict:
             snapshots[step] = {
                 str(n): str(d) for n,d in current.assignment.items()
             }
+        if step in spatial_checkpoints:
+            candidate = dict(current.assignment.items())
+            spatial_probe_rows.append({
+                "step": step,
+                "reference_fraction_different":
+                    label_invariant_distance(initial_reference, candidate)["fraction_different"],
+                "warm_start_fraction_different":
+                    label_invariant_distance(warm, candidate)["fraction_different"],
+                "assignment_sha256": assignment_digest(candidate),
+            })
         if step % 500 == 0 or step == args.states - 1:
             print(f"MH step {step}/{args.states-1}, "
                   f"accepted={mh.counts['accepted']}/{mh.counts['attempted']}, "
@@ -155,6 +168,9 @@ def execute(args: argparse.Namespace) -> dict:
         "states": args.states,
         "warm_states": args.warm_steps,
         "snapshot_interval": args.snapshot_interval,
+        "spatial_interval": args.spatial_interval,
+        "warmed_step0_is_reference": False,
+        "reference_election_scores": enacted_reference_row,
         "warm_start_sha256": warm_meta["final_assignment_sha256"],
         "sample_end_sha256": assignment_digest(final_assignment),
         "from_reference": from_reference,
@@ -181,6 +197,12 @@ def execute(args: argparse.Namespace) -> dict:
                              stem, metadata=meta)
     reports=args.output_root / "reports"
     reports.mkdir(parents=True,exist_ok=True)
+    (reports/(stem+"_reference.json")).write_text(
+        json.dumps(enacted_reference_row, indent=2), encoding="utf-8"
+    )
+    pd.DataFrame(spatial_probe_rows).to_csv(
+        reports/(stem+"_spatial_probes.csv"), index=False
+    )
     summary={
         "condition":args.condition,
         "warm_seed":args.warm_seed,
@@ -220,10 +242,13 @@ def main() -> int:
     parser.add_argument("--warm-steps",type=int,default=800)
     parser.add_argument("--states",type=int,default=2001)
     parser.add_argument("--snapshot-interval",type=int,default=100)
+    parser.add_argument("--spatial-interval",type=int,default=1000)
     parser.add_argument("--max-cut-edges",type=int,required=True)
     parser.add_argument("--max-split-counties",type=int,required=True)
     parser.add_argument("--max-split-county-mcd",type=int,required=True)
     args=parser.parse_args()
+    if args.spatial_interval < 1:
+        parser.error("--spatial-interval must be positive")
     execute(args)
     return 0
 
