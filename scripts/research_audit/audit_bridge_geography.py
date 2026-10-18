@@ -24,10 +24,56 @@ from verify_graph import digest
 BLOB = "a4dfe70818f87b97924781216f3d86a672cfc66a"
 
 
+def county_component_reachability(source) -> dict:
+    """Ask whether same-county labels can join all ORIGINAL components.
+
+    This is a source-attribute feasibility screen, not a legal/geometric
+    determination that an actual bridge exists at that location.
+    """
+    components=sorted(nx.connected_components(source),key=len,reverse=True)
+    if not components:
+        raise ValueError("Empty graph cannot support a bridge inventory")
+    group_counties=[]
+    for comp in components:
+        counties=set()
+        for node in comp:
+            raw=source.nodes[node].get("COUNTYFIPS")
+            county=str(raw).strip() if raw is not None else ""
+            if county and county.lower() not in ("nan","none"):
+                counties.add(county)
+        group_counties.append(counties)
+    component_graph=nx.Graph()
+    component_graph.add_nodes_from(range(len(components)))
+    overlap_records=[]
+    for a in range(len(components)):
+        for b in range(a+1,len(components)):
+            overlap=sorted(group_counties[a]&group_counties[b])
+            if overlap:
+                component_graph.add_edge(a,b)
+                overlap_records.append({
+                    "component_a":a,"component_b":b,
+                    "shared_source_counties":overlap,
+                })
+    return {
+        "original_component_count":len(components),
+        "original_component_sizes":[len(comp) for comp in components],
+        "source_county_overlap_edges":overlap_records,
+        "county_overlap_component_network_connected":nx.is_connected(component_graph),
+        "county_overlap_connected_components":[sorted(c) for c in
+                                               nx.connected_components(component_graph)],
+        "interpretation":(
+            "If disconnected, county-label-only bridges cannot repair this "
+            "source graph. If connected, possible county matches still require "
+            "authoritative shoreline/island GIS and legal review."
+        ),
+    }
+
+
 def bridge_audit_from_graph(graph) -> dict:
     """Return sufficient facts for independent review without inferring geometry."""
     source=graph.get_nx_graph()
     original_components=sorted([len(x) for x in nx.connected_components(source)],reverse=True)
+    county_reachability=county_component_reachability(source)
     # This mutates only an in-memory graph loaded exclusively for the audit.
     added=_connect_components_within_district(graph)
     records=[]
@@ -59,6 +105,7 @@ def bridge_audit_from_graph(graph) -> dict:
     return {
         "node_count":len(source),
         "components_before":original_components,
+        "county_component_reachability":county_reachability,
         "components_after":nx.number_connected_components(source),
         "artificial_bridge_count":len(records),
         "artificial_bridges":records,
