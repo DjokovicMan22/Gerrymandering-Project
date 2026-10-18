@@ -34,7 +34,7 @@ def read_chains(paths: list[Path], burn_in: int) -> dict[str, pd.DataFrame]:
         if df.empty or df["step"].duplicated().any() or not df["step"].is_monotonic_increasing:
             raise ValueError(f"{path}: empty, duplicated or out-of-order steps")
         if int(df["step"].iloc[0]) != 0:
-            raise ValueError(f"{path}: expected reference plan at step 0")
+            raise ValueError(f"{path}: expected chain initial state at step 0")
         if not np.isfinite(df[list(FIELDS)].to_numpy(float)).all():
             raise ValueError(f"{path}: non-finite metrics")
         retained = df.loc[df["step"] >= burn_in].reset_index(drop=True)
