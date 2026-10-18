@@ -79,7 +79,7 @@ def main() -> int:
                 if cmd[1] == str(DIAGNOSTICS) and result.returncode == 2:
                     any_diagnostic_failure = True
                     print("NOT CERTIFIED: chain diagnostics did not pass for epsilon", epsilon, file=sys.stderr)
-                if result.returncode not in (0, 2):
+                if result.returncode != 0 and not (cmd[1] == str(DIAGNOSTICS) and result.returncode == 2):
                     raise RuntimeError(f"Subprocess failed: {result.returncode}: {cmd}")
     if not args.execute:
         print("DRY RUN ONLY. Pass --execute to run. No simulations performed.")
