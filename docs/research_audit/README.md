@@ -5,6 +5,16 @@
 **Scope:** Michigan 13-district 2021-adopted congressional map; 2016 and 2020 presidential voting layers are **counterfactual scores**, not results of elections under that map.  
 **Scientific disposition:** Stage 1 reviewed; Stage 2 mathematically audited; Stage 3 exploratory feasibility demonstrated in a prior separate execution, **not publication-ready**.
 
+## Stage 3 seeded warm-start diversity — October 18, 2026
+
+**Executed:** Eight separately seeded Michigan ReCom warmup paths, each 800 recorded states, starting from the same enacted plan. All eight final plans passed independent structural/geographic/population checks. Exact **label-invariant** node-assignment differences passed the predeclared 5% minimum both relative to enacted and across all pairs: **closer** pairwise 11.56–17.47%; **relaxed** pairwise 21.17–31.33%. Geographic proposal rejection remains high (closer 76–80%; relaxed 53–57%). **This is measured diversification, not stationarity or legally representative sampling.**
+
+- [Executed results](stage3_warm_start_diversity_results.md) and [predeclared protocol](stage3_warm_start_diversity_protocol.md).
+- [Successful two-condition GitHub Actions run](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39157734877).
+- [32 passing automated tests](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39157734817).
+- Reproduction entrypoint: `scripts/research_audit/diversified_start_pilot.py`; package: `src/redistricting/ensemble/start_diversity.py`.
+- **Stage 3 scientific validation remains open:** all chains share an enacted ancestor, geographic/legal model conditions are limited, and no stationary-law or mixing certification exists.
+
 ## Geographic comparability extension — completed short pilot
 
 The October 18 **holding-kernel** geographic sensitivity pilot executed four real Michigan chains (600 recorded states each; 240 independently validated archived assignments). Enforced caps were (cut edges, split counties, split county+MCD source groups): closer (760, 18, 20) and relaxed (850, 24, 49). Rejected geographic proposals create recorded self-loops rather than invisible retries.
