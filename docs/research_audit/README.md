@@ -49,14 +49,14 @@ python scripts/research_audit/run_experiment_matrix.py --execute
 
 The matrix plans **4 seeds × 2 population tolerances × 8,000 steps**, 2,000 step burn-in, assignment snapshots every 10 steps. The driver calls the original GerryChain `run_baseline.py`, validates snapshots with `verify_snapshots.py`, and summarizes saved plan traces with `analyze_chains.py`. Data-sensitive executable work needs an environment with GerryChain and the verified original graph. The pipeline uses the **existing artificial graph bridges**; it logs neither physically verified island adjacency nor county-/municipality-split constraints, so outputs remain research models, not legally eligible plans.
 
-Saved assignments are only a **subsample**. Passing snapshot checks does not validate each unrecorded transition. Retain complete assignments or implement per-step invariant checks before a journal-quality release.
+The runner refuses to overwrite existing chain outputs unless explicitly invoked with `--overwrite`, and returns exit status 2 if diagnostic thresholds fail (while retaining those diagnostics).\n\nSaved assignments are only a **subsample**. Passing snapshot checks does not validate each unrecorded transition. Retain complete assignments or implement per-step invariant checks before a journal-quality release.
 
 ### Step C — investigate and report diagnostics
 
 Each experiment condition produces:
 
 - Original per-chain metrics, district rows, seed/epsilon metadata, and assignment snapshots under `outputs/chains/week4/`.
-- Independent snapshot-validation paired election scores under `outputs/research_audit/epsilon_*/validated_snapshots.csv`.
+- Independent snapshot-validation paired election scores under `outputs/research_audit/epsilon_*/validated_snapshots.csv`. Each saved snapshot's Democratic-seat count, efficiency gap, cut edges, and population deviation are reconciled with its original plan-metrics CSV. Any mismatch aborts the matrix.
 - Rank R-hat, bulk ESS, tail ESS, inclusive upper tails, and ±0.5% overlap under `outputs/research_audit/epsilon_*/diagnostics.csv` and `audit.json`.
 
 `analyze_chains.py` uses an intentionally conservative **diagnostic gate** (R-hat <= 1.01 and bulk/tail ESS >= 400). Passing these scalar checks would be **necessary evidence, not proof** that the sampled high-dimensional map distribution is stationary, representative, or uniform. The driver marks inadequate mixing with an exit code but retains outputs.
