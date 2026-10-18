@@ -20,6 +20,7 @@ sys.path.insert(0, str(MOD_DIR))
 
 import verify_graph
 import analyze_chains
+from metric_reconciliation import crosscheck_metrics
 
 
 def sample_graph():
@@ -98,3 +99,49 @@ def test_chain_reader_preserves_post_burn_in(tmp_path):
     assert len(chains) == 2
     assert all(len(df) == 9 for df in chains.values())
     assert all(df["step"].iloc[0] == 3 for df in chains.values())
+
+
+def test_reconciliation_accepts_consistent_saved_scores(tmp_path):
+    name = "mi_2020_demo_assignments.json"
+    archived = tmp_path / "mi_2020_demo_plan_metrics.csv"
+    data = pd.DataFrame({
+        "step": [0, 1, 2], "dem_seats": [7, 6, 7],
+        "efficiency_gap": [0.1, 0.2, -0.1],
+        "cut_edges": [5, 6, 7],
+        "max_population_deviation": [0.001, 0.002, 0.003],
+    })
+    data.to_csv(archived, index=False)
+    verified = data.copy()
+    verified["chain"] = name
+    crosscheck_metrics(verified, [archived])
+
+
+@pytest.mark.parametrize("field", ["dem_seats", "efficiency_gap", "cut_edges", "max_population_deviation"])
+def test_reconciliation_rejects_tampered_archived_stat(tmp_path, field):
+    archived = tmp_path / "mi_2020_demo_plan_metrics.csv"
+    verified = pd.DataFrame({
+        "chain": ["mi_2020_demo_assignments.json"] * 2,
+        "step": [0, 10], "dem_seats": [7, 6],
+        "efficiency_gap": [0.1, 0.2],
+        "cut_edges": [5, 6],
+        "max_population_deviation": [0.001, 0.002],
+    })
+    altered = verified.drop(columns=["chain"]).copy()
+    altered.loc[1, field] += 1
+    altered.to_csv(archived, index=False)
+    with pytest.raises(ValueError, match="disagrees"):
+        crosscheck_metrics(verified, [archived])
+
+
+def test_reconciliation_rejects_missing_archived_snapshot(tmp_path):
+    archived = tmp_path / "mi_2020_demo_plan_metrics.csv"
+    verified = pd.DataFrame({
+        "chain": ["mi_2020_demo_assignments.json"] * 2,
+        "step": [0, 10], "dem_seats": [7, 6],
+        "efficiency_gap": [0.1, 0.2],
+        "cut_edges": [5, 6],
+        "max_population_deviation": [0.001, 0.002],
+    })
+    verified.iloc[:1].drop(columns=["chain"]).to_csv(archived, index=False)
+    with pytest.raises(ValueError, match="missing recorded steps"):
+        crosscheck_metrics(verified, [archived])
