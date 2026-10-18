@@ -20,15 +20,18 @@ def _connect_components_within_district(graph: Graph, district_field: str = "CD"
     They must be documented as modeling edges, not literal shared borders.
     """
     added_edges: list[tuple] = []
+    # GerryChain 0.3+ wraps NetworkX; Graph.nodes is no longer an NX NodeView.
+    # Mutate the NetworkX backing graph while constructing the bridge convention.
+    nx_graph = graph.get_nx_graph()
 
-    while not nx.is_connected(graph):
-        components = sorted(nx.connected_components(graph), key=len, reverse=True)
+    while not nx.is_connected(nx_graph):
+        components = sorted(nx.connected_components(nx_graph), key=len, reverse=True)
         main_component = components[0]
         connected_one = False
 
         main_nodes_by_district: dict[str, list] = {}
         for node in main_component:
-            district = str(graph.nodes[node].get(district_field))
+            district = str(nx_graph.nodes[node].get(district_field))
             main_nodes_by_district.setdefault(district, []).append(node)
 
         for component in components[1:]:
@@ -48,7 +51,7 @@ def _connect_components_within_district(graph: Graph, district_field: str = "CD"
             source = min(component_nodes_by_district[district])
             target = min(main_nodes_by_district[district])
 
-            graph.add_edge(
+            nx_graph.add_edge(
                 source,
                 target,
                 artificial_bridge=True,
@@ -83,7 +86,8 @@ def load_graph(path: str | Path) -> Graph:
     if len(graph) == 0:
         raise ValueError("Graph contains no nodes.")
 
-    if not nx.is_connected(graph):
+    nx_graph = graph.get_nx_graph()
+    if not nx.is_connected(nx_graph):
         component_sizes_before = sorted(
             (len(c) for c in nx.connected_components(graph)),
             reverse=True,
@@ -103,7 +107,7 @@ def load_graph(path: str | Path) -> Graph:
                 f"within enacted district {district}"
             )
 
-    if not nx.is_connected(graph):
+    if not nx.is_connected(nx_graph):
         raise ValueError("Graph remains disconnected after bridge repair.")
 
     return graph
@@ -114,7 +118,8 @@ def validate_node_fields(graph: Graph, required: Iterable[str] = REQUIRED_NODE_F
     required = tuple(required)
     missing_by_field: dict[str, int] = {field: 0 for field in required}
 
-    for _, attrs in graph.nodes(data=True):
+    for node in graph:
+        attrs = graph.node_data(node)
         for field in required:
             if field not in attrs or attrs[field] is None:
                 missing_by_field[field] += 1
@@ -124,7 +129,7 @@ def validate_node_fields(graph: Graph, required: Iterable[str] = REQUIRED_NODE_F
         raise KeyError(f"Missing required node attributes: {missing_by_field}")
 
     nonpositive_population = sum(
-        1 for _, attrs in graph.nodes(data=True) if float(attrs["TOTPOP"]) < 0
+        1 for node in graph if float(graph.node_data(node)["TOTPOP"]) < 0
     )
     if nonpositive_population:
         raise ValueError(f"Found {nonpositive_population} nodes with negative TOTPOP.")
