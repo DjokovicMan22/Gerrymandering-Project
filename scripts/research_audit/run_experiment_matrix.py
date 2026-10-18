@@ -54,15 +54,15 @@ def main() -> int:
                    "--snapshot-interval", str(args.snapshot_interval)]
             print("+", " ".join(cmd))
             if args.execute:
+                expected_dir = ROOT / "outputs" / "chains" / "week4"
+                expected = [expected_dir / (stem + suffix) for suffix in ("_assignments.json", "_plan_metrics.csv", "_district_metrics.csv", "_metadata.json")]
+                if not args.overwrite and any(p.exists() for p in expected):
+                    raise FileExistsError("Refusing to overwrite chain artifacts: " + ", ".join(str(p) for p in expected if p.exists()))
                 subprocess.run(cmd, check=True, cwd=ROOT)
         chain_dir = ROOT / "outputs" / "chains" / "week4"
         out = ROOT / "outputs" / "research_audit" / f"epsilon_{epsilon}"
         assignment_files = [chain_dir / (s + "_assignments.json") for s in names]
         metric_files = [chain_dir / (s + "_plan_metrics.csv") for s in names]
-        if args.execute and not args.overwrite:
-            existing = [p for p in assignment_files + metric_files if p.exists()]
-            if existing:
-                raise FileExistsError("Refusing to overwrite existing experiment artifacts. Use --overwrite after review: " + ", ".join(map(str, existing)))
         verification = [sys.executable, str(VERIFIER), "--graph", str(graph),
                         "--epsilon", str(epsilon), "--assignments",
                         *map(str, assignment_files), "--output",
