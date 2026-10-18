@@ -96,3 +96,17 @@ def test_count_split_groups_counts_each_partition_group_once():
     groups = {"county1": (0, 1, 2), "county2": (3, 4, 5)}
     assignment = {0: 1, 1: 2, 2: 3, 3: 4, 4: 4, 5: 4}
     assert count_split_groups(assignment, groups) == 1
+
+
+def test_geographic_caps_on_actual_gerrychain_partition_rustworkx_backend():
+    from gerrychain import Graph, Partition, updaters
+    g = graph_with_group_keys()
+    partition = Partition(
+        graph=Graph.from_networkx(g),
+        assignment={0: 1, 1: 1, 2: 2, 3: 2, 4: 2, 5: 2},
+        updaters={"cut_edges": updaters.cut_edges},
+    )
+    evaluator = GeographicEvaluator(partition.graph, GeographicCaps(2, 1, 0))
+    assert evaluator.validate_reference(partition) == {
+        "cut_edges": 1, "split_counties": 1, "split_county_mcd": 0
+    }
