@@ -1,5 +1,6 @@
 # Stage 3 geographic-constraint pilot — executed and independently validated
 
+> **REPRODUCIBILITY ERRATUM — October 18, 2026:** The historical runs described below used GerryChain 1.0.0 without explicitly passing `rng=seed` to `MarkovChain`. Their seed labels therefore **do not reproduce exact trajectories**. The archived generated maps and scalar results remain descriptive observations but should **not** be characterized as exactly seeded/replayable. See [Stage 3 RNG reproducibility erratum](stage3_rng_reproducibility_erratum.md) and the subsequently re-executed, seeded studies.\n\n
 **Executed:** 18 October 2026  
 **Development branch:** `research/stages-1-3-validation`  
 **Authoritative holding-kernel run:** https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39123162067  
