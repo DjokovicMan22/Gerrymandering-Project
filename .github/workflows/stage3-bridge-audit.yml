@@ -1,0 +1,63 @@
+name: Stage 3 Michigan artificial bridge county and geometry audit
+
+on:
+  push:
+    branches:
+      - research/stages-1-3-validation
+    paths:
+      - .github/workflows/stage3-bridge-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-michigan-source-bridge-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install pinned data-graph library and synthetic tests
+        run: |
+          python -m pip install --disable-pip-version-check -e ".[dev]"
+          PYTHONPATH=src python -m pytest tests/test_bridge_geography_audit.py -q
+      - name: Fetch, hash-check and analyze original unmodified Michigan graph
+        run: |
+          python scripts/research_audit/download_source.py --acknowledge-source-terms
+          python scripts/research_audit/verify_graph.py \
+            --graph data/raw/mi/mi/mi.json \
+            --expected-git-blob a4dfe70818f87b97924781216f3d86a672cfc66a \
+            --expected-nodes 4756 --expected-population 10077331 \
+            --output outputs/research_audit/geographic_source_manifest.json
+          python scripts/research_audit/audit_bridge_geography.py \
+            --graph data/raw/mi/mi/mi.json \
+            --out outputs/research_audit/bridge_county_source_audit.json
+      - name: Highlight any county-inconsistent bridges without claiming GIS compliance
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("outputs/research_audit/bridge_county_source_audit.json")
+          x=json.loads(p.read_text())
+          total=x["artificial_bridge_count"]
+          suspect=[row for row in x["artificial_bridges"] if not row["same_source_county"]]
+          print(f"Audited {total} original artificial edges; {len(suspect)} have differing/missing county labels")
+          for edge in suspect:
+            print("COUNTY FLAG:",edge["node_a"],edge["node_b"],edge["county_a"],edge["county_b"])
+          with open(__import__("os").environ["GITHUB_STEP_SUMMARY"],"a") as f:
+            f.write(f"**{len(suspect)}/{total} artificial bridges have differing or missing source county identifiers.**\n\n")
+            f.write("A positive county-label check does not establish physical/legal contiguity; authoritative GIS is required.\n")
+          PY
+      - name: Preserve source-attribute audit without redistributing third-party graph
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage3-michigan-artificial-bridge-attribute-audit
+          retention-days: 90
+          path: |
+            outputs/research_audit/geographic_source_manifest.json
+            outputs/research_audit/bridge_county_source_audit.json
