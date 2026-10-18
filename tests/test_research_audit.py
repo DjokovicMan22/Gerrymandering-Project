@@ -165,3 +165,22 @@ def test_reconciliation_accepts_real_paired_year_snapshot_schema(tmp_path):
         "max_population_deviation": [0.004, 0.003],
     })
     crosscheck_metrics(verified, [archive])
+
+
+def test_reconciliation_rejects_tampered_geographic_metrics(tmp_path):
+    archived = tmp_path / "mi_2020_demo_plan_metrics.csv"
+    verified = pd.DataFrame({
+        "chain": ["mi_2020_demo_assignments.json"] * 2,
+        "step": [0, 10], "dem_seats_20": [7, 7],
+        "efficiency_gap_20": [0.01, 0.02],
+        "cut_edges": [681, 720],
+        "max_population_deviation": [0.004, 0.003],
+        "split_counties": [14, 17], "split_county_mcd": [9, 13],
+    })
+    damaged = verified.drop(columns=["chain", "dem_seats_20", "efficiency_gap_20"]).copy()
+    damaged["dem_seats"] = [7, 7]
+    damaged["efficiency_gap"] = [0.01, 0.02]
+    damaged.loc[1, "split_county_mcd"] = 19
+    damaged.to_csv(archived, index=False)
+    with pytest.raises(ValueError, match="split_county_mcd disagrees"):
+        crosscheck_metrics(verified, [archived])
