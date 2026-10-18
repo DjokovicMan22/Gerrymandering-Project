@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "geometry_proximity_only_NOT_legally_certified",
+  "graph_git_blob": "a4dfe70818f87b97924781216f3d86a672cfc66a",
+  "precinct_shapefile_git_blob": "07bce18dabbcca9d549e28995a8156fd6978d7db",
+  "candidate_method": "label_agnostic_minimum_spanning_tree_of_original_components_by_projected_polygon_distance",
+  "source_workflow": "https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39177987944",
+  "computed_crs": "EPSG:32616",
+  "edges": [
+    {
+      "u": 391,
+      "v": 1774,
+      "separation_m": 0
+    },
+    {
+      "u": 4170,
+      "v": 4448,
+      "separation_m": 222.70453976021008
+    },
+    {
+      "u": 375,
+      "v": 1775,
+      "separation_m": 14898.821668659255
+    },
+    {
+      "u": 1772,
+      "v": 1777,
+      "separation_m": 3936.218564258192
+    },
+    {
+      "u": 1765,
+      "v": 1772,
+      "separation_m": 571.8818713613581
+    }
+  ],
+  "physical_land_or_legal_island_contiguity_verified": false,
+  "do_not_use_for_legal_plan_probability": true,
+  "notes": "Source polygons were aligned to all 4756 JSON nodes via TOTPOP, CD and COUNTYFIPS. These are shortest-distance component connectors, not evidence of road access or compliance with Michigan Article IV section 6."
+}
