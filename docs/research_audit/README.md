@@ -5,6 +5,14 @@
 **Scope:** Michigan 13-district 2021-adopted congressional map; 2016 and 2020 presidential voting layers are **counterfactual scores**, not results of elections under that map.  
 **Scientific disposition:** Stage 1 reviewed; Stage 2 mathematically audited; Stage 3 exploratory feasibility demonstrated in a prior separate execution, **not publication-ready**.
 
+## Critical reproducibility correction and current Stage 3 experiments
+
+**Corrected GerryChain 1.0 seeded RNG:** Previous production/geo pilot/warmup files tagged with a `seed` were not deterministic because `random.seed` was used without `MarkovChain(rng=seed)`. Read [the documented erratum](stage3_rng_reproducibility_erratum.md) before interpreting historical results. The branch now uses `MarkovChain(rng=seed)`, pins `gerrychain==1.0.0`, and has [passed two separate-process replay smoke tests](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39162110048).
+
+**Corrected warmups:** [Eight independently seeded starting-map results](stage3_seeded_diversity_results.md) passed exact, label-invariant 5% distance gates in both geographic proxy conditions; these maps share the same enacted ancestor and are NOT stationary draws. [Verified warmup CI](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39162240056).
+
+**Current sampling experiment:** [Predeclared diversified-start protocol](stage3_diversified_sampling_protocol.md); [eight-chain production run](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39162686274). The sampling step-0 maps are warmed, **not the enacted reference**, and the aggregation script must use matching, separately scored enacted JSON references. Execution/CI completion does not imply stationary sampling or valid gerrymandering probabilities.
+
 ## Stage 3 seeded warm-start diversity — October 18, 2026
 
 **Executed:** Eight separately seeded Michigan ReCom warmup paths, each 800 recorded states, starting from the same enacted plan. All eight final plans passed independent structural/geographic/population checks. Exact **label-invariant** node-assignment differences passed the predeclared 5% minimum both relative to enacted and across all pairs: **closer** pairwise 11.56–17.47%; **relaxed** pairwise 21.17–31.33%. Geographic proposal rejection remains high (closer 76–80%; relaxed 53–57%). **This is measured diversification, not stationarity or legally representative sampling.**
