@@ -9,6 +9,7 @@ on:
       - scripts/research_audit/**
       - tests/test_research_audit.py
       - tests/test_geographic_constraints.py
+      - tests/test_start_diversity.py
       - src/redistricting/ensemble/**
       - .github/workflows/research-audit.yml
 
@@ -30,4 +31,4 @@ jobs:
           PYTHONPATH: src
         run: |
           python -m compileall -q src/redistricting/ensemble scripts/run_baseline.py
-          python -m pytest tests/test_research_audit.py tests/test_geographic_constraints.py -q
+          python -m pytest tests/test_research_audit.py tests/test_geographic_constraints.py tests/test_start_diversity.py -q
