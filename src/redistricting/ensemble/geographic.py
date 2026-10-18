@@ -102,3 +102,29 @@ class GeographicEvaluator:
         if not self(partition):
             raise ValueError(f"Starting map exceeds requested geographic caps: {score}, {self.caps}")
         return score
+
+
+class GeographicHoldingProposal:
+    """One ReCom proposal per recorded transition, with an explicit self-loop.
+
+    GerryChain's MarkovChain skips constraint-invalid proposals instead of
+    counting them as steps. For strict geographic models this can stall and
+    selects a different conditional transition kernel. Apply geographic caps
+    here, before the built-in population/contiguity checks; a rejected
+    geographic candidate returns the unchanged state. This self-loop behavior
+    must be documented in model comparisons.
+    """
+
+    def __init__(self, proposal: Any, geography: GeographicEvaluator) -> None:
+        self.proposal = proposal
+        self.geography = geography
+        self.attempted = 0
+        self.geographic_rejected = 0
+
+    def __call__(self, current: Any, *, rng: Any = None) -> Any:
+        self.attempted += 1
+        candidate = self.proposal(current, rng=rng)
+        if not self.geography(candidate):
+            self.geographic_rejected += 1
+            return current
+        return candidate
