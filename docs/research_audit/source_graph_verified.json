@@ -1,0 +1,110 @@
+{
+  "source": "https://github.com/eveomett-states/Michigan/blob/main/mi.json",
+  "git_blob_sha1": "a4dfe70818f87b97924781216f3d86a672cfc66a",
+  "source_bytes": 7651302,
+  "analysis": "Direct verification against public JSON graph fetched by immutable Git blob SHA; no new Markov chain run",
+  "nodes": 4756,
+  "edges": 12378,
+  "precinct_id_count": 4756,
+  "edge_asymmetries": 0,
+  "validation_errors": [],
+  "total_population": 10077331,
+  "ideal_district_population": 775179.3076923077,
+  "reference_district_count": 13,
+  "reference_district_population_deviation": 0.0040193182103474,
+  "reference_district_populations": {
+    "1": 774526,
+    "2": 777013,
+    "3": 776017,
+    "4": 773080,
+    "5": 775287,
+    "6": 773813,
+    "7": 775479,
+    "8": 775432,
+    "9": 772271,
+    "10": 775218,
+    "11": 778295,
+    "12": 775234,
+    "13": 775666
+  },
+  "original_component_sizes": [
+    4521,
+    227,
+    4,
+    2,
+    1,
+    1
+  ],
+  "reference_district_component_sizes_without_artificial_bridges": {
+    "1": [
+      321,
+      227,
+      2,
+      1,
+      1
+    ],
+    "2": [
+      405
+    ],
+    "3": [
+      292
+    ],
+    "4": [
+      302
+    ],
+    "5": [
+      331
+    ],
+    "6": [
+      306,
+      4
+    ],
+    "7": [
+      326
+    ],
+    "8": [
+      392
+    ],
+    "9": [
+      354
+    ],
+    "10": [
+      302
+    ],
+    "11": [
+      296
+    ],
+    "12": [
+      415
+    ],
+    "13": [
+      479
+    ]
+  },
+  "reference_cut_edges_original_graph": 681,
+  "split_county_groups": 14,
+  "split_county_mcd_groups": 9,
+  "original_votes": {
+    "PRE16D": 2268776.9999999986,
+    "PRE16R": 2279540.000000002,
+    "PRE20D": 2804046,
+    "PRE20R": 2649864
+  },
+  "reference_2016": {
+    "democratic_seats": 6,
+    "dem_votes": 2268777,
+    "rep_votes": 2279539.9999999995,
+    "efficiency_gap_pipeline_convention": -0.038749278029653667
+  },
+  "reference_2020": {
+    "democratic_seats": 7,
+    "dem_votes": 2804046,
+    "rep_votes": 2649864,
+    "efficiency_gap_pipeline_convention": 0.003333204985047425
+  },
+  "limitations": [
+    "Source Git blob authenticity does not imply that election allocations match independent official totals.",
+    "Artificial island-bridge conventions and physical topology not validated.",
+    "This is a source/reference audit only, not a Stage 3 convergence analysis or legal plan certification."
+  ]
+}
