@@ -118,6 +118,25 @@ def execute(args: argparse.Namespace) -> dict:
     if assignment_digest(snapshots[0]) != assignment_digest(warm_assignment):
         raise ValueError("Sampled chain step 0 does not match audited warm start")
 
+    # Sparse exact spatial probes, not merely scalar vote or cut-edge traces.
+    # Checkpoints are aligned to saved snapshots and span the sampled path.
+    checkpoint_steps = sorted({
+        args.snapshot_interval *
+        (((args.steps - 1) * fraction // 4) // args.snapshot_interval)
+        for fraction in range(5)
+    })
+    spatial_probes = []
+    for step in checkpoint_steps:
+        candidate = snapshots[step]
+        spatial_probes.append({
+            "step":step,
+            "reference_fraction_different":
+                label_invariant_distance(original, candidate)["fraction_different"],
+            "warm_start_fraction_different":
+                label_invariant_distance(warm_assignment, candidate)["fraction_different"],
+            "assignment_sha256":assignment_digest(candidate),
+        })
+
     endpoint = snapshots[args.steps - 1]
     endpoint_vs_reference = label_invariant_distance(original, endpoint)
     endpoint_vs_warmup = label_invariant_distance(warm_assignment, endpoint)
@@ -144,6 +163,7 @@ def execute(args: argparse.Namespace) -> dict:
         "geographic_proxy_caps": warm_config.caps.__dict__,
         "final_sample_distance_from_enacted": endpoint_vs_reference,
         "final_sample_distance_from_warm_start": endpoint_vs_warmup,
+        "spatial_probe_steps": checkpoint_steps,
         "reference_election_scores": reference_row,
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "interpretation": (
@@ -156,6 +176,9 @@ def execute(args: argparse.Namespace) -> dict:
     )
     report_dir = args.output_root / "reports"
     report_dir.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(spatial_probes).to_csv(
+        report_dir / (stem + "_spatial_probes.csv"), index=False
+    )
     (report_dir / (stem + "_reference.json")).write_text(
         json.dumps(reference_row, indent=2), encoding="utf-8"
     )
