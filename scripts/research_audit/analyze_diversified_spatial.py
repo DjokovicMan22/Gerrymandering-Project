@@ -29,7 +29,9 @@ def analyze_spatial(paths: list[Path], expected_steps: tuple[int, ...] =
         raise ValueError("Checkpoints must be ordered and distinct")
     frames = []
     for path in paths:
-        df = pd.read_csv(path)
+        # SHA-256 values may contain only digits; force strings to prevent pandas
+        # treating a 64-character hash as an arbitrary-precision integer.
+        df = pd.read_csv(path, dtype={"assignment_sha256":"string"})
         if not REQUIRED.issubset(df.columns):
             raise ValueError(f"{path}: missing columns {sorted(REQUIRED - set(df.columns))}")
         if tuple(int(v) for v in df["step"]) != expected_steps:
