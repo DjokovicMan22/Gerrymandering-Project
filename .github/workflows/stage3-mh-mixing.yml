@@ -1,0 +1,166 @@
+name: Stage 3 reversible-MH cross-chain mixing validation
+
+on:
+  push:
+    branches:
+      - research/stages-1-3-validation
+    paths:
+      - .github/workflows/stage3-mh-mixing.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reversible-mh-chains:
+    name: ${{ matrix.condition }} MH warm ${{ matrix.warm_seed }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        include:
+          - {condition: closer, cut: 760, counties: 18, mcd: 20, warm_seed: 101, sample_seed: 7101, hash: "a1cb09ace3596f11531170c14d8ed18a125d0acd7404cccb15df61956ddfa910"}
+          - {condition: closer, cut: 760, counties: 18, mcd: 20, warm_seed: 202, sample_seed: 7202, hash: "1bfdc79ef1ed8862cb1ac03bbcfe9cae02ba923128c9784dce56cc050b9112e0"}
+          - {condition: closer, cut: 760, counties: 18, mcd: 20, warm_seed: 303, sample_seed: 7303, hash: "a9b814df23174fe527663ad7716f1a1eb7cb9d7c5fa442583110841f574a3f57"}
+          - {condition: closer, cut: 760, counties: 18, mcd: 20, warm_seed: 404, sample_seed: 7404, hash: "a03356fe60f4e8dd6ce5a3a43aba1cd124c93e452d4f482b7543e8e78be999ee"}
+          - {condition: relaxed, cut: 850, counties: 24, mcd: 49, warm_seed: 101, sample_seed: 7101, hash: "fa6d219689c0fe1d47c1306bfb10a81cea59c1dd150be27e4f480ded14cf4287"}
+          - {condition: relaxed, cut: 850, counties: 24, mcd: 49, warm_seed: 202, sample_seed: 7202, hash: "031abb8e1e1d7fdd58ea39193482c9d87da34b062646d7fcb24eb5c3e563cdf8"}
+          - {condition: relaxed, cut: 850, counties: 24, mcd: 49, warm_seed: 303, sample_seed: 7303, hash: "0c8bf4b74a734f175cbaf61423f6630cd4736fb376b094f5c55198f55821e452"}
+          - {condition: relaxed, cut: 850, counties: 24, mcd: 49, warm_seed: 404, sample_seed: 7404, hash: "7b8a3989e54ec9cc9dd30824db727bd365e9fca2c7e1ec57cad24c6712c7fb2b"}
+    env:
+      CONDITION: ${{ matrix.condition }}
+      CUT: ${{ matrix.cut }}
+      COUNTIES: ${{ matrix.counties }}
+      MCD: ${{ matrix.mcd }}
+      WARM_SEED: ${{ matrix.warm_seed }}
+      SAMPLE_SEED: ${{ matrix.sample_seed }}
+      EXPECTED_HASH: ${{ matrix.hash }}
+      PYTHONUNBUFFERED: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install reproducible dependencies and check tests
+        run: |
+          python -m pip install --disable-pip-version-check -e ".[dev]"
+          python -m pip freeze > pinned-runtime.txt
+          PYTHONPATH=src python -m pytest tests/test_reversible_kernel.py tests/test_reversible_mixing.py -q
+          python -m compileall -q src/redistricting/ensemble/reversible.py scripts/research_audit
+      - name: Fetch source and verify official raw-data pin
+        run: |
+          python scripts/research_audit/download_source.py --acknowledge-source-terms
+          python scripts/research_audit/verify_graph.py \
+            --graph data/raw/mi/mi/mi.json \
+            --expected-git-blob a4dfe70818f87b97924781216f3d86a672cfc66a \
+            --expected-nodes 4756 --expected-population 10077331 \
+            --output "outputs/research_audit/mh_mixing/source_${CONDITION}_${WARM_SEED}.json"
+      - name: Exactly recreate vetted warm map and run 4000 MH proposals
+        run: |
+          python scripts/research_audit/run_reversible_pilot.py \
+            --graph data/raw/mi/mi/mi.json \
+            --output-root outputs/research_audit/mh_mixing \
+            --condition "$CONDITION" \
+            --warm-seed "$WARM_SEED" --sample-seed "$SAMPLE_SEED" \
+            --expected-warm-sha "$EXPECTED_HASH" \
+            --warm-steps 800 --states 4001 \
+            --snapshot-interval 50 --spatial-interval 1000 \
+            --epsilon 0.005 --flip-probability 0.5 \
+            --max-cut-edges "$CUT" \
+            --max-split-counties "$COUNTIES" \
+            --max-split-county-mcd "$MCD"
+      - name: Reconstruct and validate 81 complete district maps from saved assignments
+        run: |
+          STEM="mi_2020_reversible_${CONDITION}_warm${WARM_SEED}_sample${SAMPLE_SEED}_4001states"
+          DIR=outputs/research_audit/mh_mixing/chains
+          python scripts/research_audit/verify_snapshots.py \
+            --graph data/raw/mi/mi/mi.json --epsilon 0.005 \
+            --max-cut-edges "$CUT" --max-split-counties "$COUNTIES" \
+            --max-split-county-mcd "$MCD" \
+            --assignments "$DIR/${STEM}_assignments.json" \
+            --metric-files "$DIR/${STEM}_plan_metrics.csv" \
+            --output "outputs/research_audit/mh_mixing/reports/${STEM}_verified.csv"
+      - name: Preserve derived metrics, RNG and graph provenance, and crosscheck
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage3-mh-mixing-${{ matrix.condition }}-${{ matrix.warm_seed }}
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            pinned-runtime.txt
+            outputs/research_audit/mh_mixing/source_*.json
+            outputs/research_audit/mh_mixing/chains/*_plan_metrics.csv
+            outputs/research_audit/mh_mixing/chains/*_metadata.json
+            outputs/research_audit/mh_mixing/reports/*_reference.json
+            outputs/research_audit/mh_mixing/reports/*_spatial_probes.csv
+            outputs/research_audit/mh_mixing/reports/*_summary.csv
+            outputs/research_audit/mh_mixing/reports/*_verified.csv
+
+  strict-mixing-aggregation:
+    name: Cohort provenance, R-hat, ESS and spatial movement
+    needs: reversible-mh-chains
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install analysis dependencies
+        run: python -m pip install --disable-pip-version-check pandas numpy arviz
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: stage3-mh-mixing-*
+          merge-multiple: true
+          path: downloaded
+      - name: Require exact matched cohorts and compute all scalar/spatial diagnostics
+        shell: bash
+        run: |
+          set -euo pipefail
+          failed=0
+          for condition in closer relaxed; do
+            mapfile -t plans < <(find downloaded -type f -name "mi_2020_reversible_${condition}_warm*_plan_metrics.csv" | sort)
+            mapfile -t metas < <(find downloaded -type f -name "mi_2020_reversible_${condition}_warm*_metadata.json" | sort)
+            mapfile -t refs < <(find downloaded -type f -name "mi_2020_reversible_${condition}_warm*_reference.json" | sort)
+            mapfile -t probes < <(find downloaded -type f -name "mi_2020_reversible_${condition}_warm*_spatial_probes.csv" | sort)
+            if [ "${#plans[@]}" -ne 4 ] || [ "${#metas[@]}" -ne 4 ] || [ "${#refs[@]}" -ne 4 ] || [ "${#probes[@]}" -ne 4 ]; then
+              echo "INCOMPLETE $condition: need four separate chains and four references/probes/metadata" >&2
+              exit 1
+            fi
+            set +e
+            python scripts/research_audit/analyze_reversible_mixing.py \
+              --chains "${plans[@]}" --metadata "${metas[@]}" \
+              --references "${refs[@]}" --condition "$condition" \
+              --states 4001 --burn-in 1000 \
+              --out "outputs/research_audit/mh_mixing/aggregate/$condition"
+            rc=$?
+            set -e
+            if [ "$rc" -eq 2 ]; then
+              failed=1
+            elif [ "$rc" -ne 0 ]; then
+              exit "$rc"
+            fi
+            python scripts/research_audit/analyze_diversified_spatial.py \
+              --probes "${probes[@]}" --condition "$condition" \
+              --out "outputs/research_audit/mh_mixing/aggregate/$condition/spatial"
+            echo "### Reversible MH $condition" >> "$GITHUB_STEP_SUMMARY"
+            cat "outputs/research_audit/mh_mixing/aggregate/$condition/rhat_ess.csv" >> "$GITHUB_STEP_SUMMARY"
+          done
+          if [ "$failed" -eq 1 ]; then
+            echo "NOT CONVERGED: at least one rank-Rhat / bulk-or-tail-ESS gate failed." | tee outputs/research_audit/mh_mixing/aggregate/verdict.txt
+          else
+            echo "Scalar gates pass; NOT certified for component irreducibility or Michigan legal plans." | tee outputs/research_audit/mh_mixing/aggregate/verdict.txt
+          fi
+      - name: Archive diagnostics and provisional scientific verdict
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage3-mh-mixing-convergence-rhat-ess-spatial
+          retention-days: 90
+          if-no-files-found: warn
+          path: outputs/research_audit/mh_mixing/aggregate/
