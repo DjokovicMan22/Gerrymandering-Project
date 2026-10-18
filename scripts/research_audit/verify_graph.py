@@ -36,7 +36,7 @@ def read_graph(path: Path) -> nx.Graph:
 
 def digest(path: Path) -> dict[str, str | int]:
     content = path.read_bytes()
-    git_blob = hashlib.sha1(b"blob " + str(len(content)).encode() + b"\\0" + content).hexdigest()
+    git_blob = hashlib.sha1(b"blob " + str(len(content)).encode() + bytes([0]) + content).hexdigest()
     return {"sha256": hashlib.sha256(content).hexdigest(),
             "git_blob_sha1": git_blob, "size_bytes": len(content)}
 
