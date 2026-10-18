@@ -12,13 +12,21 @@ from dataclasses import dataclass
 from typing import Any
 
 
-def _nx(graph: Any) -> Any:
-    return graph.get_nx_graph() if hasattr(graph, "get_nx_graph") else graph
+def _node_items(graph: Any):
+    """Read nodes from either a NetworkX graph or GerryChain's RustworkX graph.
+
+    Creating a Partition converts GerryChain's NetworkX backend to RustworkX.
+    Calling get_nx_graph() on the resulting FrozenGraph raises TypeError.
+    The node_data/node_indices API is backend-independent.
+    """
+    if hasattr(graph, "node_indices") and hasattr(graph, "node_data"):
+        return ((node, graph.node_data(node)) for node in graph.node_indices)
+    return graph.nodes(data=True)
 
 
 def _groups(graph: Any, fields: tuple[str, ...]) -> dict[tuple[str, ...], tuple[Any, ...]]:
     result: dict[tuple[str, ...], list[Any]] = defaultdict(list)
-    for node, data in _nx(graph).nodes(data=True):
+    for node, data in _node_items(graph):
         key = []
         for field in fields:
             value = data.get(field)
