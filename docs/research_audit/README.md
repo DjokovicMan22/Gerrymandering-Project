@@ -1,3 +1,17 @@
+## Current Stage 3 scientific gate — failed (October 18, 2026)
+
+**Do not mark Stage 3 as scientifically validated and do not treat Stage 4 as a confirmed outlier analysis yet.** The latest *eight-chain reversible Metropolis–Hastings experiment* completed **32,008 recorded sample states**, all 648 saved maps passed independent reconciliation, and the exact proposal kernel passed synthetic detailed-balance tests. Nevertheless, **neither proxy-geographic condition meets the R-hat/ESS gates**: efficiency-gap R-hat **1.568** (closer) and **2.588** (relaxed), and bulk ESS **7.1** and **4.8** versus required R-hat ≤1.01 and ESS ≥400. Means lie near the hard boundary-cut caps, which raises a separate target-distribution issue.
+
+**New official-source geographical evidence:** The raw graph has six disconnected pieces and all five artificial bridge edges chosen to join them cross county identifiers. These facts do **not** establish illegality—real contiguity can cross counties—but **the particular constructed links have no independent GIS/topological validation**. Simple same-county links cannot fully connect the original graph either. Full Michigan constitutional requirements (VRA, communities, contiguity, partisan fairness, boundaries, compactness) are not implemented.
+
+- [Executed MH R-hat/ESS results and final Stage 3 blocker ledger](stage3_reversible_mixing_results.md).
+- [Complete successful eight-chain pipeline plus failed convergence findings](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39173401095).
+- [Source-pinned Michigan graph bridge audit](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39173742278).
+- Official constitutional text: https://legislature.mi.gov/Laws/MCL?objectName=mcl-Article-IV-6
+- Official commission mapping data: https://www.michigan.gov/micrc/mapping-process/mapping-data
+
+The next finite research gate is: replace/certify artificial contiguity with authoritative GIS; justify the constrained comparison distribution; develop demonstrably mixing transitions and pass prespecified diagnostics. If these fail, Stage 3 should publish a transparent negative methods result rather than claim a valid gerrymandering probability.
+
 # Stages 1–3: reproducible research-development branch
 
 **Branch:** `research/stages-1-3-validation` (separate development branch, **not a GitHub fork**).  
