@@ -5,6 +5,16 @@
 **Scope:** Michigan 13-district 2021-adopted congressional map; 2016 and 2020 presidential voting layers are **counterfactual scores**, not results of elections under that map.  
 **Scientific disposition:** Stage 1 reviewed; Stage 2 mathematically audited; Stage 3 exploratory feasibility demonstrated in a prior separate execution, **not publication-ready**.
 
+## Updated empirical execution status — October 18, 2026
+
+The historical completion ledger below predates the latest full production execution. **Eight 8,000-state GerryChain jobs completed and passed per-chain verification (64,000 recorded states; 6,400 checked saved full assignments).** The separately executed cross-chain postprocessor succeeded, but **both ±0.5% and ±2% models fail the conservative R-hat/ESS convergence requirements**. Comparison maps are also much more fragmented than the enacted reference (about 916–919 versus 681 graph cut edges), so the research is **not scientifically certified** and cannot support claims of legality or map-intent probability.
+
+- Executed findings: [stage3_executed_empirical_results.md](stage3_executed_empirical_results.md)
+- Production CI: https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39120743275
+- Successful independent diagnostics CI: https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39121398554
+- The original production CI includes a **failed legacy aggregation job** caused by an artifact path mismatch. All eight simulation/verification jobs succeeded; the independent aggregation CI succeeded, and the production workflow's path was corrected for subsequent runs.
+- A **new production run must be explicitly triggered** by changing `docs/research_audit/trigger_stage3_production.txt` on this branch; editing other research files does not inadvertently restart 64,000 expensive chain states.
+
 ## Evidence provenance
 
 - `docs/research_audit/stage1_repository_audit.md`: previously completed code/data/reproducibility audit. Static audit + 25 helper-function tests, **not** complete live rerun.
