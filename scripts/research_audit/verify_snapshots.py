@@ -78,6 +78,7 @@ def check_one(graph: nx.Graph, assignment: dict, epsilon: float,
         for node, attrs in graph.nodes(data=True):
             county_to_districts[str(attrs["COUNTYFIPS"])].add(str(assignment[str(node)]))
         row["split_county_groups"] = sum(len(ds) > 1 for ds in county_to_districts.values())
+        row["split_counties"] = row["split_county_groups"]
     if all("COUNTYFIPS" in attrs and "MCDFIPS" in attrs
            for _, attrs in graph.nodes(data=True)):
         subdivision_to_districts = defaultdict(set)
@@ -87,6 +88,7 @@ def check_one(graph: nx.Graph, assignment: dict, epsilon: float,
         row["split_county_subdivision_name_groups"] = sum(
             len(ds) > 1 for ds in subdivision_to_districts.values()
         )
+        row["split_county_mcd"] = row["split_county_subdivision_name_groups"]
     for yr in ("16", "20"):
         dv, rv = defaultdict(float), defaultdict(float)
         for node, data in graph.nodes(data=True):
@@ -115,6 +117,9 @@ def main() -> int:
     ap.add_argument("--assignments", type=Path, nargs="+", required=True)
     ap.add_argument("--epsilon", type=float, default=0.005)
     ap.add_argument("--districts", type=int, default=13)
+    ap.add_argument("--max-cut-edges", type=int)
+    ap.add_argument("--max-split-counties", type=int)
+    ap.add_argument("--max-split-county-mcd", type=int)
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--metric-files", type=Path, nargs="+", help="Corresponding original plan-level CSVs for cross-check")
     args = ap.parse_args()
@@ -130,6 +135,17 @@ def main() -> int:
             if not isinstance(assignment, dict):
                 raise ValueError("Expected JSON mapping node id -> district id")
             row = check_one(graph, assignment, args.epsilon, args.districts)
+            caps = {
+                "cut_edges": args.max_cut_edges,
+                "split_counties": args.max_split_counties,
+                "split_county_mcd": args.max_split_county_mcd,
+            }
+            for column, upper in caps.items():
+                if upper is not None:
+                    if upper < 0 or column not in row:
+                        raise ValueError(f"Cannot validate geographic cap {column}={upper}")
+                    if row[column] > upper:
+                        raise ValueError(f"Geographic cap violated at step {step}: {column}={row[column]} > {upper}")
             row.update(chain=path.name, step=int(step),
                        assignment_sha256=hashlib.sha256(
                            json.dumps(assignment, sort_keys=True).encode()).hexdigest())
