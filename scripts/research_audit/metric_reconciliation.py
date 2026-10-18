@@ -22,7 +22,7 @@ def crosscheck_metrics(verified: pd.DataFrame, metric_files: list[Path],
         observed = verified.loc[verified["chain"] == assignment_name]
         if observed.empty:
             raise ValueError(f"No verified snapshots correspond to {metric_path}")
-        archived = pd.read_csv(metric_path)
+        # Independently rescored 2020 results carry an explicit election suffix.\n        # The original single-election chain CSV uses unsuffixed metric names.\n        observed = observed.copy()\n        for field in ("dem_seats", "efficiency_gap"):\n            if field not in observed.columns:\n                named = f"{field}_20"\n                if named not in observed.columns:\n                    raise ValueError(f"Verified snapshots missing {field} / {named}")\n                observed[field] = observed[named]\n        archived = pd.read_csv(metric_path)
         needed = {"step", "dem_seats", "efficiency_gap", "cut_edges",
                   "max_population_deviation"}
         if not needed.issubset(archived.columns):
