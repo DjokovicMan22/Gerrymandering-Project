@@ -63,7 +63,8 @@ def county_component_reachability(source) -> dict:
                                                nx.connected_components(component_graph)],
         "interpretation":(
             "If disconnected, county-label-only bridges cannot repair this "
-            "source graph. If connected, possible county matches still require "
+            "source graph. But legally and physically plausible land/road connections "
+            "may cross county lines. All candidates still require "
             "authoritative shoreline/island GIS and legal review."
         ),
     }
@@ -101,7 +102,7 @@ def bridge_audit_from_graph(graph) -> dict:
         })
     status=("COUNTY_LABELS_MATCH_BUT_PHYSICAL_GEOGRAPHY_UNVERIFIED"
             if all(x["same_source_county"] for x in records)
-            else "AT_LEAST_ONE_COUNTY_LABEL_MISMATCH_OR_MISSING")
+            else "ARTIFICIAL_EDGES_CROSS_COUNTY_OR_MISSING_LABELS")
     return {
         "node_count":len(source),
         "components_before":original_components,
@@ -119,8 +120,8 @@ def bridge_audit_from_graph(graph) -> dict:
             "between districts or counties do not establish that rule."
         ),
         "research_warning":(
-            "County FIPS agreement is only a necessary source-data plausibility "
-            "check for this modeling assumption, not legal/topological validation. "
+            "County FIPS agreement is neither sufficient nor generally necessary "
+            "for geographical contiguity (actual shared land borders can cross counties). "
             "Official water, county, and precinct geometries must be inspected."
         ),
     }
