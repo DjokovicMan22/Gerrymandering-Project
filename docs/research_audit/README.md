@@ -5,6 +5,17 @@
 **Scope:** Michigan 13-district 2021-adopted congressional map; 2016 and 2020 presidential voting layers are **counterfactual scores**, not results of elections under that map.  
 **Scientific disposition:** Stage 1 reviewed; Stage 2 mathematically audited; Stage 3 exploratory feasibility demonstrated in a prior separate execution, **not publication-ready**.
 
+## Latest Stage 3 diversified-start full sampling (October 18, 2026)
+
+**Executed and independently checked:** eight **explicitly seeded GerryChain 1.0** Michigan sampling chains starting from eight cryptographically verified different warm-start maps, **32,008 recorded sample states** and **648 validated archived full assignments**. The fixed enacted reference is separately scored for comparison; the warmed sample step 0 is NOT the enacted plan. Five exact relabel-invariant spatial probes per chain show nonzero map movement.
+
+**Scientific result:** BOTH geographic models **fail every scalar R-hat/ESS convergence gate**. Under closer caps, efficiency-gap rank R-hat ~**1.733** and bulk ESS **9.4**; under relaxed caps, R-hat ~**1.139** and bulk ESS **20.4**, versus gate R-hat <=1.01 and ESS >=400. Do **not** infer a legal-plan p-value or stationary outlier probability. Physical island adjacency, municipality polygons, Michigan legal constraints, and the transition kernel's intended stationary law remain unverified.
+
+- [Authoritative report and explicit nonconvergence verdict](stage3_diversified_sampling_results.md)
+- [Production run: 8/8 sampling and validation jobs + four-chain scalar aggregation passed operational checks](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39162686274)
+- [Independent spatial movement analysis](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39163062277)
+- [Preregistered experimental parameters](stage3_diversified_sampling_protocol.md), [corrected seed-diversity study](stage3_seeded_diversity_results.md), and [historic RNG erratum](stage3_rng_reproducibility_erratum.md)
+
 ## Critical reproducibility correction and current Stage 3 experiments
 
 **Corrected GerryChain 1.0 seeded RNG:** Previous production/geo pilot/warmup files tagged with a `seed` were not deterministic because `random.seed` was used without `MarkovChain(rng=seed)`. Read [the documented erratum](stage3_rng_reproducibility_erratum.md) before interpreting historical results. The branch now uses `MarkovChain(rng=seed)`, pins `gerrychain==1.0.0`, and has [passed two separate-process replay smoke tests](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39162110048).
