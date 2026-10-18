@@ -12,6 +12,7 @@ on:
       - tests/test_start_diversity.py
       - tests/test_diversified_sampling.py
       - tests/test_diversified_spatial.py
+      - tests/test_reversible_kernel.py
       - src/redistricting/ensemble/**
       - .github/workflows/research-audit.yml
 
@@ -33,4 +34,4 @@ jobs:
           PYTHONPATH: src
         run: |
           python -m compileall -q src/redistricting/ensemble scripts/run_baseline.py
-          python -m pytest tests/test_research_audit.py tests/test_geographic_constraints.py tests/test_start_diversity.py tests/test_diversified_sampling.py tests/test_diversified_spatial.py -q
+          python -m pytest tests/test_research_audit.py tests/test_geographic_constraints.py tests/test_start_diversity.py tests/test_diversified_sampling.py tests/test_diversified_spatial.py tests/test_reversible_kernel.py -q
