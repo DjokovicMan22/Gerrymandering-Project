@@ -20,6 +20,8 @@ File: `mi.json`, pinned Git blob SHA-1: `a4dfe70818f87b97924781216f3d86a672cfc66
 Expected properties from the previously archived Stage 3 report: 4,756 nodes; 12,378 original edges; population 10,077,331; 13 reference districts; approximately 0.4019% maximum reference population deviation.  
 **Licensing:** CC BY-NC 4.0 and Redistricting Data Hub use/attribution conditions; comply with the upstream terms. Source owner disclaims legal correctness.
 
+**Directly verified on this branch:** `docs/research_audit/source_graph_verified.json` records an independent read of the immutable upstream Git blob: 4,756 nodes, 12,378 edges, zero duplicate precinct IDs, zero adjacency asymmetries, 10,077,331 census population, 13 reference districts, 681 original graph cut edges, and 14 split county / 9 split county-MCD groups. The original graph has disconnected pieces; artificial bridges have not been geographically certified.
+
 ### Step A — install dependencies and obtain verified source
 
 ```bash
