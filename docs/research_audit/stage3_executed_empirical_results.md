@@ -19,7 +19,7 @@ Each condition has four post-burn-in chains of 6,000 **serially dependent** metr
 
 ## Completed diagnostics
 
-The baseline reference scores **7 Democratic seats** under the 2020 presidential two-party vote layer, and continuous-project-convention efficiency gap **+0.003333** (positive means relative Democratic advantage). The graph reference has **681 cut edges**.
+The baseline reference scores **7 Democratic seats** under the 2020 presidential two-party vote layer, and the pipeline's floor-half-plus-one winning-threshold efficiency gap **+0.003333** (positive means relative Democratic advantage). The graph reference has **681 cut edges**.
 
 | Metric | Reference | ±0.5% pooled mean | ±0.5% R-hat | ±0.5% bulk ESS | ±2% pooled mean | ±2% R-hat | ±2% bulk ESS |
 |---|---:|---:|---:|---:|---:|---:|---:|
