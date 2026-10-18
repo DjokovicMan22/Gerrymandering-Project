@@ -155,6 +155,7 @@ def run_recom_chain(initial_partition, config: ChainConfig) -> tuple[pd.DataFram
         accept=accept.always_accept,
         initial_state=initial_partition,
         total_steps=config.total_steps,
+        rng=config.seed,  # Pin GerryChain's own Random; Python global seed is insufficient.
     )
 
     plan_rows: list[dict] = []
