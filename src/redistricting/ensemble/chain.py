@@ -12,6 +12,7 @@ import pandas as pd
 from gerrychain import MarkovChain, accept
 
 from .constraints import build_constraints
+from .geographic import GeographicCaps, GeographicEvaluator
 from .partition import ideal_population, max_population_deviation
 from .proposals import make_recom_proposal
 
@@ -23,6 +24,9 @@ class ChainConfig:
     node_repeats: int = 2
     seed: int = 2026
     snapshot_interval: int = 0
+    max_cut_edges: int | None = None
+    max_split_counties: int | None = None
+    max_split_county_mcd: int | None = None
 
     def validate(self) -> None:
         if self.total_steps < 2:
@@ -33,6 +37,8 @@ class ChainConfig:
             raise ValueError("node_repeats must be at least 1.")
         if self.snapshot_interval < 0:
             raise ValueError("snapshot_interval cannot be negative.")
+        GeographicCaps(self.max_cut_edges, self.max_split_counties,
+                       self.max_split_county_mcd)
 
 
 def _winning_threshold(total_votes: float) -> int:
@@ -128,6 +134,12 @@ def run_recom_chain(initial_partition, config: ChainConfig) -> tuple[pd.DataFram
     np.random.seed(config.seed)
 
     target_population = ideal_population(initial_partition)
+    caps = GeographicCaps(config.max_cut_edges, config.max_split_counties,
+                          config.max_split_county_mcd)
+    geography = GeographicEvaluator(initial_partition.graph, caps) if caps.active else None
+    if geography is not None:
+        reference_score = geography.validate_reference(initial_partition)
+        print(f"GEOGRAPHIC PROXY CAPS: {caps}; reference: {reference_score}", flush=True)
     proposal = make_recom_proposal(
         ideal_population=target_population,
         epsilon=config.epsilon,
@@ -135,7 +147,8 @@ def run_recom_chain(initial_partition, config: ChainConfig) -> tuple[pd.DataFram
     )
     chain = MarkovChain(
         proposal=proposal,
-        constraints=build_constraints(initial_partition, config.epsilon),
+        constraints=build_constraints(initial_partition, config.epsilon,
+                                      geography=geography),
         accept=accept.always_accept,
         initial_state=initial_partition,
         total_steps=config.total_steps,
@@ -149,6 +162,8 @@ def run_recom_chain(initial_partition, config: ChainConfig) -> tuple[pd.DataFram
         plan_row, current_district_rows = partition_statistics(
             partition, step, target_population
         )
+        if geography is not None:
+            plan_row.update(geography.score(partition))
         plan_rows.append(plan_row)
         district_rows.extend(current_district_rows)
 
