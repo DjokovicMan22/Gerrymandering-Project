@@ -71,8 +71,8 @@ def validate(graph: nx.Graph, *, population_field="TOTPOP") -> dict:
                 errors.append(f"invalid {f} at node {node!r}")
             else:
                 votes[f] += v
-        if "PRECINCTID" in a:
-            key = str(a["PRECINCTID"])
+        if "PRECINCTID" in a or "PRECINCT20" in a:
+            key = str(a.get("PRECINCTID", a.get("PRECINCT20")))
             if key in precinct_ids:
                 duplicates += 1
             precinct_ids.add(key)
