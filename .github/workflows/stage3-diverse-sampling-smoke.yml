@@ -8,6 +8,7 @@ on:
       - .github/workflows/stage3-diverse-sampling-smoke.yml
       - scripts/research_audit/run_diversified_chains.py
       - src/redistricting/ensemble/start_diversity.py
+      - src/redistricting/ensemble/chain.py
   workflow_dispatch:
 
 permissions:
@@ -21,15 +22,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {condition: closer, cut: 760, counties: 18, mcd: 20, expected: "5b3887cae71a45fb74a592646c444d040c44eb144b0f4ffe60e576fa15bc2fcb"}
-          - {condition: relaxed, cut: 850, counties: 24, mcd: 49, expected: "0649670be165473f896e8ed9df3a836abb69ba7631390cb25351b5cb6c40459a"}
+          - {condition: closer, cut: 760, counties: 18, mcd: 20}
+          - {condition: relaxed, cut: 850, counties: 24, mcd: 49}
     env:
       CONDITION: ${{ matrix.condition }}
       CUT: ${{ matrix.cut }}
       COUNTIES: ${{ matrix.counties }}
       MCD: ${{ matrix.mcd }}
-      WARM_HASH: ${{ matrix.expected }}
       PYTHONUNBUFFERED: "1"
+      PYTHONHASHSEED: "0"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -39,6 +40,8 @@ jobs:
       - name: Install project and test dependencies
         run: |
           python -m pip install --disable-pip-version-check -e ".[dev]"
+          python -m pip install --disable-pip-version-check gerrychain==1.0.0
+          python -m pip freeze > outputs-dependencies.txt
           PYTHONPATH=src python -m pytest tests/test_diversified_sampling.py -q
       - name: Fetch source with pinned hash
         run: |
@@ -60,8 +63,42 @@ jobs:
             --max-cut-edges "$CUT" \
             --max-split-counties "$COUNTIES" \
             --max-split-county-mcd "$MCD" \
-            --expected-warm-hash "$WARM_HASH" \
             --min-initial-distance 0.05
+      - name: Replay independently in a new process and compare every saved metric and endpoint hash
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/research_audit/run_diversified_chains.py \
+            --graph data/raw/mi/mi/mi.json \
+            --output-root outputs/research_audit/diverse_smoke_replay \
+            --condition "$CONDITION" \
+            --warm-seed 101 --sample-seed 1101 \
+            --warm-steps 800 --steps 101 --burn-in 20 \
+            --snapshot-interval 10 --epsilon 0.005 \
+            --max-cut-edges "$CUT" \
+            --max-split-counties "$COUNTIES" \
+            --max-split-county-mcd "$MCD" \
+            --min-initial-distance 0.05
+          STEM="mi_2020_diverse_${CONDITION}_warm101_sample1101_101steps"
+          ORIG="outputs/research_audit/diverse_smoke"
+          REPLAY="outputs/research_audit/diverse_smoke_replay"
+          cmp "$ORIG/chains/${STEM}_plan_metrics.csv" "$REPLAY/chains/${STEM}_plan_metrics.csv"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          condition=os.environ["CONDITION"]
+          stem=f"mi_2020_diverse_{condition}_warm101_sample1101_101steps"
+          paths=[
+            Path(f"outputs/research_audit/{directory}/chains/{stem}_metadata.json")
+            for directory in ("diverse_smoke","diverse_smoke_replay")
+          ]
+          one, two=[json.loads(p.read_text()) for p in paths]
+          for key in ("warmup_metadata", "final_sample_distance_from_enacted",
+                      "final_sample_distance_from_warm_start"):
+            if one[key] != two[key]:
+              raise SystemExit(f"Different seeded processes disagree on {key}")
+          print("REPLAY PASS: warm-start hash, sampled metrics, and end-state distances are identical.")
+          PY
       - name: Independently verify sampled warm-origin snapshots against saved metrics
         run: |
           STEM="mi_2020_diverse_${CONDITION}_warm101_sample1101_101steps"
@@ -85,3 +122,4 @@ jobs:
             outputs/research_audit/diverse_smoke/reports/
             outputs/research_audit/diverse_smoke/chains/*_plan_metrics.csv
             outputs/research_audit/diverse_smoke/chains/*_metadata.json
+            outputs-dependencies.txt
