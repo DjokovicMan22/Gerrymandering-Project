@@ -68,6 +68,22 @@ def check_one(graph: nx.Graph, assignment: dict, epsilon: float,
 
     row = {"districts": len(totals), "max_population_deviation": deviation,
            "cut_edges": sum(assignment[str(u)] != assignment[str(v)] for u, v in graph.edges)}
+    # Descriptive geographical fragmentation proxies, not legal constraints.
+    # Keys come from the upstream Michigan processing README.
+    if all("COUNTYFP20" in attrs for _, attrs in graph.nodes(data=True)):
+        county_to_districts = defaultdict(set)
+        for node, attrs in graph.nodes(data=True):
+            county_to_districts[str(attrs["COUNTYFP20"])].add(str(assignment[str(node)]))
+        row["split_county_groups"] = sum(len(ds) > 1 for ds in county_to_districts.values())
+    if all("COUNTYFP20" in attrs and "cousubname20" in attrs
+           for _, attrs in graph.nodes(data=True)):
+        subdivision_to_districts = defaultdict(set)
+        for node, attrs in graph.nodes(data=True):
+            label = (str(attrs["COUNTYFP20"]), str(attrs["cousubname20"]))
+            subdivision_to_districts[label].add(str(assignment[str(node)]))
+        row["split_county_subdivision_name_groups"] = sum(
+            len(ds) > 1 for ds in subdivision_to_districts.values()
+        )
     for yr in ("16", "20"):
         dv, rv = defaultdict(float), defaultdict(float)
         for node, data in graph.nodes(data=True):
