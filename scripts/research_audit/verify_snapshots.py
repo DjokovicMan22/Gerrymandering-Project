@@ -46,6 +46,8 @@ def exact_gap(d: list[float], r: list[float]) -> float:
 
 def check_one(graph: nx.Graph, assignment: dict, epsilon: float,
               expected_districts: int) -> dict:
+    # GerryChain Graph wraps NetworkX in newer releases; inspect the backing graph.
+    graph = graph.get_nx_graph() if hasattr(graph, "get_nx_graph") else graph
     graph_ids = {str(n) for n in graph.nodes}
     if set(assignment) != graph_ids:
         raise ValueError(f"assignment node set differs: missing={len(graph_ids - set(assignment))}, extra={len(set(assignment) - graph_ids)}")
