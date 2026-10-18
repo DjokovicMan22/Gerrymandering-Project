@@ -1,0 +1,3 @@
+Stage 3 postprocessing trigger for GitHub Actions run 39120743275.
+This request reuses completed per-chain artifacts and performs matched-budget R-hat/ESS diagnostics without rerunning any chains.
+Scientific convergence and geographic/legal plan eligibility are not pre-certified.
