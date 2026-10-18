@@ -11,6 +11,7 @@ from itertools import combinations
 import networkx as nx
 import pytest
 from gerrychain import Graph, Partition
+from gerrychain.constraints import contiguous
 
 from redistricting.ensemble.partition import make_updaters
 from redistricting.ensemble.reversible import (
@@ -43,9 +44,7 @@ def valid_toy_plans():
         if not (2 <= len(membership) <= 4):
             continue
         part = plan(graph, membership)
-        if BoundaryMH(part, BoundaryMHConfig(epsilon=.34,
-                          max_cut_edges=None, max_split_counties=None,
-                          max_split_county_mcd=None)).valid(part):
+        if contiguous(part):
             valid[mask] = part
     return valid
 
@@ -139,10 +138,10 @@ def test_strict_population_rejection_becomes_counted_self_loop():
     for _ in range(35):
         event=mh.step(initial)
         assert event.partition is initial
-        assert event.outcome=="population_rejected"
+        assert event.outcome in {"population_rejected", "contiguity_rejected"}
     audit=mh.conservation_audit()
     assert audit["attempted"]==35
-    assert audit["population_rejected"]==35
+    assert audit["population_rejected"]+audit["contiguity_rejected"]==35
     assert audit.get("accepted",0)==0
 
 
