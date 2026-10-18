@@ -1,0 +1,88 @@
+name: Stage 3 independent-seed warm-start diversity audit
+
+on:
+  push:
+    branches:
+      - research/stages-1-3-validation
+    paths:
+      - .github/workflows/stage3-diversity-pilot.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audited-warmup:
+    name: ${{ matrix.condition }} geography - exact start distances
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {condition: closer, max_cut: 760, max_counties: 18, max_mcd: 20}
+          - {condition: relaxed, max_cut: 850, max_counties: 24, max_mcd: 49}
+    env:
+      CONDITION: ${{ matrix.condition }}
+      CUT: ${{ matrix.max_cut }}
+      COUNTIES: ${{ matrix.max_counties }}
+      MCD: ${{ matrix.max_mcd }}
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install project and validate source code
+        run: |
+          python -m pip install --disable-pip-version-check -e ".[dev]"
+          python -m compileall -q src/redistricting/ensemble scripts/research_audit
+          PYTHONPATH=src python -m pytest tests/test_start_diversity.py -q
+      - name: Fetch immutable public Michigan source
+        run: |
+          python scripts/research_audit/download_source.py --acknowledge-source-terms
+          python scripts/research_audit/verify_graph.py \
+            --graph data/raw/mi/mi/mi.json \
+            --expected-git-blob a4dfe70818f87b97924781216f3d86a672cfc66a \
+            --expected-nodes 4756 --expected-population 10077331 \
+            --output "outputs/research_audit/warm_start_${CONDITION}_source_integrity.json"
+      - name: Generate four separately seeded constrained warmups and audit distances
+        shell: bash
+        run: |
+          set +e
+          python scripts/research_audit/diversified_start_pilot.py \
+            --graph data/raw/mi/mi/mi.json \
+            --output "outputs/research_audit/warm_starts_${CONDITION}" \
+            --warmup-steps 800 \
+            --seeds 101 202 303 404 \
+            --epsilon 0.005 \
+            --max-cut-edges "$CUT" \
+            --max-split-counties "$COUNTIES" \
+            --max-split-county-mcd "$MCD" \
+            --min-pairwise-distance 0.05 \
+            --min-reference-distance 0.05
+          rc=$?
+          set -e
+          if [ "$rc" -eq 2 ]; then
+            echo "DISTANCE GATE FAILED: bounded warmup endpoints are not sufficiently dispersed."
+            echo "The model cannot claim independent/dispersed starting maps." >> "$GITHUB_STEP_SUMMARY"
+          elif [ "$rc" -eq 0 ]; then
+            echo "Distances exceed predeclared 5% thresholds; these are still not independent stationary starts." >> "$GITHUB_STEP_SUMMARY"
+          else
+            exit "$rc"
+          fi
+          echo "### Geographic warm-start condition: $CONDITION" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "outputs/research_audit/warm_starts_${CONDITION}/label_invariant_distances.csv" ]; then
+            cat "outputs/research_audit/warm_starts_${CONDITION}/label_invariant_distances.csv" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload only source hashes, summary metrics and label-invariant distances
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage3-warm-start-distance-${{ matrix.condition }}
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            outputs/research_audit/warm_start_${{ matrix.condition }}_source_integrity.json
+            outputs/research_audit/warm_starts_${{ matrix.condition }}/
