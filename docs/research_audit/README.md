@@ -5,6 +5,17 @@
 **Scope:** Michigan 13-district 2021-adopted congressional map; 2016 and 2020 presidential voting layers are **counterfactual scores**, not results of elections under that map.  
 **Scientific disposition:** Stage 1 reviewed; Stage 2 mathematically audited; Stage 3 exploratory feasibility demonstrated in a prior separate execution, **not publication-ready**.
 
+## Reversible local sampler: specified stationary target and Michigan feasibility pilot
+
+**New Stage 3 method:** A separately defined boundary-edge Metropolis–Hastings sampler whose proposal probabilities and detailed-balance correction are explicit. Enumerative toy-map tests verify each nontrivial pair's detailed balance. The stationary measure is **uniform over each communicating component of proxy-constrained labeled assignments**—not a proven single law over all legally acceptable Michigan plans. Irreducibility, mixing time, adequate sample size, physical island geography, VRA rules, communities of interest and legal-plan uniformity are **unverified**.
+
+**Real pilot: completed successfully:** Four 2,001-state Michigan runs (2 warm seeds × 2 geographic regimes), 8,000 proposed MH transitions, **995 accepted**, **84 independently verified full assignments**. Acceptance ranged **9.20–9.25%** under closer caps and **15.35–15.95%** under relaxed caps. Despite this, exact final assignments differed from their warmup maps on only **1.7–3.7%** of precinct nodes. This is reproducible algorithmic progress, **not convergence certification or a gerrymandering p-value**.
+
+- [Proof, assumptions, transition formulas and limits](stage3_reversible_kernel_method.md).
+- [Actual pilot outcomes and rejection reasons](stage3_reversible_mh_pilot_results.md).
+- [All four successful source/seed-validated MH jobs](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39172395140).
+- Code `src/redistricting/ensemble/reversible.py`, executable `scripts/research_audit/run_reversible_pilot.py`, exact balance tests `tests/test_reversible_kernel.py`.
+
 ## Latest Stage 3 diversified-start full sampling (October 18, 2026)
 
 **Executed and independently checked:** eight **explicitly seeded GerryChain 1.0** Michigan sampling chains starting from eight cryptographically verified different warm-start maps, **32,008 recorded sample states** and **648 validated archived full assignments**. The fixed enacted reference is separately scored for comparison; the warmed sample step 0 is NOT the enacted plan. Five exact relabel-invariant spatial probes per chain show nonzero map movement.
