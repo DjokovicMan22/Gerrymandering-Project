@@ -5,6 +5,16 @@
 **Scope:** Michigan 13-district 2021-adopted congressional map; 2016 and 2020 presidential voting layers are **counterfactual scores**, not results of elections under that map.  
 **Scientific disposition:** Stage 1 reviewed; Stage 2 mathematically audited; Stage 3 exploratory feasibility demonstrated in a prior separate execution, **not publication-ready**.
 
+## Geographic comparability extension — completed short pilot
+
+The October 18 **holding-kernel** geographic sensitivity pilot executed four real Michigan chains (600 recorded states each; 240 independently validated archived assignments). Enforced caps were (cut edges, split counties, split county+MCD source groups): closer (760, 18, 20) and relaxed (850, 24, 49). Rejected geographic proposals create recorded self-loops rather than invisible retries.
+
+- **Results:** [stage3_geographic_pilot_results.md](stage3_geographic_pilot_results.md).
+- **Successful GitHub Actions pilot:** https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39123162067
+- **Scientific disposition:** closer caps rejected 71–83% of geographic proposals; both models remained fragmented relative to the enacted county/MCD split counts. **Not converged, not legally certified, not suitable for a gerrymandering p-value.** Do not pool earlier retry-kernel pilot traces with the holding-kernel traces.
+- **Model implementation:** `src/redistricting/ensemble/geographic.py`, updated `constraints.py`, `chain.py`, and `scripts/run_baseline.py`.
+- **Regression tests:** `tests/test_geographic_constraints.py` including an actual RustworkX-backed GerryChain Partition.
+
 ## Updated empirical execution status — October 18, 2026
 
 The historical completion ledger below predates the latest full production execution. **Eight 8,000-state GerryChain jobs completed and passed per-chain verification (64,000 recorded states; 6,400 checked saved full assignments).** The separately executed cross-chain postprocessor succeeded, but **both ±0.5% and ±2% models fail the conservative R-hat/ESS convergence requirements**. Comparison maps are also much more fragmented than the enacted reference (about 916–919 versus 681 graph cut edges), so the research is **not scientifically certified** and cannot support claims of legality or map-intent probability.
