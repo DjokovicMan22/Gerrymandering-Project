@@ -14,7 +14,7 @@ permissions:
 jobs:
   reuse-produced-chain-artifacts:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 150
     env:
       ORIGINAL_RUN_ID: "39120743275"
     steps:
@@ -24,6 +24,23 @@ jobs:
           python-version: '3.11'
       - name: Install postprocessing requirements
         run: python -m pip install --disable-pip-version-check pandas numpy arviz
+      - name: Wait for all eight seeded-chain artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            count=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$ORIGINAL_RUN_ID/artifacts?per_page=100" --jq '[.artifacts[].name | select(startswith("stage3-prod-"))] | length')
+            if [ "$count" -eq 8 ]; then
+              echo "All eight production artifacts are available."
+              exit 0
+            fi
+            echo "Only $count/8 archives available; retrying during this workflow."
+            sleep 60
+          done
+          echo "Archive wait exhausted: do not invent missing chain results." >&2
+          exit 1
       - name: Download original production artifacts without rerunning chains
         uses: actions/download-artifact@v4
         with:
