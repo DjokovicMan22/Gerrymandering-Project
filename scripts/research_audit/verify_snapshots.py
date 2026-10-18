@@ -116,7 +116,7 @@ def main() -> int:
     ap.add_argument("--epsilon", type=float, default=0.005)
     ap.add_argument("--districts", type=int, default=13)
     ap.add_argument("--output", type=Path, required=True)
-    ap.add_argument("--metric-files", type=Path, nargs="+, help="Corresponding original plan-level CSVs for cross-check")
+    ap.add_argument("--metric-files", type=Path, nargs="+", help="Corresponding original plan-level CSVs for cross-check")
     args = ap.parse_args()
     if not 0 < args.epsilon < 1 or args.districts < 2:
         ap.error("Invalid epsilon or district count")
