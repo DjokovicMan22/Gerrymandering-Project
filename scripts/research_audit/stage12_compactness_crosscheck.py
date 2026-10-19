@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Independently recompute Michigan Polsby–Popper and convex-hull compactness.
+"""Independently recompute Michigan Polsby–Popper, Reock and hull compactness.
 
 Uses source ZIP polygons, not saved district geometries or the original Week 2
-metric implementation. A passed check does not certify Reock's enclosing circle,
-projection choice, legal geography, or the underlying raw RDH polygon joins.
+metric implementation. Reock uses GEOS minimum_bounding_radius instead of the\noriginal randomized circle code. A passed check does not certify legal geography\nor the underlying raw RDH polygon joins.
 """
 from __future__ import annotations
 
@@ -16,6 +15,7 @@ from zipfile import ZipFile
 
 import geopandas as gpd
 import pandas as pd
+from shapely import minimum_bounding_radius
 
 from geometry_bridge_validation import align_precincts, git_blob
 from verify_graph import read_graph, digest
@@ -65,29 +65,36 @@ def recompute(graph_path: Path, zip_path: Path, table_path: Path) -> dict:
         hull_area = float(geom.convex_hull.area)
         if area <= 0 or perimeter <= 0 or hull_area <= 0:
             raise ValueError(f"Degenerate dissolved district geometry: {label}")
+        radius = float(minimum_bounding_radius(geom))
+        if not math.isfinite(radius) or radius <= 0:
+            raise ValueError(f"Invalid minimum enclosing circle radius for district {label}")
         metrics = {
             "area": area, "perimeter": perimeter, "convex_hull_area": hull_area,
+            "reock": area / (math.pi * radius**2),
             "polsby_popper": 4 * math.pi * area / perimeter**2,
             "convex_hull_ratio": area / hull_area,
         }
         for metric, value in metrics.items():
             reference = float(stored.loc[label, metric])
-            if not math.isclose(value, reference, rel_tol=2e-6, abs_tol=1e-7):
+            if not math.isclose(value, reference,
+                                rel_tol=1e-4 if metric == "reock" else 2e-6,
+                                abs_tol=1e-7):
                 raise ValueError(
                     f"District {label} {metric} mismatches saved Week 2: "
                     f"independent {value}, archive {reference}"
                 )
         rows.append({"district": label, **metrics,
-                     "saved_Week2_Polsby_and_hull_match": True})
+                     "saved_Week2_Polsby_Reock_and_hull_match": True})
     return {
         "source_graph_git_blob_sha1": GRAPH_BLOB,
         "source_precinct_zip_git_blob_sha1": ZIP_BLOB,
         "source_geometry_crs": str(polygons.crs),
         "source_alignment_method": alignment["method"],
         "districts_recomputed": len(rows),
-        "all_13_Polsby_and_hull_scores_reconciled": True,
+        "all_13_Polsby_Reock_and_hull_scores_reconciled": True,
         "district_metrics": rows,
-        "Reock_independently_recomputed": False,
+        "Reock_independently_recomputed": True,
+        "Reock_method": "GEOS minimum_bounding_radius via Shapely; independent of project randomized circle implementation",
         "legal_geography_certified": False,
         "raw_RDH_source_joins_reconstructed": False,
     }
