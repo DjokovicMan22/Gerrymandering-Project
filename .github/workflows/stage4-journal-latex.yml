@@ -1,0 +1,147 @@
+name: Stage 4 Phantom Baseline journal LaTeX
+
+on:
+  push:
+    branches:
+      - research/stages-1-3-validation
+    paths:
+      - .github/workflows/stage4-journal-latex.yml
+      - scripts/research_audit/stage4_journal_figures.py
+      - scripts/research_audit/stage4_prepare_latex.py
+      - scripts/research_audit/stage4_journal_typography.tex
+      - outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  typeset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/stages-1-3-validation
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install XeLaTeX, STIX math, Pandoc and vector plotting
+        run: |
+          sudo apt-get -qq update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended \
+            texlive-lang-english fonts-stix poppler-utils
+          python -m pip install numpy pandas matplotlib pymupdf
+          python -m compileall -q scripts/research_audit/stage4_journal_figures.py scripts/research_audit/stage4_prepare_latex.py
+          fc-match STIX
+          fc-match 'STIX Math'
+      - name: Retrieve original independently audited Stage 3 endpoint scores
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39180152601
+          github-token: ${{ github.token }}
+          name: stage3-finite-horizon-final-methodological-outcomes
+          path: outputs/reports/stage4/original_scored_endpoints
+      - name: Generate restrained, original-data, vector print graphics
+        run: |
+          python scripts/research_audit/stage4_journal_figures.py \
+            --endpoints outputs/reports/stage4/original_scored_endpoints/independent_endpoints_64.csv \
+            --summary outputs/reports/stage4/original_scored_endpoints/final_stage3_finite_horizon_summary.json \
+            --out-dir outputs/reports/stage4/figures
+      - name: Prepare real XeLaTeX with booktabs floats, STIX math and numbered equations
+        run: |
+          python scripts/research_audit/stage4_prepare_latex.py \
+            --manuscript outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md \
+            --header scripts/research_audit/stage4_journal_typography.tex \
+            --prepared outputs/reports/stage4/_phantom_compilation.md \
+            --tex outputs/reports/stage4/phantom_baseline.tex
+      - name: Compile source with XeLaTeX and fail on any TeX error
+        run: |
+          set -euo pipefail
+          cd outputs/reports/stage4
+          mkdir -p _journal_build
+          latexmk -xelatex -interaction=nonstopmode -halt-on-error -file-line-error \
+            -outdir=_journal_build phantom_baseline.tex
+          cp _journal_build/phantom_baseline.pdf phantom_baseline.pdf
+          cp phantom_baseline.pdf when_a_random_map_is_not_a_neutral_map.pdf
+          pdfinfo phantom_baseline.pdf | head -20
+      - name: Validate equations, captions, pagination and render first, results and last pages
+        run: |
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          import fitz
+          root=Path("outputs/reports/stage4")
+          tex=(root/"phantom_baseline.tex").read_text()
+          doc=fitz.open(root/"phantom_baseline.pdf")
+          if tex.count(r"\begin{equation}")<4:raise ValueError("Missing numbered LaTeX equations")
+          if tex.count(r"\begin{table}")<2:raise ValueError("Missing booktabs tables")
+          if tex.count(r"\begin{figure}")<3:raise ValueError("Missing original-data figure floats")
+          if not 12<=len(doc)<=38:raise ValueError("PDF page count out of plausible range")
+          pages=[p.get_text() for p in doc]
+          if min(len(p.strip()) for p in pages)<40:raise ValueError("Nearly blank page detected")
+          combined=" ".join(pages).lower()
+          for token in ["the phantom baseline","geographic","mixing","32","0.03278",
+                        "gate a","gate b","gate c","references"]:
+              if token not in combined:raise ValueError("Searchable PDF missing "+token)
+          previews={"first":0,"last":len(doc)-1}
+          for name,fragment in [("equations","population equality"),("results","terminal outcomes"),
+                                ("figure","empirical cumulative distributions")]:
+              page=next((i for i,p in enumerate(pages) if fragment in p.lower()),None)
+              if page is not None:previews[name]=page
+          out=root/"latex_previews";out.mkdir(exist_ok=True)
+          for name,index in previews.items():
+              doc[index].get_pixmap(matrix=fitz.Matrix(1.45,1.45),alpha=False).save(str(out/(name+".png")))
+          report={
+            "status":"PASS_TRUE_XELATEX_SCIENTIFIC_MANUSCRIPT",
+            "title":"The Phantom Baseline",
+            "pages":len(doc),
+            "numbered_equations":tex.count(r"\begin{equation}"),
+            "booktabs_tables":tex.count(r"\begin{table}"),
+            "vector_figure_floats":tex.count(r"\begin{figure}"),
+            "pdf_sha256":hashlib.sha256((root/"phantom_baseline.pdf").read_bytes()).hexdigest(),
+            "latex_sha256":hashlib.sha256(tex.encode()).hexdigest(),
+            "preview_pages":previews,
+            "limitation":"model-conditional experiments; no validated legal neutral map null"
+          }
+          (root/"phantom_latex_build_manifest.json").write_text(json.dumps(report,indent=2))
+          print("PHANTOM_LATEX_PREFLIGHT_PASS",report)
+          PY
+      - name: Commit editable LaTeX, figures, PDF and page previews to research branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add outputs/reports/stage4/phantom_baseline.tex \
+                  outputs/reports/stage4/phantom_baseline.pdf \
+                  outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.pdf \
+                  outputs/reports/stage4/phantom_latex_build_manifest.json \
+                  outputs/reports/stage4/figures/figure*.pdf \
+                  outputs/reports/stage4/figures/figure*.svg \
+                  outputs/reports/stage4/figures/figure*.png \
+                  outputs/reports/stage4/figures/stage4_journal_figure_manifest.json \
+                  outputs/reports/stage4/latex_previews/
+          if git diff --cached --quiet; then
+            echo "Identical journal artifacts already committed"
+          else
+            git commit -m "Publish Phantom Baseline XeLaTeX paper and redesigned journal figures"
+            git fetch origin research/stages-1-3-validation
+            git rebase origin/research/stages-1-3-validation
+            git push origin HEAD:refs/heads/research/stages-1-3-validation
+          fi
+      - name: Archive PDF, editable TeX, original-data figures and compiler logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage4-phantom-baseline-true-latex
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            outputs/reports/stage4/phantom_baseline.tex
+            outputs/reports/stage4/phantom_baseline.pdf
+            outputs/reports/stage4/phantom_latex_build_manifest.json
+            outputs/reports/stage4/figures/figure*
+            outputs/reports/stage4/latex_previews/*.png
+            outputs/reports/stage4/_journal_build/*.log
