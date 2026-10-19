@@ -7,6 +7,8 @@ on:
     paths:
       - .github/workflows/stage12-reproducibility.yml
       - scripts/research_audit/stage12_*
+      - tests/test_stage12_audit.py
+      - src/redistricting/ensemble/partition.py
       - docs/data_provenance.md
       - docs/data_sources.md
   workflow_dispatch:
