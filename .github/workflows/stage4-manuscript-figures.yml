@@ -1,0 +1,79 @@
+name: Stage 4 original-evidence figures and paired endpoint robustness
+
+on:
+  push:
+    branches:
+      - research/stages-1-3-validation
+    paths:
+      - scripts/research_audit/stage4_make_figures.py
+      - .github/workflows/stage4-manuscript-figures.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  verified-experimental-figures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install plotting/uncertainty dependencies
+        run: |
+          python -m pip install --disable-pip-version-check numpy pandas matplotlib
+          python -m compileall -q scripts/research_audit/stage4_make_figures.py
+      - name: Retrieve exact successful 64-endpoint Stage 3 research artifact, not fabricated plotting inputs
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39180152601
+          github-token: ${{ github.token }}
+          name: stage3-finite-horizon-final-methodological-outcomes
+          path: outputs/reports/stage4/source
+      - name: Prove inputs and generate three source-linked publication figures and paired Monte Carlo contrasts
+        run: |
+          find outputs/reports/stage4/source -type f -maxdepth 3 -print
+          python scripts/research_audit/stage4_make_figures.py \
+            --endpoints outputs/reports/stage4/source/independent_endpoints_64.csv \
+            --summary outputs/reports/stage4/source/final_stage3_finite_horizon_summary.json \
+            --out-dir outputs/reports/stage4/figures
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("outputs/reports/stage4/figures")
+          x=json.loads((root/"stage4_figure_data_manifest.json").read_text())
+          assert len(x["plot_files"])==6
+          assert x["comparison"]["n_seed_labels_per_condition"]==32
+          assert x["comparison"]["not_a_neutral_map_inference"] is True
+          for name in x["plot_files"]:
+              path=root/name
+              assert path.stat().st_size>4000
+              print("VALIDATED_FIGURE",name,path.stat().st_size,"bytes")
+          PY
+      - name: Explain inferential limits in job summary
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path("outputs/reports/stage4/figures/stage4_figure_data_manifest.json")
+          x=json.loads(p.read_text())
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as f:
+              f.write("**PASS: three publication figures created from the ORIGINAL, independently verified 64-map Stage 3 aggregate**.\n\n")
+              for metric,row in x["comparison"]["paired_mean_difference"].items():
+                  f.write(f"- {metric}, closer − relaxed mean: {row['mean_closer_minus_relaxed']:.5f}; paired bootstrap 95% CI {row['paired_bootstrap_95pct_CI_closer_minus_relaxed']}.\n")
+              f.write("\n**Important:** The plots characterize 800-transition reference-anchored experimental proximity-map output, NOT legally valid neutral map probability.\n")
+          PY
+      - name: Preserve plots, source score inputs and verification manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage4-original-64-endpoint-publication-figures
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            outputs/reports/stage4/figures/
+            outputs/reports/stage4/source/independent_endpoints_64.csv
+            outputs/reports/stage4/source/final_stage3_finite_horizon_summary.json
