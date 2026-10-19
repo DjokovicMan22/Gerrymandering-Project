@@ -93,13 +93,25 @@ def verify_against_packet(reference: dict, packet: Path) -> dict:
                 name = f"outputs/chains/week4/mi_{year}_chain{idx}_7000steps_seed{seed}_plan_metrics.csv"
                 original = pd.read_csv(io.BytesIO(z.read(name))).iloc[0]
                 target = reference["elections"][yr]
+                deltas = {}
                 for metric in ("dem_seats", "efficiency_gap", "mean_median"):
-                    if not math.isclose(float(original[metric]), target[metric], abs_tol=2e-8):
-                        raise ValueError(f"{name}: independently computed {metric}={target[metric]} disagrees with archive step zero={float(original[metric])}")
+                    delta = float(original[metric]) - target[metric]
+                    deltas[metric] = delta
+                    # 2016 source has tiny fractional precinct allocations.
+                    # Floor(total/2)+1 can change by ONE vote depending on
+                    # tally summation order near an exact integer threshold.
+                    # Permit at most one statewide wasted vote, but record it.
+                    votes = target["dem_votes"] + target["rep_votes"]
+                    tolerance = (1.0 / votes + 1e-9) if yr == "16" and metric == "efficiency_gap" else 2e-8
+                    if not math.isclose(float(original[metric]), target[metric],
+                                        rel_tol=0, abs_tol=tolerance):
+                        raise ValueError(f"{name}: independently computed {metric}={target[metric]} disagrees with archive step zero={float(original[metric])}; delta={delta}")
                 for metric in ("cut_edges", "max_population_deviation"):
                     if not math.isclose(float(original[metric]), reference[metric], abs_tol=2e-8):
                         raise ValueError(f"{name}: independently computed {metric} disagrees with archive step zero")
-                verified[name] = True
+                verified[name] = {"matches_within_stated_numeric_tolerance": True,
+                                  "archive_minus_independent_deltas": deltas,
+                                  "2016_EG_one_wasted_vote_roundoff_tolerance": yr == "16"}
     return verified
 
 
@@ -120,6 +132,7 @@ def main() -> None:
         "independently_computed_reference": reference,
         "original_archive_step0_files_crosschecked": verified,
         "all_six_2016_2020_archived_references_match": len(verified) == 6,
+        "2016_roundoff_warning": "2016 processed precinct votes are fractional; the historical floor-half-plus-one wasted-vote rule may change by one vote depending on floating tally order. Deltas recorded for each archive reference; this is not evidence of an election-level difference.",
         "original_transition_histories_replayed": False,
         "upstream_Census_VEST_raw_joins_recreated": False,
         "legal_contiguity_certified": False,
