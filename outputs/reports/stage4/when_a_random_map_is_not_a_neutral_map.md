@@ -136,12 +136,8 @@ Because the neutral stationary target was not verified, the final experiment del
 
 $$
 Q_{c,T}(A)
-=\Pr\!\left(
-X_T\in A\;\middle|\;
-X_0=x_{\mathrm{enacted}},\
-G=G_{\mathrm{KNN3}},\
-P=P_c
-\right),\quad T=800.
+=\Pr\bigl(X_T\in A\mid X_0=x_{\mathrm{enacted}},
+G=G_{\mathrm{KNN3}},P=P_c\bigr),\quad T=800.
 $$
 
 Here $T=800$ recorded transitions after step zero. The estimand $\mathbb{E}_{Q_{c,T}}[f(X_T)]$ is meaningful by construction: it describes what this particular algorithm produces after a fixed computational horizon starting from a particular map. It does **not** imply a unique stationary target, unbiased representation of legal maps, or independence of the final state from the enacted reference. This weaker estimand is the subject of our finite-horizon comparison.
