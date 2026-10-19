@@ -1,13 +1,7 @@
+# Legacy HTML PDF renderer (retired from automatic builds). Canonical release is stage4-journal-latex.yml.
 name: Stage 4 submission-format PDF and visual preflight
 
 on:
-  push:
-    branches:
-      - research/stages-1-3-validation
-    paths:
-      - outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md
-      - scripts/research_audit/stage4_render_pdf.py
-      - .github/workflows/stage4-paper-pdf.yml
   workflow_dispatch:
 
 permissions:
