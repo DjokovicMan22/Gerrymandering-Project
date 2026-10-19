@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import math
 from typing import Iterable
 
 import networkx as nx
@@ -114,25 +115,56 @@ def load_graph(path: str | Path) -> Graph:
 
 
 def validate_node_fields(graph: Graph, required: Iterable[str] = REQUIRED_NODE_FIELDS) -> None:
-    """Raise a clear error when required node attributes are absent or malformed."""
+    """Reject missing, nonnumeric, nonfinite or negative population/election inputs.
+
+    A zero-population precinct is allowed (water/islands may be unpopulated).
+    Each election-scored district must nevertheless have strictly positive
+    total two-party votes. This is input integrity, not a certified VEST join.
+    """
     required = tuple(required)
     missing_by_field: dict[str, int] = {field: 0 for field in required}
+    invalid_by_field: dict[str, int] = {field: 0 for field in required
+                                      if field == "TOTPOP" or field.startswith("PRE")}
+    district_vote_totals: dict[str, float] = {}
 
     for node in graph:
         attrs = graph.node_data(node)
         for field in required:
             if field not in attrs or attrs[field] is None:
                 missing_by_field[field] += 1
+                continue
+            if field == "TOTPOP" or field.startswith("PRE"):
+                try:
+                    value = float(attrs[field])
+                except (TypeError, ValueError, OverflowError):
+                    invalid_by_field[field] += 1
+                    continue
+                if not math.isfinite(value) or value < 0:
+                    invalid_by_field[field] += 1
+        if "CD" in attrs and attrs["CD"] is not None:
+            vote_fields = [f for f in required if f.startswith("PRE")]
+            if len(vote_fields) == 2 and all(
+                f in attrs and attrs[f] is not None for f in vote_fields
+            ):
+                try:
+                    votes = [float(attrs[f]) for f in vote_fields]
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                if all(math.isfinite(v) and v >= 0 for v in votes):
+                    label = str(attrs["CD"])
+                    district_vote_totals[label] = district_vote_totals.get(label, 0.0) + sum(votes)
 
-    missing_by_field = {k: v for k, v in missing_by_field.items() if v}
-    if missing_by_field:
-        raise KeyError(f"Missing required node attributes: {missing_by_field}")
-
-    nonpositive_population = sum(
-        1 for node in graph if float(graph.node_data(node)["TOTPOP"]) < 0
-    )
-    if nonpositive_population:
-        raise ValueError(f"Found {nonpositive_population} nodes with negative TOTPOP.")
+    missing = {k: v for k, v in missing_by_field.items() if v}
+    invalid = {k: v for k, v in invalid_by_field.items() if v}
+    if missing:
+        raise KeyError(f"Missing required node attributes: {missing}")
+    if invalid:
+        raise ValueError(f"Invalid negative, nonnumeric or nonfinite node values: {invalid}")
+    if any(f.startswith("PRE") for f in required):
+        # A zero-total district produces undefined partisan vote shares and EG.
+        zero = sorted(label for label, value in district_vote_totals.items() if value <= 0)
+        if zero:
+            raise ValueError(f"Districts with zero two-party votes: {zero}")
 
 
 def make_updaters(dem_column: str = "PRE20D", rep_column: str = "PRE20R") -> dict:
