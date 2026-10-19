@@ -132,7 +132,7 @@ in Computational Redistricting\par}
 \vspace{5pt}
 
 \begin{abstract}
-**An ensemble's apparent objectivity depends on how its baseline was constructed.** We investigate three independently testable vulnerabilities in computational redistricting—geographic topology, Markov-chain exploration, and constraint dependence—using source-matched Michigan precinct geography and counterfactual presidential-vote overlays. First, a previously used graph-repair procedure selected five artificial edges according to enacted congressional labels; the endpoint polygons were separated by approximately **42–280 km**. A district-blind proximity alternative retained reference connectivity with 13 candidate links and a maximum separation of **17.8 km**, although the resulting graph is not an independently certified legal adjacency model. Second, multi-chain diagnostics rejected the treatment of tested sampler outputs as converged ensemble draws: one ReCom condition yielded rank-normalized **R-hat 1.733** and bulk effective sample size **9.4**; a local reversible Metropolis–Hastings configuration yielded **R-hat 2.588**. Third, we implement a deliberately specified finite-horizon **stress test**, rather than infer a stationary law from failed convergence. Across 64 separately seeded 800-transition terminal maps, relaxing a composite set of geographic caps increased precinct reassignment by **15.61 percentage points** and reduced mean Democratic seats by **0.406** and mean efficiency gap by **0.03278**. The tighter-minus-relaxed efficiency-gap contrast had a paired-bootstrap 95% interval of **[+0.00975, +0.05631]**. We use these results to define an operational **baseline reliability protocol**: source-grounded topology, target-specific exploration evidence, and explicit assumption-sensitivity checks. The experiments identify how a reproducible computational baseline can depend materially on modeling decisions; they do not claim to establish the distribution of all lawful Michigan maps.
+An ensemble's apparent objectivity depends on how its baseline was constructed. We investigate three independently testable vulnerabilities in computational redistricting—geographic topology, Markov-chain exploration, and constraint dependence—using source-matched Michigan precinct geography and counterfactual presidential-vote overlays. First, a previously used graph-repair procedure selected five artificial edges according to enacted congressional labels; the endpoint polygons were separated by approximately 42–280 km. A district-blind proximity alternative retained reference connectivity with 13 candidate links and a maximum separation of 17.8 km, although the resulting graph is not an independently certified legal adjacency model. Second, multi-chain diagnostics rejected the treatment of tested sampler outputs as converged ensemble draws: one ReCom condition yielded rank-normalized R-hat 1.733 and bulk effective sample size 9.4; a local reversible Metropolis–Hastings configuration yielded R-hat 2.588. Third, we implement a deliberately specified finite-horizon stress test, rather than infer a stationary law from failed convergence. Across 64 separately seeded 800-transition terminal maps, relaxing a composite set of geographic caps increased precinct reassignment by 15.61 percentage points and reduced mean Democratic seats by 0.406 and mean efficiency gap by 0.03278. The tighter-minus-relaxed efficiency-gap contrast had a paired-bootstrap 95% interval of [+0.00975, +0.05631]. We use these results to define an operational baseline reliability protocol: source-grounded topology, target-specific exploration evidence, and explicit assumption-sensitivity checks. The experiments identify how a reproducible computational baseline can depend materially on modeling decisions; they do not claim to establish the distribution of all lawful Michigan maps.
 
 \end{abstract}
 
@@ -141,14 +141,14 @@ Monte Carlo; ReCom; graph topology; computational reproducibility;
 sampling convergence; geographic sensitivity; Michigan.
 
 \hypertarget{introduction}{%
-\subsection{Introduction}\label{introduction}}
+\section{Introduction}\label{introduction}}
 
-\textbf{A redistricting ensemble does not become an objective baseline
-simply because it contains many maps.} What a histogram means depends on
-the graph used to define districts, the rules that determine
-admissibility, the transition kernel that explores them, and whether the
-resulting sample adequately approximates the claimed distribution. These
-are substantive modeling decisions. A stable-looking percentile does not
+A redistricting ensemble does not become an objective baseline simply
+because it contains many maps. What a histogram means depends on the
+graph used to define districts, the rules that determine admissibility,
+the transition kernel that explores them, and whether the resulting
+sample adequately approximates the claimed distribution. These are
+substantive modeling decisions. A stable-looking percentile does not
 independently establish that its counterfactual alternatives were
 neutral or legally plausible.
 
@@ -165,40 +165,37 @@ methods as uniformly defective. We examine a concrete pipeline to
 identify the vulnerabilities that any claimed baseline should be able to
 survive.
 
-The empirical analysis is organized around three \textbf{failure
-channels}. \textbf{Topology:} arbitrarily inserted graph edges can
-determine which congressional districts count as connected, and
-conditioning such repairs on the enacted map can contaminate a
-purportedly external baseline. \textbf{Mixing:} a chain may make many
-proposals or record thousands of maps without supplying independent
-information about the intended stationary law. \textbf{Constraint
-selection:} altering researcher-specified fragmentation caps can change
-the finite-horizon distribution of both geographic movement and partisan
-outcomes.
+The empirical analysis is organized around three failure channels.
+Topology: arbitrarily inserted graph edges can determine which
+congressional districts count as connected, and conditioning such
+repairs on the enacted map can contaminate a purportedly external
+baseline. Mixing: a chain may make many proposals or record thousands of
+maps without supplying independent information about the intended
+stationary law. Constraint selection: altering researcher-specified
+fragmentation caps can change the finite-horizon distribution of both
+geographic movement and partisan outcomes.
 
 We investigate these channels using pinned 2020 Michigan precinct data.
 Original polygon geometry permits the measurement of artificial-edge
 separations. Independently seeded multi-chain studies supply
 rank-normalized convergence diagnostics. A separate, expressly
-finite-horizon experiment produces \textbf{64 independently verified
-terminal assignments}, with \textbf{32 seed-indexed runs in each of two
-composite constraint regimes}. On the same model graph and 2020
-presidential-vote overlay, relaxing those caps increased mean precinct
-reassignment by \textbf{15.61 percentage points} while decreasing
-Democratic seats by \textbf{0.406} and efficiency gap by
-\textbf{0.03278}. This signed direction matters: a comparison of two
-modeled procedures is not a generic statement that relaxing rules
+finite-horizon experiment produces 64 independently verified terminal
+assignments, with 32 seed-indexed runs in each of two composite
+constraint regimes. On the same model graph and 2020 presidential-vote
+overlay, relaxing those caps increased mean precinct reassignment by
+15.61 percentage points while decreasing Democratic seats by 0.406 and
+efficiency gap by 0.03278. This signed direction matters: a comparison
+of two modeled procedures is not a generic statement that relaxing rules
 benefits a particular party.
 
-\textbf{Our contribution is an executable way to interrogate a baseline,
-not a new asymptotic sampling theorem.} We turn the case findings into
-three auditable gates---independent geographic provenance,
-target-specific sampling diagnostics, and a quantitative
-constraint-perturbation check---each with records, criteria, and failure
-consequences. The study demonstrates why these gates are operationally
-consequential in one source-reconciled experiment. Establishing how
-often published analyses or expert testimony fail them remains a
-separate empirical task.
+Our contribution is an executable way to interrogate a baseline, not a
+new asymptotic sampling theorem. We turn the case findings into three
+auditable gates---independent geographic provenance, target-specific
+sampling diagnostics, and a quantitative constraint-perturbation
+check---each with records, criteria, and failure consequences. The study
+demonstrates why these gates are operationally consequential in one
+source-reconciled experiment. Establishing how often published analyses
+or expert testimony fail them remains a separate empirical task.
 
 The paper first formalizes the computational baseline and verifies its
 sources. It then presents the topology, mixing, and constraint
@@ -207,11 +204,11 @@ researchers can apply before interpreting simulated maps as a neutral
 comparison.
 
 \hypertarget{defining-a-computational-baseline}{%
-\subsection{Defining a computational
+\section{Defining a computational
 baseline}\label{defining-a-computational-baseline}}
 
 \hypertarget{geographic-topology-defines-the-state-space}{%
-\subsubsection{Geographic topology defines the state
+\subsection{Geographic topology defines the state
 space}\label{geographic-topology-defines-the-state-space}}
 
 Represent a precinct-level state as an undirected graph \(G=(V,E)\).
@@ -251,7 +248,7 @@ is therefore a proposed \emph{model of admissibility}, not a legal
 determination.
 
 \hypertarget{the-transition-kernel-and-its-target}{%
-\subsubsection{The transition kernel and its
+\subsection{The transition kernel and its
 target}\label{the-transition-kernel-and-its-target}}
 
 Even after selecting a graph and feasible set \(S\), an ensemble needs a
@@ -286,7 +283,7 @@ target. Neither output should automatically be treated as a sample of
 legal maps.
 
 \hypertarget{interpretation-of-partisan-scores}{%
-\subsubsection{Interpretation of partisan
+\subsection{Interpretation of partisan
 scores}\label{interpretation-of-partisan-scores}}
 
 We use Democratic seats under a fixed two-party presidential vote
@@ -321,11 +318,11 @@ counterfactually to the congressional plan adopted in 2021; they are not
 observed congressional-election outcomes under that plan.
 
 \hypertarget{source-verification-and-measurement}{%
-\subsection{Source verification and
+\section{Source verification and
 measurement}\label{source-verification-and-measurement}}
 
 \hypertarget{provenance-and-processed-precinct-graph}{%
-\subsubsection{Provenance and processed precinct
+\subsection{Provenance and processed precinct
 graph}\label{provenance-and-processed-precinct-graph}}
 
 The principal Michigan source is the processed
@@ -341,31 +338,29 @@ matching original precinct polygon ZIP by
 files are governed by the authors' CC BY-NC 4.0 terms together with the
 applicable Redistricting Data Hub terms.
 
-The original processed Michigan graph has \textbf{4,756 vertices, 12,378
-edges, six connected components and 13 enacted congressional labels}.
-Summed precinct population is \textbf{10,077,331}, giving an ideal of
-\textbf{775,179.31} persons per district. The reference's maximum
-district deviation from that ideal is approximately \textbf{0.4019\%}.
-Independently inspecting the published shapefile confirms its coordinate
-system as \textbf{EPSG:32616}. All 4,756 graph nodes were reconciled
-with polygon records on population, enacted label and county
-identifiers. This establishes processed-input matching, not a new
-recreation of the full upstream Census/VEST block-to-precinct data join
-or agreement with official election canvasses.
+The original processed Michigan graph has 4,756 vertices, 12,378 edges,
+six connected components and 13 enacted congressional labels. Summed
+precinct population is 10,077,331, giving an ideal of 775,179.31 persons
+per district. The reference's maximum district deviation from that ideal
+is approximately 0.4019\%. Independently inspecting the published
+shapefile confirms its coordinate system as EPSG:32616. All 4,756 graph
+nodes were reconciled with polygon records on population, enacted label
+and county identifiers. This establishes processed-input matching, not a
+new recreation of the full upstream Census/VEST block-to-precinct data
+join or agreement with official election canvasses.
 
 Under the processed 2020 presidential fields, statewide two-party totals
-are \textbf{2,804,046 Democratic} and \textbf{2,649,864 Republican}
-votes. The enacted reference gives \textbf{seven Democratic seats} and
-efficiency gap \textbf{+0.0033332} under the project's arithmetic. The
-processed 2016 presidential layer yields \textbf{six Democratic seats}
-and efficiency gap approximately \textbf{−0.0387493}, subject to the
-tiny rounding issue noted above. These reference calculations were
-independently reproduced by summing graph-node vote fields and
-reconciled against six saved initial-chain rows and 26 district-level
-election rows.
+are 2,804,046 Democratic and 2,649,864 Republican votes. The enacted
+reference gives seven Democratic seats and efficiency gap +0.0033332
+under the project's arithmetic. The processed 2016 presidential layer
+yields six Democratic seats and efficiency gap approximately −0.0387493,
+subject to the tiny rounding issue noted above. These reference
+calculations were independently reproduced by summing graph-node vote
+fields and reconciled against six saved initial-chain rows and 26
+district-level election rows.
 
 \hypertarget{independent-computational-checks}{%
-\subsubsection{Independent computational
+\subsection{Independent computational
 checks}\label{independent-computational-checks}}
 
 Reproducibility was assessed at different levels rather than reduced to
@@ -390,11 +385,11 @@ evidence, not as features that can be inferred from the consistency of
 derived tables.
 
 \hypertarget{pillar-i-topological-vulnerability}{%
-\subsection{Pillar I: Topological
+\section{Pillar I: Topological
 vulnerability}\label{pillar-i-topological-vulnerability}}
 
 \hypertarget{the-hidden-role-of-artificial-adjacency}{%
-\subsubsection{The hidden role of artificial
+\subsection{The hidden role of artificial
 adjacency}\label{the-hidden-role-of-artificial-adjacency}}
 
 The published Michigan graph contains six disconnected components, a
@@ -409,8 +404,8 @@ assignments. But it encoded the enacted map into the connectivity repair
 itself.
 
 When the original published precinct polygons were consulted, the five
-artificial edges proved to span roughly \textbf{42, 117, 134, 170 and
-280 kilometers} between their endpoint polygons. They were not chosen to
+artificial edges proved to span roughly 42, 117, 134, 170 and 280
+kilometers between their endpoint polygons. They were not chosen to
 represent contact, geographic proximity, county-island rules or a
 documented transport corridor. An algorithm that subsequently assesses
 ``contiguity'' on the augmented graph inherits these unsupported
@@ -428,28 +423,28 @@ comparison intended to treat the enacted map as an external object
 evaluated against alternatives.
 
 \hypertarget{geometric-repair-reference-compatibility-and-selection-bias}{%
-\subsubsection{Geometric repair, reference compatibility and selection
+\subsection{Geometric repair, reference compatibility and selection
 bias}\label{geometric-repair-reference-compatibility-and-selection-bias}}
 
 The first replacement joined original graph components using a
 minimum-spanning tree based on measured polygon-to-polygon distance,
 without consulting district labels when proposing edges. Its total
-proposed connection length fell to approximately \textbf{19.6
-kilometers}. However, the resulting graph still left a four-precinct
-piece of the enacted sixth district disconnected. Rather than repair the
-failure by adding another enacted-label-conditioned connection, we
-examined a predeclared sensitivity grid of \emph{K} nearest external
-polygon contacts per original disconnected component, with \emph{K}
-taking values 1, 3, 10, 25 and 50.
+proposed connection length fell to approximately 19.6 kilometers.
+However, the resulting graph still left a four-precinct piece of the
+enacted sixth district disconnected. Rather than repair the failure by
+adding another enacted-label-conditioned connection, we examined a
+predeclared sensitivity grid of \emph{K} nearest external polygon
+contacts per original disconnected component, with \emph{K} taking
+values 1, 3, 10, 25 and 50.
 
-The smallest \textbf{tested} neighborhood level that simultaneously
-connected the statewide graph and allowed all 13 enacted reference
-districts to be represented as connected was \textbf{K=3}, yielding
-\textbf{13 distinct inserted edges}. The longest candidate polygon
-separation was approximately \textbf{17.8 kilometers}. Under this model
-graph, the enacted reference has \textbf{682 graph cut edges}, versus
-\textbf{681} on the untouched published source graph. Source graph and
-generated-graph hashes were checked in independent workflow runs.
+The smallest tested neighborhood level that simultaneously connected the
+statewide graph and allowed all 13 enacted reference districts to be
+represented as connected was K=3, yielding 13 distinct inserted edges.
+The longest candidate polygon separation was approximately 17.8
+kilometers. Under this model graph, the enacted reference has 682 graph
+cut edges, versus 681 on the untouched published source graph. Source
+graph and generated-graph hashes were checked in independent workflow
+runs.
 
 This construction avoids \emph{directly} using partisan returns or
 enacted labels to select individual edges. Yet the choice of K=3 was
@@ -459,8 +454,8 @@ reference-conditioned. More importantly, geographic nearness alone does
 not certify Michigan's statutory island/county contiguity: some
 candidate connections span nonzero gaps between polygons and may cross
 water. The resulting KNN3 graph is therefore best described as an
-\textbf{explicit proximity-based sensitivity topology}. It is not a
-legal replacement for an authoritative adjacency model.
+explicit proximity-based sensitivity topology. It is not a legal
+replacement for an authoritative adjacency model.
 
 A general principle follows: selecting boundary conventions by how well
 they preserve the benchmark plan can introduce a subtle
@@ -470,25 +465,24 @@ would require an adjacency convention grounded independently in
 geography and applicable law \emph{before} assessing the enacted plan.
 
 \hypertarget{pillar-ii-the-mixing-illusion}{%
-\subsection{Pillar II: The mixing
+\section{Pillar II: The mixing
 illusion}\label{pillar-ii-the-mixing-illusion}}
 
 \hypertarget{original-archived-recom-histories}{%
-\subsubsection{Original archived ReCom
+\subsection{Original archived ReCom
 histories}\label{original-archived-recom-histories}}
 
 The earlier Michigan experiment produced long ReCom traces and summary
 percentiles. Subsequent audits recovered the original checked-in
-research ZIP and independently recomputed \textbf{12 complete
-scalar-metric histories}: six 7,000-state runs under 2016 or 2020
-presidential overlays with nominal ±2\% population tolerance, and six
-3,000-state runs under ±1\% or ±3\% tolerances. After the archived
-burn-in convention, the 2020 ±2\% case contained \textbf{18,900
-correlated recorded states}, with mean Democratic seats \textbf{5.7149}
-and mean efficiency gap \textbf{−0.0999}. The enacted reference's
-inclusive Democratic seat-count upper-tail frequency was
-\textbf{2,633/18,900 (13.93\%)}, while a midrank percentile counted tied
-values differently. Such differences are not statistical-significance
+research ZIP and independently recomputed 12 complete scalar-metric
+histories: six 7,000-state runs under 2016 or 2020 presidential overlays
+with nominal ±2\% population tolerance, and six 3,000-state runs under
+±1\% or ±3\% tolerances. After the archived burn-in convention, the 2020
+±2\% case contained 18,900 correlated recorded states, with mean
+Democratic seats 5.7149 and mean efficiency gap −0.0999. The enacted
+reference's inclusive Democratic seat-count upper-tail frequency was
+2,633/18,900 (13.93\%), while a midrank percentile counted tied values
+differently. Such differences are not statistical-significance
 estimates: the observations are serially correlated, the target
 distribution was not shown to be the legally relevant one, and the
 original RNG settings did not make those historic trajectories
@@ -496,38 +490,37 @@ replayable from their nominal seed numbers.
 
 The original ±2\% chains also do not satisfy the later, stricter ±0.5\%
 population modeling assumption. Among the 18,900 post-burn-in states in
-that historical condition, \textbf{zero} met the ±0.5\% tolerance. A
-sample cannot be retroactively relabeled as drawn from a more
-restrictive feasible space merely because its partisan metrics were
-calculated correctly.
+that historical condition, zero met the ±0.5\% tolerance. A sample
+cannot be retroactively relabeled as drawn from a more restrictive
+feasible space merely because its partisan metrics were calculated
+correctly.
 
 \hypertarget{explicit-seed-recom-and-diagnostic-failure}{%
-\subsubsection{Explicit-seed ReCom and diagnostic
+\subsection{Explicit-seed ReCom and diagnostic
 failure}\label{explicit-seed-recom-and-diagnostic-failure}}
 
 After correcting GerryChain 1.0's independent random-number generator
 initialization, a separate experiment used four dispersed warm starts
 under each of two exploratory geographic-constraint regimes. Eight
-explicitly seeded ReCom chains, each with \textbf{4,001 recorded
-states}, produced \textbf{32,008 serially correlated observations} and
-648 independently verified saved assignments. For the efficiency gap,
-the closer condition yielded rank-normalized \textbf{R-hat 1.733} and
-bulk effective sample size \textbf{9.4}; the relaxed condition yielded
-\textbf{R-hat 1.139} and bulk ESS \textbf{20.4}. Both violated the
-study's prespecified scalar diagnostics of R-hat no greater than
-\textbf{1.01} and ESS at least \textbf{400}.
+explicitly seeded ReCom chains, each with 4,001 recorded states,
+produced 32,008 serially correlated observations and 648 independently
+verified saved assignments. For the efficiency gap, the closer condition
+yielded rank-normalized R-hat 1.733 and bulk effective sample size 9.4;
+the relaxed condition yielded R-hat 1.139 and bulk ESS 20.4. Both
+violated the study's prespecified scalar diagnostics of R-hat no greater
+than 1.01 and ESS at least 400.
 
 R-hat and ESS are diagnostics, not proofs of equilibrium; nevertheless,
 values this far outside prespecified acceptance criteria are affirmative
-grounds \textbf{not} to interpret pooled values as stationary estimates.
-As emphasized by Vehtari et al.~(2021), convergence analysis must attend
-to inter-chain behavior and autocorrelation rather than the sheer volume
-of saved draws. Here, chains often moved noticeably through geographic
+grounds not to interpret pooled values as stationary estimates. As
+emphasized by Vehtari et al.~(2021), convergence analysis must attend to
+inter-chain behavior and autocorrelation rather than the sheer volume of
+saved draws. Here, chains often moved noticeably through geographic
 space, yet movement did not produce satisfactory mixing on partisan
 outcomes.
 
 \hypertarget{reversibility-without-usable-exploration}{%
-\subsubsection{Reversibility without usable
+\subsection{Reversibility without usable
 exploration}\label{reversibility-without-usable-exploration}}
 
 We next implemented a local boundary-edge Metropolis--Hastings kernel
@@ -537,39 +530,38 @@ label swap, rejects invalid configurations, and applies
 \texttt{min(1,q(y,x)/q(x,y))} to enforce detailed balance between
 feasible neighboring states. Exact enumeration on a small graph verified
 detailed balance in the implemented finite setting. The resulting
-uniform invariant law applies \textbf{within a reachable communicating
-component of labeled, proxy-feasible maps}; irreducibility across the
-full feasible space was not established.
+uniform invariant law applies within a reachable communicating component
+of labeled, proxy-feasible maps; irreducibility across the full feasible
+space was not established.
 
 Theory did not resolve the empirical obstacle. A real-data pilot
-obtained acceptance rates around \textbf{9--16\%} but changed only
-\textbf{1.7--3.7\%} of precinct assignments from warm starts after 2,000
-attempts. In later eight-chain testing, efficiency-gap R-hat and bulk
-ESS remained unacceptable: for the closer condition \textbf{1.568 and
-7.1}, respectively; for the relaxed condition \textbf{2.588 and 4.8}.
-Under the project's hard caps and small feasible boundary moves, the
-method did not explore useful portions of the space in the allotted
-computational budget.
+obtained acceptance rates around 9--16\% but changed only 1.7--3.7\% of
+precinct assignments from warm starts after 2,000 attempts. In later
+eight-chain testing, efficiency-gap R-hat and bulk ESS remained
+unacceptable: for the closer condition 1.568 and 7.1, respectively; for
+the relaxed condition 2.588 and 4.8. Under the project's hard caps and
+small feasible boundary moves, the method did not explore useful
+portions of the space in the allotted computational budget.
 
 We also tested a GerryChain implementation of the published reversible
 ReCom variant. Under the specific strict parameter settings tried,
-neither of two \textbf{200-proposal} pilots produced a changed map. This
-is a negative \emph{pilot configuration} result, not a general
-refutation of reversible recombination or of the proven spanning-tree
-target developed by Cannon et al.~(2026).
+neither of two 200-proposal pilots produced a changed map. This is a
+negative \emph{pilot configuration} result, not a general refutation of
+reversible recombination or of the proven spanning-tree target developed
+by Cannon et al.~(2026).
 
 Together, the experiments reveal an operational distinction that should
-appear in redistricting research reports: \textbf{a chain with strong
-local movement is not necessarily a valid stationary sampler, and a
-sampler with a derivable stationary law is not necessarily
-computationally effective under the proposed constraints}.
+appear in redistricting research reports: a chain with strong local
+movement is not necessarily a valid stationary sampler, and a sampler
+with a derivable stationary law is not necessarily computationally
+effective under the proposed constraints.
 
 \hypertarget{pillar-iii-finite-horizon-constraint-stress-testing}{%
-\subsection{Pillar III: Finite-horizon constraint stress
+\section{Pillar III: Finite-horizon constraint stress
 testing}\label{pillar-iii-finite-horizon-constraint-stress-testing}}
 
 \hypertarget{defining-a-finite-horizon-stress-test-estimand}{%
-\subsubsection{Defining a finite-horizon stress-test
+\subsection{Defining a finite-horizon stress-test
 estimand}\label{defining-a-finite-horizon-stress-test-estimand}}
 
 Because the neutral stationary target was not verified, the final
@@ -577,7 +569,7 @@ experiment deliberately changed the research question. Let \(x_0\) be
 the enacted reference assignment and \(P_c\) the implemented stochastic
 transition procedure under geographic condition \(c\). Rather than
 assert that \(x_T\) approximates a uniform or spanning-tree-weighted
-legal map, define the \textbf{finite-horizon outcome law}
+legal map, define the finite-horizon outcome law
 
 \begin{equation}
 Q_{c,T}(A)
@@ -588,81 +580,77 @@ G=G_{\mathrm{KNN3}},P=P_c\bigr),\quad T=800.
 Here \(T=800\) recorded transitions after step zero. The estimand
 \(\mathbb{E}_{Q_{c,T}}[f(X_T)]\) is meaningful by construction: it
 describes what this particular algorithm produces after a fixed
-computational horizon starting from a particular map. It does
-\textbf{not} imply a unique stationary target, unbiased representation
-of legal maps, or independence of the final state from the enacted
-reference. This weaker estimand is the subject of our finite-horizon
-comparison.
+computational horizon starting from a particular map. It does not imply
+a unique stationary target, unbiased representation of legal maps, or
+independence of the final state from the enacted reference. This weaker
+estimand is the subject of our finite-horizon comparison.
 
 \hypertarget{experiment-protocol}{%
-\subsubsection{Experiment protocol}\label{experiment-protocol}}
+\subsection{Experiment protocol}\label{experiment-protocol}}
 
 We used the source-reconciled KNN3 model graph, an ideal-population
-deviation tolerance of \textbf{±0.5\%}, and GerryChain 1.0 ReCom
-transitions with an explicitly initialized, chain-owned RNG. Each run
-recorded \textbf{801 states including the initial enacted plan}. Only
-its \emph{terminal} state was retained as a Monte Carlo observation.
+deviation tolerance of ±0.5\%, and GerryChain 1.0 ReCom transitions with
+an explicitly initialized, chain-owned RNG. Each run recorded 801 states
+including the initial enacted plan. Only its \emph{terminal} state was
+retained as a Monte Carlo observation.
 
-Two geographically constrained regimes were examined. The
-\textbf{closer} regime permitted at most \textbf{760 cut edges},
-\textbf{18 split source county groups}, and \textbf{20 split source
-county-plus-MCD groups}. The \textbf{relaxed} regime increased these
-thresholds to \textbf{850}, \textbf{24}, and \textbf{49}, respectively.
-The counts are exploratory proxies, not Michigan statutory compliance
-determinations. They were selected in a broader development process
-involving source and pilot inspection; the final 64-run protocol fixed
-them before the final independent-endpoint results were aggregated, but
-this is \textbf{not an untouched confirmatory preregistration}.
+Two geographically constrained regimes were examined. The closer regime
+permitted at most 760 cut edges, 18 split source county groups, and 20
+split source county-plus-MCD groups. The relaxed regime increased these
+thresholds to 850, 24, and 49, respectively. The counts are exploratory
+proxies, not Michigan statutory compliance determinations. They were
+selected in a broader development process involving source and pilot
+inspection; the final 64-run protocol fixed them before the final
+independent-endpoint results were aggregated, but this is not an
+untouched confirmatory preregistration.
 
-For each condition, independently initialized RNG seeds
-\textbf{10001--10032} generated \textbf{32 trajectories}, producing
-\textbf{64 terminal maps} in total. The same seed labels were used
-across conditions for bookkeeping; they do not make the alternative
-Markov kernels identical. Seed 10001 was replayed in a separate process
-in both regimes, reproducing terminal assignment hashes and complete
-reported metrics. Each terminal assignment was independently rescored
-for 2020 presidential seat counts and efficiency gap, population
-equality, proxy fragmentation, source-graph contiguity and its SHA-256.
-Both regimes had \textbf{32 distinct final assignment hashes}.
+For each condition, independently initialized RNG seeds 10001--10032
+generated 32 trajectories, producing 64 terminal maps in total. The same
+seed labels were used across conditions for bookkeeping; they do not
+make the alternative Markov kernels identical. Seed 10001 was replayed
+in a separate process in both regimes, reproducing terminal assignment
+hashes and complete reported metrics. Each terminal assignment was
+independently rescored for 2020 presidential seat counts and efficiency
+gap, population equality, proxy fragmentation, source-graph contiguity
+and its SHA-256. Both regimes had 32 distinct final assignment hashes.
 
 Sampling \emph{one terminal map per independently seeded run}, rather
-than all \textbf{51,264} correlated recorded states, makes the Monte
-Carlo unit explicit. It does not remove every concern about
-pseudorandomness or parameter choice, and 32 terminal maps per condition
-remain a modest sample. But it avoids mistaking closely related
-successive MCMC states for independent observations when estimating
-uncertainty about the \textbf{finite-time algorithmic mean}.
+than all 51,264 correlated recorded states, makes the Monte Carlo unit
+explicit. It does not remove every concern about pseudorandomness or
+parameter choice, and 32 terminal maps per condition remain a modest
+sample. But it avoids mistaking closely related successive MCMC states
+for independent observations when estimating uncertainty about the
+finite-time algorithmic mean.
 
 \hypertarget{uncertainty-calculations}{%
-\subsubsection{Uncertainty
-calculations}\label{uncertainty-calculations}}
+\subsection{Uncertainty calculations}\label{uncertainty-calculations}}
 
 For a statistic \(f\), the mean of 32 independent-seed endpoints
 estimates \texttt{E\_\{Q\_c,T\}{[}f{]}} under the generator and its
 fixed starting map. We used 10,000 nonparametric, deterministic-seed
-bootstrap resamples of the \textbf{32 endpoints}, taking the 2.5th and
-97.5th percentiles to form approximate \textbf{95\% Monte Carlo
-intervals for that conditional mean}. These intervals represent
-variability among independent runs of this algorithm, not uncertainty
-about a legally neutral map distribution or a claim of generalizing to
-other election years.
+bootstrap resamples of the 32 endpoints, taking the 2.5th and 97.5th
+percentiles to form approximate 95\% Monte Carlo intervals for that
+conditional mean. These intervals represent variability among
+independent runs of this algorithm, not uncertainty about a legally
+neutral map distribution or a claim of generalizing to other election
+years.
 
 For the descriptive indicator that an endpoint's efficiency gap is at
 least the enacted reference efficiency gap, we computed the observed
 proportion and Wilson 95\% binomial interval. Since the enacted map is
 also the deterministic starting state, and the model and caps are
-researcher-designed, the resulting fraction \textbf{must not} be
-described as an enacted-map randomization p-value.
+researcher-designed, the resulting fraction must not be described as an
+enacted-map randomization p-value.
 
 \hypertarget{results-quantifying-the-constraint-shift}{%
-\subsection{Results: Quantifying the constraint
+\section{Results: Quantifying the constraint
 shift}\label{results-quantifying-the-constraint-shift}}
 
 \hypertarget{terminal-partisan-scores-and-geographic-movement}{%
-\subsubsection{Terminal partisan scores and geographic
+\subsection{Terminal partisan scores and geographic
 movement}\label{terminal-partisan-scores-and-geographic-movement}}
 
-\begin{table}[tbp]
+\begin{table}[H]
 \centering
 \caption{Terminal outcomes after 800 recorded transitions under two exploratory geographic regimes.}
 \label{tab:endpoints}
@@ -692,31 +680,27 @@ The proximity graph and fragmentation caps are not certified as Michigan legal r
 \end{threeparttable}
 \end{table}
 
-\hypertarget{original-data-figures}{%
-\subsubsection*{Original-data figures}\label{original-data-figures}}
-\addcontentsline{toc}{subsubsection}{Original-data figures}
-
-Figures 1--3 present empirical terminal outcomes from the \textbf{64
-independently verified endpoint maps}. Together, they show how the
+Figures 1--3 present empirical terminal outcomes from the 64
+independently verified endpoint maps. Together, they show how the
 constraint regimes affect the efficiency-gap distribution, the
 correspondence between seed-indexed runs, and spatial movement from the
 enacted reference.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.90\linewidth]{figures/figure1_terminal_EG_ECDF.pdf}
 \caption{Empirical cumulative distributions of efficiency gap under tighter and relaxed model constraints (32 independently seeded endpoints per regime). The vertical reference marker is the enacted plan under the same 2020 presidential-vote overlay; this is not a legal-map outlier test.}
 \label{fig:stage4-1}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.71\linewidth]{figures/figure2_paired_seed_EG.pdf}
 \caption{Efficiency-gap scores by shared seed identifier across the two regimes. The dashed diagonal marks equal values. Shared seed numbers do not imply identical proposals or matched geographic plans.}
 \label{fig:stage4-2}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.90\linewidth]{figures/figure3_spatial_change_vs_EG.pdf}
 \caption{Endpoint efficiency gap versus the fraction of precincts reassigned from the enacted reference after optimal label matching. Candidate geography is defined by the experimental proximity graph.}
@@ -729,60 +713,56 @@ figure-generation logs are supplied in the reproducibility appendix.
 The tighter model produces terminal plans closer to the original
 geography by every reported fragmentation measure and yields modestly
 higher Democratic seat scores under the selected election layer. Mean
-efficiency gaps differ by about \textbf{0.0328} (3.28 percentage points
-of the efficiency-gap scale) between regimes, while mean Democratic
-seats differ by about \textbf{0.406} seats. These are differences
-between \textbf{specified finite-time algorithmic procedures}, not a
-causal estimate of how legally valid district maps would respond to
-relaxing real Michigan law.
+efficiency gaps differ by about 0.0328 (3.28 percentage points of the
+efficiency-gap scale) between regimes, while mean Democratic seats
+differ by about 0.406 seats. These are differences between specified
+finite-time algorithmic procedures, not a causal estimate of how legally
+valid district maps would respond to relaxing real Michigan law.
 
 The geometry contrast is particularly strong. Under the closer regime,
-an endpoint differs from the enacted assignment at approximately
-\textbf{13.4\%} of precinct nodes after optimal district-label matching;
-under the relaxed regime, \textbf{29.0\%}. The chains also reject a
-large share of attempted geographic proposals: on average
-\textbf{79.22\%} under closer caps and \textbf{52.83\%} under relaxed
-caps. Lower geometric movement under tighter caps is consistent with
-more severe constraints on feasible proposals. However, the
-rejected-proposal rate is an implementation diagnostic and does not
-prove any particular legal or political mechanism.
+an endpoint differs from the enacted assignment at approximately 13.4\%
+of precinct nodes after optimal district-label matching; under the
+relaxed regime, 29.0\%. The chains also reject a large share of
+attempted geographic proposals: on average 79.22\% under closer caps and
+52.83\% under relaxed caps. Lower geometric movement under tighter caps
+is consistent with more severe constraints on feasible proposals.
+However, the rejected-proposal rate is an implementation diagnostic and
+does not prove any particular legal or political mechanism.
 
 The closer condition concentrates near its caps on county and
-county-plus-MCD splits (means \textbf{17.97 of 18} and \textbf{19.94 of
-20}). The relaxed condition approaches its much larger bounds (means
-\textbf{23.81 of 24} and \textbf{47.94 of 49}). Because the baseline
-itself has only \textbf{14 split source county groups} and \textbf{9
-split county-plus-MCD groups}, both models can diverge materially from
-the reference's administrative fragmentation. A headline suggesting
-``maps just like the enacted one except for partisan choices'' would
-therefore misdescribe the sample-generating assumptions.
+county-plus-MCD splits (means 17.97 of 18 and 19.94 of 20). The relaxed
+condition approaches its much larger bounds (means 23.81 of 24 and 47.94
+of 49). Because the baseline itself has only 14 split source county
+groups and 9 split county-plus-MCD groups, both models can diverge
+materially from the reference's administrative fragmentation. A headline
+suggesting ``maps just like the enacted one except for partisan
+choices'' would therefore misdescribe the sample-generating assumptions.
 
 \hypertarget{enacted-reference-frequencies-under-the-tested-procedure}{%
-\subsubsection{Enacted-reference frequencies under the tested
+\subsection{Enacted-reference frequencies under the tested
 procedure}\label{enacted-reference-frequencies-under-the-tested-procedure}}
 
-The 2020-reference efficiency gap is about \textbf{+0.00333}. In the
-closer regime, \textbf{16 of 32} terminal simulated gaps were at least
-that value (50.0\%; Wilson 95\% interval approximately
-\textbf{33.6--66.4\%}). In the relaxed regime, \textbf{13 of 32} met the
-same criterion (40.6\%; Wilson interval approximately
-\textbf{25.5--57.7\%}). Neither fraction provides a legal-map null
+The 2020-reference efficiency gap is about +0.00333. In the closer
+regime, 16 of 32 terminal simulated gaps were at least that value
+(50.0\%; Wilson 95\% interval approximately 33.6--66.4\%). In the
+relaxed regime, 13 of 32 met the same criterion (40.6\%; Wilson interval
+approximately 25.5--57.7\%). Neither fraction provides a legal-map null
 probability. The generator is initialized \emph{at} the enacted
 reference, the model topology is a geometry-proximity approximation, and
 the two cap regimes are researcher-selected. Consequently, no inference
 about intent, statutory validity or statewide partisan extremeness
 follows from these percentages.
 
-The findings support a different, narrower statement: \textbf{within 800
+The findings support a different, narrower statement: within 800
 recorded ReCom transitions from the same reference and on the same
 experimental proximity graph, choices about fragmentation caps were
 associated with materially different geographic movement and
-distributions of partisan scores}. The experiment makes that conditional
+distributions of partisan scores. The experiment makes that conditional
 relationship observable and reproducible. It does not identify which cap
 choice is socially, legally or scientifically neutral.
 
 \hypertarget{signed-paired-seed-contrasts}{%
-\subsubsection{Signed paired-seed
+\subsection{Signed paired-seed
 contrasts}\label{signed-paired-seed-contrasts}}
 
 Because each cap regime was run under the same 32 nominal pseudorandom
@@ -802,11 +782,11 @@ f\!\left(X_{800,s}^{\mathrm{tight}}\right)
 \end{equation}
 
 We retained the paired indexing of the original fixed-horizon experiment
-and drew \textbf{20,000 bootstrap resamples of entire seed-indexed
-endpoint pairs}, not individual correlated chain steps. A deterministic
-resampling seed (20261018) makes the interval calculation reproducible.
+and drew 20,000 bootstrap resamples of entire seed-indexed endpoint
+pairs, not individual correlated chain steps. A deterministic resampling
+seed (20261018) makes the interval calculation reproducible.
 
-\begin{table}[tbp]
+\begin{table}[H]
 \centering
 \caption{Paired-seed terminal contrasts: tighter minus relaxed conditions.}
 \label{tab:paired}
@@ -836,118 +816,112 @@ The contrasts are neither legal-map neutrality tests nor isolated causal effects
 The paired bootstrap uses the joint seed-indexed output of the two
 programs. Its precision is conditional on the fixed, researcher-selected
 comparison and approximate independence across the 32 separate RNG seed
-labels. It does \textbf{not} imply identical stochastic proposals within
-a pair, actual matched districts, or isolation of any one cap, because
-the cut-edge, county-split and MCD-split caps changed simultaneously.
-The results nonetheless sharpen the descriptive finding: the two
+labels. It does not imply identical stochastic proposals within a pair,
+actual matched districts, or isolation of any one cap, because the
+cut-edge, county-split and MCD-split caps changed simultaneously. The
+results nonetheless sharpen the descriptive finding: the two
 finite-horizon procedures have distinguishable outcomes in this executed
-computational experiment. They supply \textbf{no additional evidence
-that either procedure samples neutral, legally valid Michigan plans}.
+computational experiment. They supply no additional evidence that either
+procedure samples neutral, legally valid Michigan plans.
 
 \hypertarget{baseline-reliability-a-three-gate-evidentiary-protocol}{%
-\subsection{Baseline reliability: A three-gate evidentiary
+\section{Baseline reliability: A three-gate evidentiary
 protocol}\label{baseline-reliability-a-three-gate-evidentiary-protocol}}
 
 A recommendation to ``validate the simulation'' provides little guidance
 about which failures must stop a substantive claim. We instead propose
-three \textbf{operational gates}. Each identifies required evidence, a
-failure condition, and the disposition of the Michigan case. This is an
+three operational gates. Each identifies required evidence, a failure
+condition, and the disposition of the Michigan case. This is an
 auditable reporting and stress-testing procedure, not a newly proven
 statistical test.
 
 \hypertarget{gate-a-validate-topology-independently-of-the-enacted-map}{%
-\subsubsection{Gate A --- Validate topology independently of the enacted
+\subsection{Gate A --- Validate topology independently of the enacted
 map}\label{gate-a-validate-topology-independently-of-the-enacted-map}}
 
-\textbf{Required evidence.} Archive input polygon and election
-provenance, graph construction rules, an explicit list of synthetic
-adjacencies, and geographic distances or statutory island connections
-for exceptional edges. Test the enacted reference's connectivity only
-\textbf{after} choosing edges without using its district labels.
+Required evidence. Archive input polygon and election provenance, graph
+construction rules, an explicit list of synthetic adjacencies, and
+geographic distances or statutory island connections for exceptional
+edges. Test the enacted reference's connectivity only after choosing
+edges without using its district labels.
 
-\textbf{Failure condition.} Connectivity is created through
+Failure condition. Connectivity is created through
 enacted-label-dependent links, or invented adjacency is treated as
 physical/legal contact without supporting evidence.
 
-\textbf{Case decision.} The original five enacted-conditioned artificial
-edges linked precinct polygons approximately \textbf{42--280 km} apart.
-A district-blind KNN3 alternative adds \textbf{13} candidate links, with
-maximum polygon separation \textbf{17.8 km}, while retaining reference
-connectivity. However, KNN3 was selected after reference-compatibility
-testing and remains legally uncertified. Source geometry matching
-passed; \textbf{legal geography did not pass this gate}.
+Case decision. The original five enacted-conditioned artificial edges
+linked precinct polygons approximately 42--280 km apart. A
+district-blind KNN3 alternative adds 13 candidate links, with maximum
+polygon separation 17.8 km, while retaining reference connectivity.
+However, KNN3 was selected after reference-compatibility testing and
+remains legally uncertified. Source geometry matching passed; legal
+geography did not pass this gate.
 
 \hypertarget{gate-b-verify-the-claimed-sampling-law-and-substantive-mixing}{%
-\subsubsection{Gate B --- Verify the claimed sampling law and
-substantive
+\subsection{Gate B --- Verify the claimed sampling law and substantive
 mixing}\label{gate-b-verify-the-claimed-sampling-law-and-substantive-mixing}}
 
-\textbf{Required evidence.} Specify the target law or explicitly state
-that the result estimates a finite-horizon procedure. For stationary
-ensemble claims, evaluate multiple appropriate starting maps,
-proposal/holding behavior, assignment mobility, rank-normalized R-hat,
-and bulk/tail effective sample size for substantive partisan metrics.
-Publish the acceptance criteria and actual failures.
+Required evidence. Specify the target law or explicitly state that the
+result estimates a finite-horizon procedure. For stationary ensemble
+claims, evaluate multiple appropriate starting maps, proposal/holding
+behavior, assignment mobility, rank-normalized R-hat, and bulk/tail
+effective sample size for substantive partisan metrics. Publish the
+acceptance criteria and actual failures.
 
-\textbf{Failure condition.} The law is unidentified, the diagnostic plan
-is missing, or the chain fails its declared convergence criteria. Saving
+Failure condition. The law is unidentified, the diagnostic plan is
+missing, or the chain fails its declared convergence criteria. Saving
 more highly correlated maps is not a substitute for meeting these
 conditions.
 
-\textbf{Case decision.} Eight-chain studies recorded \textbf{32,008}
-states and independently checked \textbf{648} full assignments, but the
-tested ReCom and local MH configurations failed their prespecified
-thresholds (\textbf{R-hat ≤1.01}, \textbf{bulk and tail ESS ≥400}). For
-efficiency gap, ordinary ReCom gave \textbf{R-hat 1.733} with bulk ESS
-\textbf{9.4} in one condition; local MH yielded \textbf{R-hat 2.588}
-with ESS \textbf{4.8} in another. These experiments \textbf{do not
-establish a usable stationary neutral ensemble}. They do not imply a
-universal failure of all redistricting samplers.
+Case decision. Eight-chain studies recorded 32,008 states and
+independently checked 648 full assignments, but the tested ReCom and
+local MH configurations failed their prespecified thresholds (R-hat
+≤1.01, bulk and tail ESS ≥400). For efficiency gap, ordinary ReCom gave
+R-hat 1.733 with bulk ESS 9.4 in one condition; local MH yielded R-hat
+2.588 with ESS 4.8 in another. These experiments do not establish a
+usable stationary neutral ensemble. They do not imply a universal
+failure of all redistricting samplers.
 
 \hypertarget{gate-c-quantify-sensitivity-to-declared-constraint-alternatives}{%
-\subsubsection{Gate C --- Quantify sensitivity to declared constraint
+\subsection{Gate C --- Quantify sensitivity to declared constraint
 alternatives}\label{gate-c-quantify-sensitivity-to-declared-constraint-alternatives}}
 
-\textbf{Required evidence.} Define credible alternative rules, hold the
-remaining experimental setup fixed where possible, measure signed
-changes in the outcome of interest, and estimate uncertainty from
-appropriate independent units. Explain when several constraints change
-at once.
+Required evidence. Define credible alternative rules, hold the remaining
+experimental setup fixed where possible, measure signed changes in the
+outcome of interest, and estimate uncertainty from appropriate
+independent units. Explain when several constraints change at once.
 
-\textbf{Sensitivity flag.} An estimated procedure contrast whose
-uncertainty interval excludes zero identifies a detected difference at
-the tested horizon and computational precision. This is a
-\textbf{model-choice warning}, not a legal decision rule or a test that
-an enacted map was manipulated.
+Sensitivity flag. An estimated procedure contrast whose uncertainty
+interval excludes zero identifies a detected difference at the tested
+horizon and computational precision. This is a model-choice warning, not
+a legal decision rule or a test that an enacted map was manipulated.
 
-\textbf{Case decision.} Relative to tighter caps, relaxed
-\emph{composite} caps produced \textbf{15.61 percentage points more
-precinct reassignment}, \textbf{0.406 fewer Democratic seats}, and
-\textbf{0.03278 lower efficiency gap} under the fixed overlay. The
-tighter-minus-relaxed efficiency-gap 95\% paired bootstrap interval is
-\textbf{{[}+0.00975, +0.05631{]}}. Since cut-edge, county-split, and
+Case decision. Relative to tighter caps, relaxed \emph{composite} caps
+produced 15.61 percentage points more precinct reassignment, 0.406 fewer
+Democratic seats, and 0.03278 lower efficiency gap under the fixed
+overlay. The tighter-minus-relaxed efficiency-gap 95\% paired bootstrap
+interval is {[}+0.00975, +0.05631{]}. Since cut-edge, county-split, and
 county--MCD caps changed jointly, the individual effect of any one rule
 is not identified.
 
 \hypertarget{the-evidentiary-consequence}{%
-\subsubsection{The evidentiary
+\subsection{The evidentiary
 consequence}\label{the-evidentiary-consequence}}
 
 The three gates perform distinct jobs: topology determines which
 district plans are representable; sampling evidence determines whether
 output supports a specified probability law; and sensitivity analysis
-measures dependence on defensible assumptions. Passing one does
-\textbf{not} compensate for failing another.
+measures dependence on defensible assumptions. Passing one does not
+compensate for failing another.
 
 For the present case, numerical execution is reproducible and the
-finite-horizon \textbf{constraint sensitivity} is quantifiable. A
-statewide legal neutral-map null has not passed the necessary topology
-and convergence conditions. This supports an actionable principle for
-methodological research and evaluation of expert evidence: a
-simulation-based baseline should be accompanied by independently
-verifiable graph provenance, target-law/mixing records, and model-choice
-sensitivity results \textbf{before its percentiles are assigned
-substantive authority}.
+finite-horizon constraint sensitivity is quantifiable. A statewide legal
+neutral-map null has not passed the necessary topology and convergence
+conditions. This supports an actionable principle for methodological
+research and evaluation of expert evidence: a simulation-based baseline
+should be accompanied by independently verifiable graph provenance,
+target-law/mixing records, and model-choice sensitivity results before
+its percentiles are assigned substantive authority.
 
 We have not audited a representative sample of published studies or
 courtroom testimony. The broader prevalence of such failures remains a
@@ -955,16 +929,16 @@ testable question for subsequent research, not a result of this Michigan
 case.
 
 \hypertarget{limitations}{%
-\subsection{Limitations}\label{limitations}}
+\section{Limitations}\label{limitations}}
 
-The first and largest limitation is \textbf{legal and geographic}. The
-repaired KNN3 graph is an experimentally chosen proximity approximation,
-not a certified Michigan island, shoreline, municipal, Voting Rights Act
-or communities-of-interest model. The absence of detailed VRA and
-community constraints precludes legal plan probability claims. In
-addition, the source polygons and election allocations are processed
-public derivatives; the original raw Census/VEST joining pipeline and
-agreement with official election canvasses have not been fully rebuilt.
+The first and largest limitation is legal and geographic. The repaired
+KNN3 graph is an experimentally chosen proximity approximation, not a
+certified Michigan island, shoreline, municipal, Voting Rights Act or
+communities-of-interest model. The absence of detailed VRA and community
+constraints precludes legal plan probability claims. In addition, the
+source polygons and election allocations are processed public
+derivatives; the original raw Census/VEST joining pipeline and agreement
+with official election canvasses have not been fully rebuilt.
 
 Second, the election overlays are historically displaced: 2016 and 2020
 presidential returns are allocated to a plan adopted in 2021. They do
@@ -992,26 +966,25 @@ These limitations do not contradict the empirical findings. They
 determine the scale of claims those findings can support.
 
 \hypertarget{conclusion}{%
-\subsection{Conclusion}\label{conclusion}}
+\section{Conclusion}\label{conclusion}}
 
-\textbf{Neutrality cannot be inferred from the size or reproducibility
-of an ensemble.} Our Michigan experiments document three independent
-points of vulnerability: enacted-label-conditioned graph repairs linked
-polygons separated by approximately \textbf{42--280 km}; tested ReCom
-and local reversible MH configurations failed prespecified convergence
-criteria; and a 64-run finite-horizon stress test detected changes in
-partisan and spatial outcomes across two constraint regimes. The
-tighter-minus-relaxed efficiency-gap contrast was \textbf{+0.03278},
-with a conditional paired-bootstrap interval \textbf{{[}+0.00975,
-+0.05631{]}}.
+Neutrality cannot be inferred from the size or reproducibility of an
+ensemble. Our Michigan experiments document three independent points of
+vulnerability: enacted-label-conditioned graph repairs linked polygons
+separated by approximately 42--280 km; tested ReCom and local reversible
+MH configurations failed prespecified convergence criteria; and a 64-run
+finite-horizon stress test detected changes in partisan and spatial
+outcomes across two constraint regimes. The tighter-minus-relaxed
+efficiency-gap contrast was +0.03278, with a conditional
+paired-bootstrap interval {[}+0.00975, +0.05631{]}.
 
 The finding is not merely that permissive caps increase geographic
 movement. It is that an apparently precise baseline has three distinct
-layers requiring independent justification: \textbf{the graph that
-defines possible maps, the sampler that assigns probability, and the
-assumptions that determine what results remain stable}. The Michigan
-case quantifies concrete failure modes in each layer without claiming a
-stationary distribution over legally permissible maps.
+layers requiring independent justification: the graph that defines
+possible maps, the sampler that assigns probability, and the assumptions
+that determine what results remain stable. The Michigan case quantifies
+concrete failure modes in each layer without claiming a stationary
+distribution over legally permissible maps.
 
 Our practical contribution is a three-gate audit with falsifiable
 refusal conditions: validate synthetic geography independently,
@@ -1023,8 +996,8 @@ baseline. Establishing how widely such checks are absent from published
 or litigated analyses requires a separate systematic study.
 
 \hypertarget{references}{%
-\subsection*{References}\label{references}}
-\addcontentsline{toc}{subsection}{References}
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
 
 \begingroup\small
 \setlength{\parindent}{0pt}
@@ -1058,11 +1031,10 @@ Veomett, Ellen, with Arbie Hsu and Alusi. “Michigan JSON and Shapefile” (pro
 \appendix
 
 \hypertarget{reproducibility-and-evidence-appendix}{%
-\subsection{Reproducibility and evidence
+\section{Reproducibility and evidence
 appendix}\label{reproducibility-and-evidence-appendix}}
 
-\textbf{A. Processed input fingerprints.} Michigan original graph Git
-blob SHA-1:
+A. Processed input fingerprints. Michigan original graph Git blob SHA-1:
 \texttt{\seqsplit{a4dfe70818f87b97924781216f3d86a672cfc66a}}. Original
 polygon ZIP Git blob SHA-1:
 \texttt{\seqsplit{07bce18dabbcca9d549e28995a8156fd6978d7db}}. Derived
@@ -1071,14 +1043,13 @@ KNN3 graph SHA-256:
 Historical archive ZIP SHA-256:
 \texttt{\seqsplit{0f52e51f8b64d1f2bc93b2e4fc206f824d777d494a90ae8a278461bac48736d4}}.
 
-\textbf{B. Exact computational environment.} The main experimental
-dependency is \texttt{gerrychain==1.0.0} with Python 3.11, networkx,
-numpy, pandas and geopandas/shapely. CI captures dependency versions.
-Both condition cohorts used deterministic \texttt{PYTHONHASHSEED=0},
-independently seeded chain RNG streams and per-run assignment/graph
-hashes.
+B. Exact computational environment. The main experimental dependency is
+\texttt{gerrychain==1.0.0} with Python 3.11, networkx, numpy, pandas and
+geopandas/shapely. CI captures dependency versions. Both condition
+cohorts used deterministic \texttt{PYTHONHASHSEED=0}, independently
+seeded chain RNG streams and per-run assignment/graph hashes.
 
-\textbf{C. Audited original source, geometry and mathematics.}
+C. Audited original source, geometry and mathematics.
 \href{https://github.com/DjokovicMan22/Gerrymandering-Project/blob/research/stages-1-3-validation/docs/research_audit/STAGE12_FINAL_VERIFICATION.md}{Stage
 1--2 verification report};
 \href{https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39183949679}{successful
@@ -1086,7 +1057,7 @@ independent source, history and compactness CI};
 \href{https://github.com/DjokovicMan22/Gerrymandering-Project/blob/research/stages-1-3-validation/docs/data_provenance.md}{source
 provenance record}.
 
-\textbf{D. Nonconvergence and model construction.}
+D. Nonconvergence and model construction.
 \href{https://github.com/DjokovicMan22/Gerrymandering-Project/blob/research/stages-1-3-validation/docs/research_audit/stage3_diversified_sampling_results.md}{Original
 diversified ReCom diagnostics};
 \href{https://github.com/DjokovicMan22/Gerrymandering-Project/blob/research/stages-1-3-validation/docs/research_audit/stage3_reversible_mixing_results.md}{reversible
@@ -1094,7 +1065,7 @@ local-chain diagnostics};
 \href{https://github.com/DjokovicMan22/Gerrymandering-Project/blob/research/stages-1-3-validation/docs/research_audit/stage3_finite_horizon_protocol.md}{geographic
 bridge analysis and finite-horizon protocol}.
 
-\textbf{E. Independently seeded endpoint experiment.}
+E. Independently seeded endpoint experiment.
 \href{https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39180152601}{Successful
 64-run GitHub Actions workflow, derived CSV endpoints, JSON summary and
 seed replay evidence};
@@ -1103,7 +1074,7 @@ seed replay evidence};
 model-specific derived scores but excludes redistributed third-party
 source graphs and full precinct assignment maps.
 
-\textbf{F. Plotting and paired contrasts.}
+F. Plotting and paired contrasts.
 \href{https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39203488689}{Stage
 4 source-audited graphics and paired Monte Carlo computation};
 production code in
@@ -1112,13 +1083,13 @@ the original Stage 3 aggregate artifact, strictly checked by SHA and
 seed identities. Contrasts concern the researcher-defined finite-horizon
 procedures only.
 
-\textbf{G. Status and interpretation.} This is a \textbf{methods and
-conditional-sensitivity manuscript}; numerical computations and scoped
+G. Status and interpretation. This is a methods and
+conditional-sensitivity manuscript; numerical computations and scoped
 reproducibility checks passed, while legal-plan stationarity,
 authoritative geographic admissibility and an enacted-map outlier
-hypothesis were \textbf{not established}. This manuscript should undergo
-external methodological review before submission. The reported
-conditional bootstrap intervals and endpoint frequencies are
-\textbf{not} gerrymandering significance tests.
+hypothesis were not established. This manuscript should undergo external
+methodological review before submission. The reported conditional
+bootstrap intervals and endpoint frequencies are not gerrymandering
+significance tests.
 
 \end{document}
