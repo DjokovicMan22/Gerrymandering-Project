@@ -57,11 +57,12 @@ STAGE12_CROSSCHECKS = {
     "original_historical_archive_hash": "0f52e51f8b64d1f2bc93b2e4fc206f824d777d494a90ae8a278461bac48736d4",
 }
 REQUIRED_SECTIONS = [
-    "## Abstract", "## 1. Introduction", "## 2. Research context",
-    "## 3. Data and reproducibility", "## 4. Geographic topology",
-    "## 5. Sampling experiments", "## 6. A narrower",
-    "## 7. Results", "## 8. Discussion", "## 9. Limitations",
-    "## 10. Conclusion", "## References",
+    "## Abstract", "## 1. Introduction", "## 2. Defining a computational baseline",
+    "## 3. Source verification and measurement", "## 4. Pillar I",
+    "## 5. Pillar II", "## 6. Pillar III",
+    "## 7. Results", "## 8. Baseline reliability",
+    "### 8.1 Gate A", "### 8.2 Gate B", "### 8.3 Gate C",
+    "## 9. Limitations", "## 10. Conclusion", "## References",
     "## Reproducibility and evidence appendix",
 ]
 REQUIRED_REFERENCES = [
@@ -69,9 +70,9 @@ REQUIRED_REFERENCES = [
     "Kenny, Christopher", "McCartan, Cory", "Michigan Constitution",
     "Stephanopoulos, Nicholas", "Vehtari, Aki", "Veomett, Ellen",
 ]
-REQUIRED_DISCLAIMERS = [
-    "not a legal replacement", "not a legal", "not", "not a", # guards additional context below
-    "conditional", "stationary", "reference-conditioned", "source-matched",
+REQUIRED_SCIENTIFIC_SCOPE = [
+    "stationary", "legally", "composite", "model",
+    "not a legal", "not identified",
 ]
 
 
@@ -102,13 +103,22 @@ def check(path: Path = TARGET, stage3: Path = STAGE3, stage12: Path = STAGE12) -
     # Stage 1–2 report renders exact 2016 difference with additional decimals.
     # Reject statements that promote algorithmic frequencies into neutral-map p-values.
     required_prose = [
-        "not a legal replacement", "an enacted-map randomization p-value",
-        "not a legal", "not a neutral", "not an untouched confirmatory preregistration",
+        "The Phantom Baseline", "## 4. Pillar I", "## 5. Pillar II",
+        "## 6. Pillar III", "Gate A", "Gate B", "Gate C",
+        "15.61 percentage points", "0.406", "0.03278",
+        "not a legal", "not identified",
         "The original processed Michigan graph", "R-hat", "ESS",
     ]
     for phrase in required_prose:
         if phrase.casefold() not in manuscript.casefold():
-            errors.append("Missing caution or method marker: " + phrase)
+            errors.append("Missing evidence/claim marker: " + phrase)
+    if manuscript.count("\n$$\n") != 8:
+        errors.append("Four genuine display equations must use eight $$ delimiters")
+    if "relaxing" not in manuscript.casefold() or (
+        "decreases mean efficiency gap" not in manuscript.casefold() and
+        "decreased mean efficiency gap" not in manuscript.casefold() and
+        "decreases mean" not in manuscript.casefold()):
+        errors.append("Relaxation direction of efficiency-gap shift not stated correctly")
     if "DOI_PLACEHOLDER" in manuscript or "[citation needed]" in manuscript.lower():
         errors.append("Unresolved reference placeholders")
     # No sources should be duplicated in full in the draft.
