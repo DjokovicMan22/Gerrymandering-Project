@@ -8,10 +8,10 @@ from pathlib import Path
 
 COVER=r"""
 \begin{center}
-{\fontsize{17.2}{20}\selectfont\bfseries When a Random Map Is Not a Neutral Map\par}
+{\fontsize{17.2}{20}\selectfont\bfseries The Phantom Baseline\par}
 \vspace{5pt}
-{\fontsize{11.2}{14}\selectfont Geographic Adjacency, Convergence, and the Limits
-of Michigan Redistricting Ensembles\par}
+{\fontsize{11.2}{14}\selectfont Geographic Assumptions, Mixing Failures, and Constraint Sensitivity
+in Computational Redistricting\par}
 \vspace{9pt}
 {\footnotesize Research methods and computational sensitivity study \enspace$\cdot$\enspace October 2026\par}
 \end{center}
@@ -165,7 +165,7 @@ def main():
     require(latex.count(r"\begin{figure}")>=3,"Missing LaTeX vector figures")
     require(latex.count(r"\begin{table}")>=2,"Missing LaTeX booktabs tables")
     require(r"\begin{hangparas}" in latex,"Missing bibliography hanging indents")
-    print("STAGE4_LATEX_SOURCE_PASS",len(latex),"bytes",
+    print("STAGE4_PHANTOM_LATEX_SOURCE_PASS",len(latex),"bytes",
           latex.count(r"\begin{equation}"),"equations",
           latex.count(r"\begin{table}"),"tables")
 if __name__=="__main__":main()
