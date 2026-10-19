@@ -27,11 +27,13 @@ ZIP_HASH="07bce18dabbcca9d549e28995a8156fd6978d7db"
 
 
 def build(g,polys,matching,k):
-    proposals=contacts(g,list(polys.geometry),matching,k)
+    # Rank from the same 50-neighbor pool used by the source sensitivity audit.\n    # A search stopping at K candidates can change the selected top-K edges.\n    proposals=contacts(g,list(polys.geometry),matching,50)
     prepared=g.copy()
     chosen=[]
     seen=set()
     for row in proposals:
+        if row["rank"]>k:
+            continue
         u,v=int(row["u"]),int(row["v"])
         key=tuple(sorted((u,v)))
         if key in seen:
