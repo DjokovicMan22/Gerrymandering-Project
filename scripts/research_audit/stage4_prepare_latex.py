@@ -76,6 +76,38 @@ The contrasts are neither legal-map neutrality tests nor isolated causal effects
 \end{threeparttable}
 \end{table}
 """
+TABLE_3=r"""
+\begin{table}[H]
+\centering
+\caption{Executable evidence and scientific disposition of baseline reliability checks.}
+\label{tab:audit-gates}
+\begin{threeparttable}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.21\linewidth}
+>{\raggedright\arraybackslash}p{.33\linewidth}
+>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Audit layer} & \textbf{Inspectible records} & \textbf{Scientific disposition}\\
+\midrule
+Source geography & Exact graph and polygon digests; artificial-bridge audit; component-MST and KNN3 tests
+& Processed inputs reconciled; authoritative legal adjacency unresolved\\
+Numerical definitions & Independent seat, population, compactness, efficiency-gap calculations
+& Arithmetic reconciles; 2016 one-vote threshold-order difference disclosed\\
+Sampling reliability & Corrected RNG replay; warmup distances; rejection logs; rank R-hat and bulk/tail ESS
+& Tested stationary-null diagnostics fail\\
+Constraint sensitivity & Versioned 64-run workflow, individually verified terminal maps, paired contrast uncertainty
+& Signed finite-horizon procedure difference detected; individual cap effect not identified\\
+Paper reproducibility & Graph and endpoint SHA gates; programmatic vector plots; XeLaTeX/visual PDF checks
+& Source-linked document verified; not external scientific review\\
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \emph{Note.} Source, numerical, or build success is not itself certification of a legal neutral-map distribution.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
 FIGURES={
 1:("figure1_terminal_EG_ECDF",.90,
 "Empirical cumulative distributions of efficiency gap under tighter and relaxed model constraints (32 independently seeded endpoints per regime). The vertical reference marker is the enacted plan under the same 2020 presidential-vote overlay; this is not a legal-map outlier test."),
@@ -119,6 +151,13 @@ def prepare(s:str)->str:
     b=s.find("The paired bootstrap uses the joint seed-indexed",a)
     require(a>0 and b>a and "| Democratic seats" in s[a:b],"Table 2 marker mismatch")
     s=s[:a]+TABLE_2+"\n\n"+s[b:]
+    # The audit-implementation table must use the same numbered booktabs
+    # standard as the outcome tables; never leave Pandoc pipe-table defaults.
+    a=s.find("**Table 3.")
+    b=s.find("### 8.5 The evidentiary consequence",a)
+    require(a>0 and b>a and "| Geographic provenance" in s[a:b],
+            "Executable audit evidence table or final-section boundary changed")
+    s=s[:a]+TABLE_3+"\n\n"+s[b:]
     for n,(stem,width,caption) in FIGURES.items():
         pattern=rf"(?ms)^!\[Figure {n}:.*?\]\(figures/{stem}\.svg\)\s*?\n\*\*Figure {n}\.\*\* [^\n]*"
         found=list(re.finditer(pattern,s))
@@ -154,7 +193,7 @@ def prepare(s:str)->str:
     # Allow immutable source hashes to wrap without overflowing text margins.
     s=re.sub(r"`([0-9a-f]{40,64})`",
              lambda m:r"\texttt{\seqsplit{"+m.group(1)+"}}",s)
-    require(s.count(r"\begin{figure}[H]")==3 and s.count(r"\begin{table}[H]")==2,
+    require(s.count(r"\begin{figure}[H]")==3 and s.count(r"\begin{table}[H]")==3,
             "Missing academic tables or figures")
     return s
 def main():
@@ -183,7 +222,7 @@ def main():
     latex=a.tex.read_text(encoding="utf-8")
     require(latex.count(r"\begin{equation}")>=4,"No proper numbered equations")
     require(latex.count(r"\begin{figure}")>=3,"Missing LaTeX vector figures")
-    require(latex.count(r"\begin{table}")>=2,"Missing LaTeX booktabs tables")
+    require(latex.count(r"\begin{table}")>=3,"Missing LaTeX booktabs tables")
     require(r"\begin{hangparas}" in latex,"Missing bibliography hanging indents")
     print("STAGE4_PHANTOM_LATEX_SOURCE_PASS",len(latex),"bytes",
           latex.count(r"\begin{equation}"),"equations",
