@@ -107,6 +107,7 @@ Paper reproducibility & Graph and endpoint SHA gates; programmatic vector plots;
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
+"""
 
 FIGURES={
 1:("figure_topology_artificial_bridges",.91,
