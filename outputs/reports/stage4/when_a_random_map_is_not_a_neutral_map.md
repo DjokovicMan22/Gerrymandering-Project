@@ -34,19 +34,24 @@ The contribution is not a verdict on the legality or intent of Michigan's distri
 
 ### 2.1 The state space is part of the hypothesis
 
-Represent a precinct-level state as an undirected graph `G=(V,E)`. Each vertex `v` is a geographic unit with population `p_v` and election attributes; an edge asserts adjacency under a defined geographic rule. A congressional map is an assignment `x:V→{1,…,K}`, where here `K=13`. For each district label `d`, the induced subgraph `G[x^{-1}(d)]` should be connected *under the chosen adjacency definition*. Population equality can be imposed by
+Represent a precinct-level state as an undirected graph $G=(V,E)$. Each vertex $v$ is a geographic unit with population $p_v$ and election attributes; an edge asserts adjacency under a defined geographic rule. A congressional map is an assignment $x:V\rightarrow\{1,\ldots,K\}$, where here $K=13$. For each district label $d$, the induced subgraph $G[x^{-1}(d)]$ should be connected *under the chosen adjacency definition*. Population equality can be imposed by
 
-```text
-|P_d(x) / P* − 1| ≤ ε,      P* = (Σ_v p_v) / K,
-```
+$
+\begin{aligned}
+P^{\star} &= \frac{1}{K}\sum_{v\in V}p_v, \\
+P_d(x) &= \sum_{\{v\in V:\,x(v)=d\}}p_v,\\
+\left|\frac{P_d(x)}{P^{\star}}-1\right| &\leq \varepsilon,
+\qquad d=1,\ldots,K.
+\end{aligned}
+$
 
-where `P_d(x)` is district population, `P*` is the equal-population ideal and `ε` is the tolerance applied by the particular experiment.
+where $P_d(x)$ is district population, $P^{\star}$ is the equal-population ideal and $\varepsilon$ is the tolerance applied by the particular experiment.
 
 This formalization immediately exposes a substantive problem: graph connectivity is not identical to legally acceptable contiguity. Michigan's Constitution, article IV, section 6(13), explicitly addresses geographic contiguity and treats islands as contiguous by land to the county of which they are part. It also establishes a ranked set of considerations that includes federal law and the Voting Rights Act, communities of interest, partisan fairness, consideration of county/city/township boundaries, and reasonable compactness. A model in which a precinct becomes “adjacent” because it is the nearest polygon across water need not satisfy those rules. Nor do generic cut-edge or county-split penalties encode them exactly. A computational state space is therefore a proposed *model of admissibility*, not a legal determination.
 
 ### 2.2 The target law is not determined by the proposal name
 
-Even after selecting a graph and feasible set `S`, an ensemble needs a probability law `π` over maps. Uniformity over labeled maps, uniformity over unlabeled district partitions and a spanning-tree-weighted distribution are different constructions. They need not agree on the frequency of a particular partisan score. A transition kernel `P(x,y)` should be assessed relative to that intended law: stationarity requires `πP=π`, while detailed balance is the stronger sufficient condition `π(x)P(x,y)=π(y)P(y,x)`. An irreducibility and practical-mixing argument is still needed to say that finite runs approach the intended law from their starting states.
+Even after selecting a graph and feasible set $S$, an ensemble needs a probability law $\pi$ over maps. Uniformity over labeled maps, uniformity over unlabeled district partitions and a spanning-tree-weighted distribution are different constructions. They need not agree on the frequency of a particular partisan score. A transition kernel $P(x,y)$ should be assessed relative to that intended law: stationarity requires $\pi P=\pi$, while detailed balance is the stronger sufficient condition $\pi(x)P(x,y)=\pi(y)P(y,x)$. An irreducibility and practical-mixing argument is still needed to say that finite runs approach the intended law from their starting states.
 
 Ordinary ReCom proposes a new pair of districts by merging adjacent districts, constructing a spanning tree and splitting it into population-balanced connected parts (DeFord et al. 2021). Its strong spatial movement can be useful, but the name “ReCom” alone does not identify a universal stationary distribution, especially when custom hard rejections alter the implementation. In contrast, Cannon et al. (2026) describe a reversible recombination kernel targeting a distribution weighted by district spanning-tree counts. That theorem applies under its specified kernel and state-space assumptions; simply invoking a library routine, adding undocumented geographic restrictions, or running it for a small number of steps does not establish mixing on the present Michigan model.
 
@@ -56,9 +61,10 @@ The distinction between *a mathematically known invariant law* and *empirical ex
 
 We use Democratic seats under a fixed two-party presidential vote overlay and the efficiency gap. Following Stephanopoulos and McGhee (2015), the efficiency gap is the difference between wasted Republican and Democratic votes, divided by total two-party votes. In the project's sign convention,
 
-```text
-EG(x) = [W_R(x) − W_D(x)] / [V_R(x) + V_D(x)].
-```
+$
+\operatorname{EG}(x)
+=\frac{W_R(x)-W_D(x)}{V_R(x)+V_D(x)}.
+$
 
 A positive value indicates more Republican than Democratic wasted votes under this convention; a negative value indicates the reverse. Wasted votes consist of votes for the losing party and votes for the winning party beyond its defined winning threshold. The implemented threshold is `floor(total_two_party_votes/2)+1`. Because 2016 precinct allocations contain fractional votes, that floor operation makes individual district wasted-vote totals slightly sensitive to floating summation order. The source audit identified and bounded a one-vote-level difference in the archived 2016 reference efficiency gap; the discrepancy is numerically small but should not be concealed as exact agreement.
 
@@ -128,14 +134,19 @@ Together, the experiments reveal an operational distinction that should appear i
 
 ### 6.1 What is being sampled?
 
-Because the neutral stationary target was not verified, the final experiment deliberately changed the research question. Let `x_0` be the enacted reference assignment and `P_c` the implemented stochastic transition procedure under geographic condition `c`. Rather than assert that `x_T` approximates a uniform or spanning-tree-weighted legal map, define the **finite-horizon outcome law**
+Because the neutral stationary target was not verified, the final experiment deliberately changed the research question. Let $x_0$ be the enacted reference assignment and $P_c$ the implemented stochastic transition procedure under geographic condition $c$. Rather than assert that $x_T$ approximates a uniform or spanning-tree-weighted legal map, define the **finite-horizon outcome law**
 
-```text
-Q_c,T(A) = Pr{x_T ∈ A | x_0 = enacted reference, graph = KNN3,
-                       fixed transition implementation and caps c}.
-```
+$
+Q_{c,T}(A)
+=\Pr\!\left(
+X_T\in A\;\middle|\;
+X_0=x_{\mathrm{enacted}},\
+G=G_{\mathrm{KNN3}},\
+P=P_c
+\right),\quad T=800.
+$
 
-Here `T=800` recorded transitions after step zero. The estimand `E_{Q_c,T}[f(x_T)]` is meaningful by construction: it describes what this particular algorithm produces after a fixed computational horizon starting from a particular map. It does **not** imply a unique stationary target, unbiased representation of legal maps, or independence of the final state from the enacted reference. This weaker estimand is the subject of our finite-horizon comparison.
+Here $T=800$ recorded transitions after step zero. The estimand $\mathbb{E}_{Q_{c,T}}[f(X_T)]$ is meaningful by construction: it describes what this particular algorithm produces after a fixed computational horizon starting from a particular map. It does **not** imply a unique stationary target, unbiased representation of legal maps, or independence of the final state from the enacted reference. This weaker estimand is the subject of our finite-horizon comparison.
 
 ### 6.2 Experiment protocol
 
@@ -149,7 +160,7 @@ Sampling *one terminal map per independently seeded run*, rather than all **51,2
 
 ### 6.3 Uncertainty calculations
 
-For a statistic `f`, the mean of 32 independent-seed endpoints estimates `E_{Q_c,T}[f]` under the generator and its fixed starting map. We used 10,000 nonparametric, deterministic-seed bootstrap resamples of the **32 endpoints**, taking the 2.5th and 97.5th percentiles to form approximate **95% Monte Carlo intervals for that conditional mean**. These intervals represent variability among independent runs of this algorithm, not uncertainty about a legally neutral map distribution or a claim of generalizing to other election years.
+For a statistic $f$, the mean of 32 independent-seed endpoints estimates `E_{Q_c,T}[f]` under the generator and its fixed starting map. We used 10,000 nonparametric, deterministic-seed bootstrap resamples of the **32 endpoints**, taking the 2.5th and 97.5th percentiles to form approximate **95% Monte Carlo intervals for that conditional mean**. These intervals represent variability among independent runs of this algorithm, not uncertainty about a legally neutral map distribution or a claim of generalizing to other election years.
 
 For the descriptive indicator that an endpoint's efficiency gap is at least the enacted reference efficiency gap, we computed the observed proportion and Wilson 95% binomial interval. Since the enacted map is also the deterministic starting state, and the model and caps are researcher-designed, the resulting fraction **must not** be described as an enacted-map randomization p-value.
 
@@ -184,7 +195,7 @@ The following figures were generated **directly from the 64 independently verifi
 
 **Figure 3.** Assignment movement from the reference after optimal relabeling versus terminal efficiency gap. The between-regime separation in mobility illustrates the algorithm's sensitivity to exploratory geographic caps. These geographic nodes are not necessarily legally valid districts.
 
-The exact source-scored CSV, original aggregate JSON, graph fingerprint, generated SVG and PNG images, and bootstrap comparison manifest are preserved in the [Stage 4 evidence-figure run](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39203488689). The deterministic figure generator is `scripts/research_audit/stage4_make_figures.py`.
+The figures are regenerated without embedded titles or footers using the source-checked 64-map artifact and the print-ready renderer `scripts/research_audit/stage4_journal_figures.py`. The archived original model scores, source hashes, and sensitivity estimates are unchanged.
 
 The tighter model produces terminal plans closer to the original geography by every reported fragmentation measure and yields modestly higher Democratic seat scores under the selected election layer. Mean efficiency gaps differ by about **0.0328** (3.28 percentage points of the efficiency-gap scale) between regimes, while mean Democratic seats differ by about **0.406** seats. These are differences between **specified finite-time algorithmic procedures**, not a causal estimate of how legally valid district maps would respond to relaxing real Michigan law.
 
@@ -200,7 +211,18 @@ The findings support a different, narrower statement: **within 800 recorded ReCo
 
 ### 7.3 Paired-seed sensitivity as a secondary, model-conditional check
 
-Because each cap regime was run under the same 32 nominal pseudorandom seeds, one can report differences between the corresponding terminal outcomes indexed by seed, rather than relying solely on two separate sets of condition means. We retained the paired indexing of the original fixed-horizon experiment and drew **20,000 bootstrap resamples of entire seed-indexed endpoint pairs**, not individual correlated chain steps. A deterministic resampling seed (20261018) makes the interval calculation reproducible.
+Because each cap regime was run under the same 32 nominal pseudorandom seeds, one can report differences between the corresponding terminal outcomes indexed by seed, rather than relying solely on two separate sets of condition means.
+
+The paired endpoint contrast for any reported statistic $f$ is
+
+$
+\widehat{\Delta}_f
+=\frac{1}{32}\sum_{s=10001}^{10032}
+\left[
+f\!\left(X_{800,s}^{\mathrm{tight}}\right)
+-f\!\left(X_{800,s}^{\mathrm{relaxed}}\right)
+\right].
+$ We retained the paired indexing of the original fixed-horizon experiment and drew **20,000 bootstrap resamples of entire seed-indexed endpoint pairs**, not individual correlated chain steps. A deterministic resampling seed (20261018) makes the interval calculation reproducible.
 
 **Table 2. Secondary paired-seed model contrasts.** Positive values mean the **tighter minus relaxed** finite-horizon procedure has a larger mean statistic. These intervals describe conditional simulation-procedure differences, not legal-plan probabilities or the causal effect of one isolated geographic rule.
 
@@ -291,6 +313,6 @@ Veomett, Ellen, with Arbie Hsu and Alusi. “Michigan JSON and Shapefile” (pro
 
 **E. Independently seeded endpoint experiment.** [Successful 64-run GitHub Actions workflow, derived CSV endpoints, JSON summary and seed replay evidence](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39180152601); [Stage 3 final empirical report](https://github.com/DjokovicMan22/Gerrymandering-Project/blob/research/stages-1-3-validation/docs/research_audit/STAGE3_FINAL_REPORT.md). The published workflow artifact contains model-specific derived scores but excludes redistributed third-party source graphs and full precinct assignment maps.
 
-**F. Plotting and paired contrasts.** [Stage 4 original-data graphics and paired Monte Carlo computation](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39203488689); production code in `scripts/research_audit/stage4_make_figures.py`. Input is the original Stage 3 aggregate artifact, strictly checked by SHA and seed identities. Contrasts concern the researcher-defined finite-horizon procedures only.
+**F. Plotting and paired contrasts.** [Stage 4 source-audited graphics and paired Monte Carlo computation](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39203488689); production code in `scripts/research_audit/stage4_journal_figures.py`. Input is the original Stage 3 aggregate artifact, strictly checked by SHA and seed identities. Contrasts concern the researcher-defined finite-horizon procedures only.
 
 **G. Status and interpretation.** This is a **methods and conditional-sensitivity manuscript**; numerical computations and scoped reproducibility checks passed, while legal-plan stationarity, authoritative geographic admissibility and an enacted-map outlier hypothesis were **not established**. This manuscript should undergo external methodological review before submission. The reported conditional bootstrap intervals and endpoint frequencies are **not** gerrymandering significance tests.
