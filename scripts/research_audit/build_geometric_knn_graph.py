@@ -43,6 +43,8 @@ def build(g,polys,matching,k):
                           legally_certified=False,
                           polygon_distance_meters=row["distance_m"])
         chosen.append({"u":u,"v":v,"distance_m":row["distance_m"]})
+    if len(chosen)!=13:
+        raise ValueError(f"K=3 source-sensitivity protocol requires exactly 13 unique links, got {len(chosen)}")
     if not nx.is_connected(prepared):
         raise ValueError("Geometry candidate still disconnects statewide graph")
     ref_parts={}
@@ -88,6 +90,7 @@ def main():
         "graph_source_sha1_git_blob":GRAPH_HASH,
         "precinct_geometry_git_blob":ZIP_HASH,
         "method":"3 closest external precinct polygons from each disconnected component",
+        "source_ranking_candidate_pool_size":50,
         "district_labels_used_in_bridge_selection":False,
         "enacted_district_contiguity_validated_after_selection":True,
         "all_original_4756_nodes_retained":True,
