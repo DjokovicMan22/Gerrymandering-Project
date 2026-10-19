@@ -34,14 +34,14 @@ The paper first formalizes the computational baseline and verifies its sources. 
 
 Represent a precinct-level state as an undirected graph $G=(V,E)$. Each vertex $v$ is a geographic unit with population $p_v$ and election attributes; an edge asserts adjacency under a defined geographic rule. A congressional map is an assignment $x:V\rightarrow\{1,\ldots,K\}$, where here $K=13$. For each district label $d$, the induced subgraph $G[x^{-1}(d)]$ should be connected *under the chosen adjacency definition*. Population equality can be imposed by
 
-$
+$$
 \begin{aligned}
 P^{\star} &= \frac{1}{K}\sum_{v\in V}p_v, \\
 P_d(x) &= \sum_{\{v\in V:\,x(v)=d\}}p_v,\\
 \left|\frac{P_d(x)}{P^{\star}}-1\right| &\leq \varepsilon,
 \qquad d=1,\ldots,K.
 \end{aligned}
-$
+$$
 
 where $P_d(x)$ is district population, $P^{\star}$ is the equal-population ideal and $\varepsilon$ is the tolerance applied by the particular experiment.
 
@@ -59,10 +59,10 @@ The distinction between *a mathematically known invariant law* and *empirical ex
 
 We use Democratic seats under a fixed two-party presidential vote overlay and the efficiency gap. Following Stephanopoulos and McGhee (2015), the efficiency gap is the difference between wasted Republican and Democratic votes, divided by total two-party votes. In the project's sign convention,
 
-$
+$$
 \operatorname{EG}(x)
 =\frac{W_R(x)-W_D(x)}{V_R(x)+V_D(x)}.
-$
+$$
 
 A positive value indicates more Republican than Democratic wasted votes under this convention; a negative value indicates the reverse. Wasted votes consist of votes for the losing party and votes for the winning party beyond its defined winning threshold. The implemented threshold is `floor(total_two_party_votes/2)+1`. Because 2016 precinct allocations contain fractional votes, that floor operation makes individual district wasted-vote totals slightly sensitive to floating summation order. The source audit identified and bounded a one-vote-level difference in the archived 2016 reference efficiency gap; the discrepancy is numerically small but should not be concealed as exact agreement.
 
@@ -134,7 +134,7 @@ Together, the experiments reveal an operational distinction that should appear i
 
 Because the neutral stationary target was not verified, the final experiment deliberately changed the research question. Let $x_0$ be the enacted reference assignment and $P_c$ the implemented stochastic transition procedure under geographic condition $c$. Rather than assert that $x_T$ approximates a uniform or spanning-tree-weighted legal map, define the **finite-horizon outcome law**
 
-$
+$$
 Q_{c,T}(A)
 =\Pr\!\left(
 X_T\in A\;\middle|\;
@@ -142,7 +142,7 @@ X_0=x_{\mathrm{enacted}},\
 G=G_{\mathrm{KNN3}},\
 P=P_c
 \right),\quad T=800.
-$
+$$
 
 Here $T=800$ recorded transitions after step zero. The estimand $\mathbb{E}_{Q_{c,T}}[f(X_T)]$ is meaningful by construction: it describes what this particular algorithm produces after a fixed computational horizon starting from a particular map. It does **not** imply a unique stationary target, unbiased representation of legal maps, or independence of the final state from the enacted reference. This weaker estimand is the subject of our finite-horizon comparison.
 
@@ -213,14 +213,16 @@ Because each cap regime was run under the same 32 nominal pseudorandom seeds, on
 
 The paired endpoint contrast for any reported statistic $f$ is
 
-$
+$$
 \widehat{\Delta}_f
 =\frac{1}{32}\sum_{s=10001}^{10032}
 \left[
 f\!\left(X_{800,s}^{\mathrm{tight}}\right)
 -f\!\left(X_{800,s}^{\mathrm{relaxed}}\right)
 \right].
-$ We retained the paired indexing of the original fixed-horizon experiment and drew **20,000 bootstrap resamples of entire seed-indexed endpoint pairs**, not individual correlated chain steps. A deterministic resampling seed (20261018) makes the interval calculation reproducible.
+$$
+
+We retained the paired indexing of the original fixed-horizon experiment and drew **20,000 bootstrap resamples of entire seed-indexed endpoint pairs**, not individual correlated chain steps. A deterministic resampling seed (20261018) makes the interval calculation reproducible.
 
 **Table 2. Secondary paired-seed model contrasts.** Positive values mean the **tighter minus relaxed** finite-horizon procedure has a larger mean statistic. These intervals describe conditional simulation-procedure differences, not legal-plan probabilities or the causal effect of one isolated geographic rule.
 
