@@ -112,6 +112,10 @@ The independent component-distance experiment (`stage3-geometric-mst-candidates.
 
 The `stage3-topology-gate.yml` workflow verifies that its specified source file and edge manifest match the pinned originals, checks state and reference connectivity, and emits an explicit `scientific_gate` result. Crucially, the checker **currently reports** rejection of a reference-incompatible candidate in its JSON rather than automatically certifying compliance with Michigan law; its successful GitHub Actions execution means the diagnostic **ran**, not that its geographic hypothesis **passed**. This separation of *execution status*, *geometric validity*, and *legal admissibility* is itself a useful design rule for automated research audits. A production gate should block downstream legal-neutral inference when geography is unresolved, while preserving failed checks as reproducible results.
 
+![Figure 1: Original five project-added artificial connections plotted using verified Michigan precinct geometry.](figures/figure_topology_artificial_bridges.svg)
+
+**Figure 1.** Original Michigan precinct polygons are displayed as representative points (gray); dashed red segments join the *nearest points on the two original source polygons* connected by each of the five synthetic edges added by the project's historical label-conditioned repair. Labels report independently recomputed polygon-to-polygon separation in kilometers. Source processed graph Git blob `a4dfe70818f87b97924781216f3d86a672cfc66a`, source polygon ZIP blob `07bce18dabbcca9d549e28995a8156fd6978d7db`; projected distance CRS EPSG:32616. The segments do not establish roads, water access, or legal contiguity.
+
 ## 5. Pillar II: The mixing illusion
 
 ### 5.1 Original archived ReCom histories
@@ -183,19 +187,19 @@ For the descriptive indicator that an endpoint's efficiency gap is at least the 
 
 ### Figures: exact, independently checked endpoint data
 
-Figures 1–3 present empirical terminal outcomes from the **64 independently verified endpoint maps**. Together, they show how the constraint regimes affect the efficiency-gap distribution, the correspondence between seed-indexed runs, and spatial movement from the enacted reference.
+Figures 2–4 present empirical terminal outcomes from the **64 independently verified endpoint maps**. Together, they show how the constraint regimes affect the efficiency-gap distribution, the correspondence between seed-indexed runs, and spatial movement from the enacted reference.
 
-![Figure 1: Empirical cumulative distributions of endpoint efficiency gaps for both constraint regimes, with enacted reference shown by dotted vertical line.](figures/figure1_terminal_EG_ECDF.svg)
+![Figure 2: Empirical cumulative distributions of endpoint efficiency gaps for both constraint regimes, with enacted reference shown by dotted vertical line.](figures/figure1_terminal_EG_ECDF.svg)
 
-**Figure 1.** Empirical cumulative distributions of terminal efficiency gaps in the two researcher-defined regimes (32 independent seeded endpoints per regime). The dotted reference line marks the enacted map's counterfactual 2020 presidential efficiency gap. This is *not* a legal-map outlier test.
+**Figure 2.** Empirical cumulative distributions of terminal efficiency gaps in the two researcher-defined regimes (32 independent seeded endpoints per regime). The dotted reference line marks the enacted map's counterfactual 2020 presidential efficiency gap. This is *not* a legal-map outlier test.
 
-![Figure 2: Matched RNG-seed labels' terminal efficiency gaps under tighter versus relaxed caps.](figures/figure2_paired_seed_EG.svg)
+![Figure 3: Matched RNG-seed labels' terminal efficiency gaps under tighter versus relaxed caps.](figures/figure2_paired_seed_EG.svg)
 
-**Figure 2.** The 32 pairs of terminal efficiency-gap scores indexed by a common RNG seed label across the two cap conditions. The dashed diagonal indicates equal partisan scores. Common seed identifiers do *not* mean that matched trajectories use identical proposal sequences or produce comparable individual districts.
+**Figure 3.** The 32 pairs of terminal efficiency-gap scores indexed by a common RNG seed label across the two cap conditions. The dashed diagonal indicates equal partisan scores. Common seed identifiers do *not* mean that matched trajectories use identical proposal sequences or produce comparable individual districts.
 
-![Figure 3: Endpoint efficiency gap against fraction of precincts reassigned from the enacted map.](figures/figure3_spatial_change_vs_EG.svg)
+![Figure 4: Endpoint efficiency gap against fraction of precincts reassigned from the enacted map.](figures/figure3_spatial_change_vs_EG.svg)
 
-**Figure 3.** Assignment movement from the reference after optimal relabeling versus terminal efficiency gap. The between-regime separation in mobility illustrates the algorithm's sensitivity to exploratory geographic caps. These geographic nodes are not necessarily legally valid districts.
+**Figure 4.** Assignment movement from the reference after optimal relabeling versus terminal efficiency gap. The between-regime separation in mobility illustrates the algorithm's sensitivity to exploratory geographic caps. These geographic nodes are not necessarily legally valid districts.
 
 Detailed data fingerprints, source-checked plotting code, and figure-generation logs are supplied in the reproducibility appendix.
 
