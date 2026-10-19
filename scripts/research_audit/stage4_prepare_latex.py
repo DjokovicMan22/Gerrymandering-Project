@@ -87,7 +87,7 @@ FIGURES={
 def require(ok,msg):
     if not ok:raise ValueError(msg)
 def prepare(s:str)->str:
-    require(s.startswith("# When a Random Map Is Not a Neutral Map:"),"Unexpected manuscript title")
+    require(s.startswith("# The Phantom Baseline:"),"Unexpected manuscript title")
     k=s.find("\n## Abstract")
     require(k>0,"No abstract")
     s=COVER+"\n"+s[k:]
