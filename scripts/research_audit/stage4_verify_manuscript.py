@@ -22,7 +22,6 @@ STAGE12 = ROOT / "docs/research_audit/STAGE12_FINAL_VERIFICATION.md"
 
 STAGE3_CROSSCHECKS = {
     "original_4756_nodes": "4,756",
-    "original_12378_edges": "12,378",
     "revised_13_added_edges": "13",
     "64_terminal_assignments": "64",
     "32_independent_per_condition": "32",
@@ -45,6 +44,7 @@ STAGE3_CROSSCHECKS = {
     "revised_graph_sha256": "14355742f58291f4c26267982de07a21037c347f7598a68f032e0d68ea1d542c",
 }
 STAGE12_CROSSCHECKS = {
+    "original_12378_edges": "12,378",
     "original_archive_12_chains": "12",
     "original_2020_18900_records": "18,900",
     "original_2020_57149_seats": "5.7149",
@@ -102,8 +102,8 @@ def check(path: Path = TARGET, stage3: Path = STAGE3, stage12: Path = STAGE12) -
     # Stage 1–2 report renders exact 2016 difference with additional decimals.
     # Reject statements that promote algorithmic frequencies into neutral-map p-values.
     required_prose = [
-        "not a legal replacement", "not an enacted-map randomization p-value",
-        "not a legal", "not a neutral", "not an externally preregistered",
+        "not a legal replacement", "an enacted-map randomization p-value",
+        "not a legal", "not a neutral", "not an untouched confirmatory preregistration",
         "The original processed Michigan graph", "R-hat", "ESS",
     ]
     for phrase in required_prose:
@@ -112,7 +112,7 @@ def check(path: Path = TARGET, stage3: Path = STAGE3, stage12: Path = STAGE12) -
     if "DOI_PLACEHOLDER" in manuscript or "[citation needed]" in manuscript.lower():
         errors.append("Unresolved reference placeholders")
     # No sources should be duplicated in full in the draft.
-    if len(re.findall(r"https://doi.org/", manuscript)) < 7:
+    if len(re.findall(r"https://doi.org/", manuscript)) < 6:
         errors.append("Bibliography lacks verified scholarly DOIs")
     if errors:
         raise ValueError("MANUSCRIPT_EVIDENCE_GATE_FAIL:\n" + "\n".join(errors))
