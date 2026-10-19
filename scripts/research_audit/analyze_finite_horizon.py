@@ -67,9 +67,9 @@ def require_complete(files:list[Path],condition:str,graph_sha:str|None=None)->pd
         raise ValueError("Missing/duplicated fixed independent RNG seed")
     if set(df["steps_including_enacted_reference"].astype(int))!={801}:
         raise ValueError("Mismatched algorithmic time horizon")
-    if df["independently_rescored_endpoint"].eq(True).all() is False:
+    if not bool(df["independently_rescored_endpoint"].eq(True).all()):
         raise ValueError("Unverified sampled endpoint found")
-    if df["legal_and_stationary_map_distribution_certified"].eq(False).all() is False:
+    if not bool(df["legal_and_stationary_map_distribution_certified"].eq(False).all()):
         raise ValueError("Unfounded stationary/legal certification flag")
     for key in ("model_graph_sha256","reference_assignment_sha256"):
         if df[key].nunique()!=1:
@@ -103,7 +103,7 @@ def require_complete(files:list[Path],condition:str,graph_sha:str|None=None)->pd
     if ((df["endpoint_fraction_precincts_different_from_reference"]<0)|
         (df["endpoint_fraction_precincts_different_from_reference"]>1)).any():
         raise ValueError("Invalid exact node-disagreement fraction")
-    if df["endpoint_sha256"].str.len().eq(64).all() is False:
+    if not bool(df["endpoint_sha256"].str.len().eq(64).all()):
         raise ValueError("Invalid endpoint assignment digest")
     return df.sort_values("rng_seed").reset_index(drop=True)
 
