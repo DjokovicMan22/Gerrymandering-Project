@@ -1,6 +1,6 @@
 # Stage 1 — Deep Repository Audit
 
-**Audit date:** 2026-10-17/18  
+> **Post-audit update (18 October 2026):** The missing-source and compactness reproducibility gaps identified below have now been addressed **within the public processed-source scope**: the pinned Michigan graph and original polygon ZIP were independently matched; all 13 enacted district Polsby–Popper, Reock and convex-hull scores were independently recomputed and reconciled; upstream provenance and licensing were documented. **Original raw Census/VEST joins and legal geography remain unverified.** See the [authoritative Stage 1–2 verification report](STAGE12_FINAL_VERIFICATION.md). The findings below describe the earlier August snapshot and should not be read as the current branch's test status.\n\n**Audit date:** 2026-10-17/18  
 **Input:** `Gerrymandering-Project-main.zip` (archive snapshot dated 2026-08-07; embedded commit prefix `f34c3c5668785c26eb619812c3dce1e87b44be47`)  
 **Disposition:** **Conditional research prototype — not yet publication-ready or end-to-end independently reproducible.**  
 **Important scope limitation:** This was a static source-code review, executable unit-test run, and independent analysis of the *saved* plan-level time series. It was **not** a fresh precinct-level simulation, full graph-validation run, or legal validity certification. The source precinct data are absent.
