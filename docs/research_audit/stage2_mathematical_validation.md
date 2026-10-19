@@ -1,6 +1,6 @@
 # Stage 2 — Mathematical validation and statistical reliability audit
 
-**Project:** Gerrymandering research, Michigan 13-district counterfactual (2016/2020 presidential vote layers)  
+> **Post-audit update (18 October 2026):** All **12 archived chain CSVs** have now been reanalyzed directly from the checked-in original ZIP; all six 2016/2020 archived step-zero references and 26 Week 3 district vote rows were independently reconciled against the pinned Michigan graph. A **one-vote floating-point threshold discrepancy** was discovered in the 2016 reference efficiency gap and explicitly bounded. **The original intermediate map assignments and stochastic transition histories cannot be independently replayed from the archived scalar tables; convergence and legal-null claims remain rejected.** See [Stage 1–2 final verification](STAGE12_FINAL_VERIFICATION.md).\n\n**Project:** Gerrymandering research, Michigan 13-district counterfactual (2016/2020 presidential vote layers)  
 **Review date:** 17–18 October 2026  
 **Inputs:** `Gerrymandering-Project-main.zip`, including `strong_paper_review_packet.zip` extracted to `gerry_audit/packet`, with Week 4 and Week 6 plan-metric histories.  
 **Readiness decision:** **Mathematical definitions verified at the plan-summary level; substantive legal-comparability and Monte Carlo convergence concerns remain unresolved.** This is a *completed analysis of available saved output*, not a reconstructed census-precinct ensemble or a certified mathematical proof of stationary mixing.
