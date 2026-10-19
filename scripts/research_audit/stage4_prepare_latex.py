@@ -137,6 +137,13 @@ def prepare(s:str)->str:
     # Remove source-only editorial emphasis from academic typesetting.
     # Journal manuscripts should not scatter bold prose or show literal ** in abstracts.
     s=re.sub(r"\*\*(.+?)\*\*", r"\1",s)
+    # The abstract is wrapped in a raw TeX environment. A literal percent
+    # would comment out everything following it on the TeX input line;
+    # escape it explicitly rather than silently truncate the contribution.
+    abstract_start=s.index(r"\\begin{abstract}")
+    abstract_end=s.index(r"\\end{abstract}",abstract_start)
+    abstract=s[abstract_start:abstract_end].replace("%",r"\\%")
+    s=s[:abstract_start]+abstract+s[abstract_end:]
     # Avoid orphaned/unnumbered internal plotting section above figures.
     s=s.replace("### Original-data figures {.unnumbered}","")
     # The paper title is a TeX cover, not a numbered Markdown heading.
