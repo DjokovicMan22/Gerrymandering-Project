@@ -95,7 +95,7 @@ def verify_against_packet(reference: dict, packet: Path) -> dict:
                 target = reference["elections"][yr]
                 for metric in ("dem_seats", "efficiency_gap", "mean_median"):
                     if not math.isclose(float(original[metric]), target[metric], abs_tol=2e-8):
-                        raise ValueError(f"{name}: independently computed {metric} disagrees with archive step zero")
+                        raise ValueError(f"{name}: independently computed {metric}={target[metric]} disagrees with archive step zero={float(original[metric])}")
                 for metric in ("cut_edges", "max_population_deviation"):
                     if not math.isclose(float(original[metric]), reference[metric], abs_tol=2e-8):
                         raise ValueError(f"{name}: independently computed {metric} disagrees with archive step zero")
