@@ -86,9 +86,10 @@ jobs:
           if not 12<=len(doc)<=38:raise ValueError("PDF page count out of plausible range")
           pages=[p.get_text() for p in doc]
           if min(len(p.strip()) for p in pages)<40:raise ValueError("Nearly blank page detected")
-          combined=" ".join(pages).lower()
+          combined=" ".join(" ".join(p.split()) for p in pages).lower()
           for token in ["the phantom baseline","geographic","mixing","32","0.03278",
-                        "gate a","gate b","gate c","references"]:
+                        "gate a","gate b","gate c","references",
+                        "the experiments identify how a reproducible computational baseline"]:
               if token not in combined:raise ValueError("Searchable PDF missing "+token)
           previews={"first":0,"last":len(doc)-1}
           for name,fragment in [("equations","population equality"),("results","terminal outcomes"),
