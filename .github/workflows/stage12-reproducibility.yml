@@ -1,0 +1,71 @@
+name: Stage 1-2 archive and source reproducibility
+
+on:
+  push:
+    branches:
+      - research/stages-1-3-validation
+    paths:
+      - .github/workflows/stage12-reproducibility.yml
+      - scripts/research_audit/stage12_*
+      - docs/data_provenance.md
+      - docs/data_sources.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  archive-and-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pinned analysis environment
+        run: |
+          python -m pip install numpy pandas networkx scipy pytest
+      - name: Inventory original research packet without redistributing it
+        run: |
+          python - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          p=Path('strong_paper_review_packet.zip')
+          assert p.exists(), 'Original archived research packet is missing'
+          with ZipFile(p) as z:
+              names=z.namelist()
+          print('ORIGINAL_PACKET_FILE_COUNT',len(names))
+          for name in names:
+              if 'chain' in name.lower() or 'week4' in name.lower() or 'week6' in name.lower() or 'stage2' in name.lower():
+                  print('PACKET_ENTRY',name)
+          PY
+      - name: Reproduce Stage 2 historical chain metrics from the checked-in original ZIP
+        run: |
+          if [ -f scripts/research_audit/stage12_archive_reanalysis.py ]; then
+            python scripts/research_audit/stage12_archive_reanalysis.py --packet strong_paper_review_packet.zip --output outputs/research_audit/stage12_archive.json
+          fi
+      - name: Verify upstream Michigan graph bytes and validate all input fields
+        run: |
+          python scripts/research_audit/download_source.py --acknowledge-source-terms
+          python scripts/research_audit/verify_graph.py \
+            --graph data/raw/mi/mi/mi.json \
+            --expected-git-blob a4dfe70818f87b97924781216f3d86a672cfc66a \
+            --expected-nodes 4756 --expected-population 10077331 \
+            --output outputs/research_audit/stage12_verified_graph.json
+      - name: Run Stage 1-2 adversarial tests
+        run: |
+          if [ -f tests/test_stage12_audit.py ]; then
+            python -m pytest tests/test_stage12_audit.py -q
+          fi
+      - name: Preserve independent verification manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage12-reproducibility-evidence
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            outputs/research_audit/stage12_archive.json
+            outputs/research_audit/stage12_verified_graph.json
+            data/raw/mi/mi/mi.json.provenance.json
