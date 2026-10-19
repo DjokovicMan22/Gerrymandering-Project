@@ -134,6 +134,9 @@ def prepare(s:str)->str:
                 "\n"+r"\begin{hangparas}{1.25em}{1}",1)
     ix=s.index(r"\clearpage"+"\n"+r"\appendix")
     s=s[:ix]+r"\end{hangparas}"+"\n"+r"\endgroup"+"\n\n"+s[ix:]
+    # Allow immutable source hashes to wrap without overflowing text margins.
+    s=re.sub(r"`([0-9a-f]{40,64})`",
+             lambda m:r"\texttt{\seqsplit{"+m.group(1)+"}}",s)
     require(s.count(r"\begin{figure}[tbp]")==3 and s.count(r"\begin{table}[tbp]")==2,
             "Missing academic tables or figures")
     return s
