@@ -42,7 +42,7 @@ def require_complete(files:list[Path],condition:str,graph_sha:str|None=None)->pd
         raise ValueError("Require four separately produced 8-seed CSVs per condition")
     parts=[]
     for path in files:
-        df=pd.read_csv(path)
+        df=pd.read_csv(path, dtype={"endpoint_sha256":"string", "model_graph_sha256":"string", "reference_assignment_sha256":"string"})
         if len(df)!=8:
             raise ValueError(f"Wrong number of endpoint replicates in {path}")
         parts.append(df)
