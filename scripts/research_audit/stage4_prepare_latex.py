@@ -18,7 +18,7 @@ in Computational Redistricting\par}
 \vspace{5pt}
 """
 TABLE_1=r"""
-\begin{table}[tbp]
+\begin{table}[H]
 \centering
 \caption{Terminal outcomes after 800 recorded transitions under two exploratory geographic regimes.}
 \label{tab:endpoints}
@@ -49,7 +49,7 @@ The proximity graph and fragmentation caps are not certified as Michigan legal r
 \end{table}
 """
 TABLE_2=r"""
-\begin{table}[tbp]
+\begin{table}[H]
 \centering
 \caption{Paired-seed terminal contrasts: tighter minus relaxed conditions.}
 \label{tab:paired}
@@ -123,7 +123,7 @@ def prepare(s:str)->str:
         pattern=rf"(?ms)^!\[Figure {n}:.*?\]\(figures/{stem}\.svg\)\s*?\n\*\*Figure {n}\.\*\* [^\n]*"
         found=list(re.finditer(pattern,s))
         require(len(found)==1,f"Figure {n} not found once")
-        fig=(r"\begin{figure}[tbp]"+"\n"+r"\centering"+"\n"+
+        fig=(r"\begin{figure}[H]"+"\n"+r"\centering"+"\n"+
              rf"\includegraphics[width={width:.2f}\linewidth]{{figures/{stem}.pdf}}"+"\n"+
              r"\caption{"+caption+"}\n"+rf"\label{{fig:stage4-{n}}}"+"\n"+r"\end{figure}")
         s=s[:found[0].start()]+fig+s[found[0].end():]
@@ -134,10 +134,20 @@ def prepare(s:str)->str:
                 "\n"+r"\begin{hangparas}{1.25em}{1}",1)
     ix=s.index(r"\clearpage"+"\n"+r"\appendix")
     s=s[:ix]+r"\end{hangparas}"+"\n"+r"\endgroup"+"\n\n"+s[ix:]
+    # Remove source-only editorial emphasis from academic typesetting.
+    # Journal manuscripts should not scatter bold prose or show literal ** in abstracts.
+    s=re.sub(r"\*\*(.+?)\*\*", r"\1",s)
+    # Avoid orphaned/unnumbered internal plotting section above figures.
+    s=s.replace("### Original-data figures {.unnumbered}","")
+    # The paper title is a TeX cover, not a numbered Markdown heading.
+    # Shift section headings down one Markdown level so Pandoc produces
+    # Section 1, Section 2, ... instead of Subsection 0.1, 0.2, ... .
+    s=re.sub(r"(?m)^(#{2,4})(?= )",
+             lambda m:"#"+m.group(1)[2:],s)
     # Allow immutable source hashes to wrap without overflowing text margins.
     s=re.sub(r"`([0-9a-f]{40,64})`",
              lambda m:r"\texttt{\seqsplit{"+m.group(1)+"}}",s)
-    require(s.count(r"\begin{figure}[tbp]")==3 and s.count(r"\begin{table}[tbp]")==2,
+    require(s.count(r"\begin{figure}[tbp]")==3 and s.count(r"\begin{table}[H]")==2,
             "Missing academic tables or figures")
     return s
 def main():
