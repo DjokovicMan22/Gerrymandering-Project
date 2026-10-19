@@ -44,6 +44,7 @@ def test_archive_numeric_baseline_is_finite():
 ])
 def test_archive_bad_numeric_rejected(field,bad):
     df=metric_frame()
+    df[field]=df[field].astype(float)
     df.loc[3,field]=bad
     with pytest.raises(ValueError):
         check(df)
