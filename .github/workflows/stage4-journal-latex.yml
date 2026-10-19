@@ -12,6 +12,10 @@ on:
       - outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md
   workflow_dispatch:
 
+concurrency:
+  group: phantom-baseline-journal-output
+  cancel-in-progress: true
+
 permissions:
   contents: write
   actions: read
