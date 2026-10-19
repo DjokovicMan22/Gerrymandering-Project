@@ -1,5 +1,18 @@
 # Project status
 
+## Stage 4 — Full manuscript, source figures and PDF now ready for external scholarly review
+
+- [x] Wrote the 6,600-word research-methods and geographic-sensitivity manuscript [**When a Random Map Is Not a Neutral Map**](outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md).
+- [x] Independent evidence gate checked original Stage 1–3 numerical results and the draft's limits.
+- [x] Reconstructed three full publication-style SVG/PNG figures directly from the original 64-map Stage 3 terminal-map score artifact; committed them, source generator and provenance manifest.
+- [x] Added 20,000-resample *paired-seed* sensitivity comparison of Democratic seats, efficiency gap, proxy cut edges and spatial movement; explicitly **not a legally neutral-map test**.
+- [x] Produced [**15-page academic PDF**](outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.pdf) containing all three vector figures; PDF text, page count, first/last page previews and graph provenance passed automated verification.
+- [x] [Literature metadata checks and reviewer-style submission-readiness review](docs/research_audit/STAGE4_SUBMISSION_READINESS.md).
+- [ ] **External statistical/methodological peer review and venue-specific copyediting**. No legal neutral-map stationary distribution has been established; do not call the paper a proof of illegal or intentional Michigan gerrymandering.
+
+**GitHub evidence:** [real-data figures](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39203727983), [source-verified PDF](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39204046502), [numeric manuscript gate](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39203675742). Original `main` remains unchanged.
+
+
 ## Stage 3 final decision — CLOSED, SCOPED RESEARCH RESULT
 
 - [x] Source-pinned Michigan graph and original precinct polygon ZIP aligned for all 4,756 nodes.
