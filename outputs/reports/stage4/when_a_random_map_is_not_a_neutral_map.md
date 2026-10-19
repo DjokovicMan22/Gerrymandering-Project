@@ -1,14 +1,14 @@
-# When a Random Map Is Not a Neutral Map: Geographic Adjacency, Convergence, and the Limits of Michigan Redistricting Ensembles
+# The Phantom Baseline: Geographic Assumptions, Mixing Failures, and Constraint Sensitivity in Computational Redistricting
 
-**A source-audited computational sensitivity study**
+**A three-axis empirical audit and finite-horizon stress test**
 
-*Research manuscript — Version 1.0, 18 October 2026*  
+*Research manuscript — Revised October 2026*  
 *Status: Complete first scholarly draft; not yet externally peer reviewed.*  
 *Data and code: [Gerrymandering-Project, research validation branch](https://github.com/DjokovicMan22/Gerrymandering-Project/tree/research/stages-1-3-validation).*
 
 ## Abstract
 
-Computer-generated redistricting plans are frequently used to evaluate whether an enacted electoral map is unusual relative to alternative geographic arrangements. Yet the evidentiary force of such comparisons depends on choices that may appear merely technical: what qualifies as adjacent geography, which maps are considered feasible, how transitions are proposed, and whether a simulation reaches its intended distribution. This study examines those dependencies using the 13-district Michigan congressional reference, a 4,756-precinct graph, and counterfactual 2016 and 2020 presidential-vote allocations. Auditing an earlier simulation revealed five artificially inserted graph edges linking precinct polygons roughly 42–280 kilometers apart; the edges were selected because their endpoints shared an enacted district label. Replacing them with a district-label-independent polygon-proximity construction produced a connected, reference-compatible graph with 13 added edges, although legal island and water contiguity remained unverified. Previously generated ReCom chains failed prespecified convergence diagnostics. An independently implemented reversible local Metropolis–Hastings sampler had a mathematically characterized conditional target but also failed to mix adequately; an additional published reversible recombination configuration produced no accepted moves in a limited feasibility pilot. Rather than interpret these outputs as samples of legally valid maps, we define a narrower estimand: the final plan produced by 800 recorded transitions from the enacted reference. Sixty-four independently seeded trajectories—32 under each of two exploratory fragmentation regimes—yielded mean Democratic seat counts of 7.219 and 6.813, and mean efficiency gaps of +0.0201 and −0.0127. These are reproducible, model-conditional algorithmic outcomes, not neutral-map probabilities. The central finding is methodological: an apparently large ensemble can support weak substantive inference when geographic representation, admissibility and mixing are unresolved. A credible redistricting benchmark requires independent validation of each layer.
+**An ensemble's apparent objectivity depends on how its baseline was constructed.** We investigate three independently testable vulnerabilities in computational redistricting—geographic topology, Markov-chain exploration, and constraint dependence—using source-matched Michigan precinct geography and counterfactual presidential-vote overlays. First, a previously used graph-repair procedure selected five artificial edges according to enacted congressional labels; the endpoint polygons were separated by approximately **42–280 km**. A district-blind proximity alternative retained reference connectivity with 13 candidate links and a maximum separation of **17.8 km**, although the resulting graph is not an independently certified legal adjacency model. Second, multi-chain diagnostics rejected the treatment of tested sampler outputs as converged ensemble draws: one ReCom condition yielded rank-normalized **R-hat 1.733** and bulk effective sample size **9.4**; a local reversible Metropolis–Hastings configuration yielded **R-hat 2.588**. Third, we implement a deliberately specified finite-horizon **stress test**, rather than infer a stationary law from failed convergence. Across 64 separately seeded 800-transition terminal maps, relaxing a composite set of geographic caps increased precinct reassignment by **15.61 percentage points** and reduced mean Democratic seats by **0.406** and mean efficiency gap by **0.03278**. The tighter-minus-relaxed efficiency-gap contrast had a paired-bootstrap 95% interval of **[+0.00975, +0.05631]**. We use these results to define an operational **baseline reliability protocol**: source-grounded topology, target-specific exploration evidence, and explicit assumption-sensitivity checks. The experiments identify how a reproducible computational baseline can depend materially on modeling decisions; they do not claim to establish the distribution of all lawful Michigan maps.
 
 **Keywords:** redistricting; gerrymandering; Markov chain Monte Carlo; ReCom; graph topology; computational reproducibility; sampling convergence; geographic sensitivity; Michigan.
 
@@ -16,23 +16,21 @@ Computer-generated redistricting plans are frequently used to evaluate whether a
 
 ## 1. Introduction
 
-A map can appear biased without being an unusual product of the rules governing its construction. Conversely, a district plan that looks geographically unremarkable can allocate political representation in ways rarely observed among plausible alternatives. Computational ensemble analysis offers a response to this ambiguity: generate alternative districting plans subject to explicit criteria, evaluate each using the same election data, and compare the enacted map with the resulting distribution. The approach is attractive precisely because it promises to replace aesthetic judgment with a reproducible counterfactual. But an ensemble is not self-validating. The adjective *neutral* describes a defensible relation between an algorithm, a feasible state space and a research question; it does not follow merely because the program contains no variable labeled “partisanship.”
+**A redistricting ensemble does not become an objective baseline simply because it contains many maps.** What a histogram means depends on the graph used to define districts, the rules that determine admissibility, the transition kernel that explores them, and whether the resulting sample adequately approximates the claimed distribution. These are substantive modeling decisions. A stable-looking percentile does not independently establish that its counterfactual alternatives were neutral or legally plausible.
 
-There are at least four logically distinct claims in the phrase “the enacted plan is an outlier among neutral alternatives.” First, the geographic representation must correspond sufficiently well to the land, islands and legally relevant relationships being modeled. Second, the state space must embody applicable population, contiguity, community, administrative and federal voting-rights constraints. Third, the sampling procedure must have an appropriate, known or justified target distribution. Fourth, the observed chains must explore that target adequately for summary statistics to be interpretable. Reproducing a script and its output verifies none of these propositions by itself.
+That distinction matters whenever ensemble rankings are treated as evidence of representational bias. A statement that an enacted plan is rare among simulated alternatives implicitly asserts that the simulation approximates a justified distribution over relevant maps. The apparent precision of a percentile cannot substitute for establishing this link. The redistricting literature already contains important work on recombination methods, simulation validation, and legally attentive state-level sampling (DeFord, Duchin, and Solomon 2021; McCartan et al. 2022; Kenny et al. 2023). We do not treat the field's existing methods as uniformly defective. We examine a concrete pipeline to identify the vulnerabilities that any claimed baseline should be able to survive.
 
-This distinction has become especially important as redistricting simulations have moved beyond demonstrations into empirical and legal argument. DeFord, Duchin and Solomon (2021) describe recombination algorithms for exploring graph partitions. Chikina, Frieze and Pegden (2017) examine how significance may be assessed in some Markov-chain settings without a full mixing result, but their methods require particular theoretical conditions rather than granting every finite Markov chain an automatic inferential interpretation. Cannon et al. (2026) rigorously develop a reversible recombination approach with a characterized spanning-tree-weighted stationary law. Meanwhile, Kenny et al. (2023) demonstrate how carefully constructed simulated plans can distinguish the contributions of geography, formal constraints and line-drawing decisions. Taken together, these works establish the promise of computation while making the definition and verification of its comparison distribution an essential research problem.
+The empirical analysis is organized around three **failure channels**. **Topology:** arbitrarily inserted graph edges can determine which congressional districts count as connected, and conditioning such repairs on the enacted map can contaminate a purportedly external baseline. **Mixing:** a chain may make many proposals or record thousands of maps without supplying independent information about the intended stationary law. **Constraint selection:** altering researcher-specified fragmentation caps can change the finite-horizon distribution of both geographic movement and partisan outcomes.
 
-This paper investigates a concrete failure mode within that broader problem. Starting with a Michigan precinct-level redistricting project, we initially attempted to characterize the partisan position of the enacted congressional map through ReCom chains. Independent audits exposed shortcomings in both graph topology and stochastic sampling. Rather than hide the failed tests or interpret tens of thousands of correlated observations as independent legal alternatives, we separated the analysis into three empirically answerable questions:
+We investigate these channels using pinned 2020 Michigan precinct data. Original polygon geometry permits the measurement of artificial-edge separations. Independently seeded multi-chain studies supply rank-normalized convergence diagnostics. A separate, expressly finite-horizon experiment produces **64 independently verified terminal assignments**, with **32 seed-indexed runs in each of two composite constraint regimes**. On the same model graph and 2020 presidential-vote overlay, relaxing those caps increased mean precinct reassignment by **15.61 percentage points** while decreasing Democratic seats by **0.406** and efficiency gap by **0.03278**. This signed direction matters: a comparison of two modeled procedures is not a generic statement that relaxing rules benefits a particular party.
 
-1. **Graph construction:** How much does a superficially minor, unverified rule for joining disconnected precinct components change the validity of a map model?
-2. **Sampling:** What can be inferred when a chain is reproducible but its stationary target, convergence or mobility is inadequate?
-3. **Conditional sensitivity:** Given an explicitly defined, reference-anchored *finite-time* algorithm, how do alternative fragmentation caps affect the distribution of terminal partisan scores and spatial changes?
+**Our contribution is an executable way to interrogate a baseline, not a new asymptotic sampling theorem.** We turn the case findings into three auditable gates—independent geographic provenance, target-specific sampling diagnostics, and a quantitative constraint-perturbation check—each with records, criteria, and failure consequences. The study demonstrates why these gates are operationally consequential in one source-reconciled experiment. Establishing how often published analyses or expert testimony fail them remains a separate empirical task.
 
-The contribution is not a verdict on the legality or intent of Michigan's district lines. It is an audit-backed account of why technically successful redistricting computations may fail to justify the statistical claims attached to them, together with a reproducible replacement experiment whose inferential scope is deliberately narrower. Michigan is useful not as an exemplar of presumed wrongdoing, but as a data-rich case in which source geometry, graph construction, historic output archives and multiple stochastic proposal mechanisms can be directly compared.
+The paper first formalizes the computational baseline and verifies its sources. It then presents the topology, mixing, and constraint experiments, followed by a failure-oriented reliability protocol that researchers can apply before interpreting simulated maps as a neutral comparison.
 
-## 2. Research context: what would count as a neutral comparison?
+## 2. Defining a computational baseline
 
-### 2.1 The state space is part of the hypothesis
+### 2.1 Geographic topology defines the state space
 
 Represent a precinct-level state as an undirected graph $G=(V,E)$. Each vertex $v$ is a geographic unit with population $p_v$ and election attributes; an edge asserts adjacency under a defined geographic rule. A congressional map is an assignment $x:V\rightarrow\{1,\ldots,K\}$, where here $K=13$. For each district label $d$, the induced subgraph $G[x^{-1}(d)]$ should be connected *under the chosen adjacency definition*. Population equality can be imposed by
 
@@ -49,7 +47,7 @@ where $P_d(x)$ is district population, $P^{\star}$ is the equal-population ideal
 
 This formalization immediately exposes a substantive problem: graph connectivity is not identical to legally acceptable contiguity. Michigan's Constitution, article IV, section 6(13), explicitly addresses geographic contiguity and treats islands as contiguous by land to the county of which they are part. It also establishes a ranked set of considerations that includes federal law and the Voting Rights Act, communities of interest, partisan fairness, consideration of county/city/township boundaries, and reasonable compactness. A model in which a precinct becomes “adjacent” because it is the nearest polygon across water need not satisfy those rules. Nor do generic cut-edge or county-split penalties encode them exactly. A computational state space is therefore a proposed *model of admissibility*, not a legal determination.
 
-### 2.2 The target law is not determined by the proposal name
+### 2.2 The transition kernel and its target
 
 Even after selecting a graph and feasible set $S$, an ensemble needs a probability law $\pi$ over maps. Uniformity over labeled maps, uniformity over unlabeled district partitions and a spanning-tree-weighted distribution are different constructions. They need not agree on the frequency of a particular partisan score. A transition kernel $P(x,y)$ should be assessed relative to that intended law: stationarity requires $\pi P=\pi$, while detailed balance is the stronger sufficient condition $\pi(x)P(x,y)=\pi(y)P(y,x)$. An irreducibility and practical-mixing argument is still needed to say that finite runs approach the intended law from their starting states.
 
@@ -57,7 +55,7 @@ Ordinary ReCom proposes a new pair of districts by merging adjacent districts, c
 
 The distinction between *a mathematically known invariant law* and *empirical exploration of it* underlies this paper. A theoretically reversible chain can be immobile. An active chain can have an unknown target. Neither output should automatically be treated as a sample of legal maps.
 
-### 2.3 Partisan scores are descriptions, not self-interpreting tests
+### 2.3 Interpretation of partisan scores
 
 We use Democratic seats under a fixed two-party presidential vote overlay and the efficiency gap. Following Stephanopoulos and McGhee (2015), the efficiency gap is the difference between wasted Republican and Democratic votes, divided by total two-party votes. In the project's sign convention,
 
@@ -70,7 +68,7 @@ A positive value indicates more Republican than Democratic wasted votes under th
 
 An efficiency gap or seat count is not, on its own, evidence of intent, legal invalidity or discriminatory effect. Even a perfectly computed score remains conditional on the overlay election, turnout distribution, districting graph, and law assigned to the alternative maps. In this study the 2016 and 2020 *presidential* vote fields are applied counterfactually to the congressional plan adopted in 2021; they are not observed congressional-election outcomes under that plan.
 
-## 3. Data and reproducibility
+## 3. Source verification and measurement
 
 ### 3.1 Provenance and processed precinct graph
 
@@ -86,7 +84,7 @@ Reproducibility was assessed at different levels rather than reduced to a single
 
 These checks support the numerical and engineering claims made in subsequent sections. They cannot recover the full precinct assignments of historical chains that saved only scalar time series. They also do not verify the upstream raw Census/VEST joins or the legal admissibility of any sampled map. These omissions are treated as limits of the evidence, not as features that can be inferred from the consistency of derived tables.
 
-## 4. Geographic topology: a five-edge decision that changed the model
+## 4. Pillar I: Topological vulnerability
 
 ### 4.1 The hidden role of artificial adjacency
 
@@ -106,7 +104,7 @@ This construction avoids *directly* using partisan returns or enacted labels to 
 
 A general principle follows: selecting boundary conventions by how well they preserve the benchmark plan can introduce a subtle baseline-selection mechanism even when a local edge-selection routine never reads election data. An analytically legitimate neutral benchmark would require an adjacency convention grounded independently in geography and applicable law *before* assessing the enacted plan.
 
-## 5. Sampling experiments: motion is not convergence
+## 5. Pillar II: The mixing illusion
 
 ### 5.1 Original archived ReCom histories
 
@@ -130,9 +128,9 @@ We also tested a GerryChain implementation of the published reversible ReCom var
 
 Together, the experiments reveal an operational distinction that should appear in redistricting research reports: **a chain with strong local movement is not necessarily a valid stationary sampler, and a sampler with a derivable stationary law is not necessarily computationally effective under the proposed constraints**.
 
-## 6. A narrower, identifiable estimand: finite-horizon perturbation
+## 6. Pillar III: Finite-horizon constraint stress testing
 
-### 6.1 What is being sampled?
+### 6.1 Defining a finite-horizon stress-test estimand
 
 Because the neutral stationary target was not verified, the final experiment deliberately changed the research question. Let $x_0$ be the enacted reference assignment and $P_c$ the implemented stochastic transition procedure under geographic condition $c$. Rather than assert that $x_T$ approximates a uniform or spanning-tree-weighted legal map, define the **finite-horizon outcome law**
 
@@ -164,7 +162,7 @@ For a statistic $f$, the mean of 32 independent-seed endpoints estimates `E_{Q_c
 
 For the descriptive indicator that an endpoint's efficiency gap is at least the enacted reference efficiency gap, we computed the observed proportion and Wilson 95% binomial interval. Since the enacted map is also the deterministic starting state, and the model and caps are researcher-designed, the resulting fraction **must not** be described as an enacted-map randomization p-value.
 
-## 7. Results
+## 7. Results: Quantifying the constraint shift
 
 ### 7.1 Terminal partisan scores and geographic movement
 
@@ -203,13 +201,13 @@ The geometry contrast is particularly strong. Under the closer regime, an endpoi
 
 The closer condition concentrates near its caps on county and county-plus-MCD splits (means **17.97 of 18** and **19.94 of 20**). The relaxed condition approaches its much larger bounds (means **23.81 of 24** and **47.94 of 49**). Because the baseline itself has only **14 split source county groups** and **9 split county-plus-MCD groups**, both models can diverge materially from the reference's administrative fragmentation. A headline suggesting “maps just like the enacted one except for partisan choices” would therefore misdescribe the sample-generating assumptions.
 
-### 7.2 Why the enacted-reference frequency is not a p-value
+### 7.2 Enacted-reference frequencies under the tested procedure
 
 The 2020-reference efficiency gap is about **+0.00333**. In the closer regime, **16 of 32** terminal simulated gaps were at least that value (50.0%; Wilson 95% interval approximately **33.6–66.4%**). In the relaxed regime, **13 of 32** met the same criterion (40.6%; Wilson interval approximately **25.5–57.7%**). Neither fraction provides a legal-map null probability. The generator is initialized *at* the enacted reference, the model topology is a geometry-proximity approximation, and the two cap regimes are researcher-selected. Consequently, no inference about intent, statutory validity or statewide partisan extremeness follows from these percentages.
 
 The findings support a different, narrower statement: **within 800 recorded ReCom transitions from the same reference and on the same experimental proximity graph, choices about fragmentation caps were associated with materially different geographic movement and distributions of partisan scores**. The experiment makes that conditional relationship observable and reproducible. It does not identify which cap choice is socially, legally or scientifically neutral.
 
-### 7.3 Paired-seed sensitivity as a secondary, model-conditional check
+### 7.3 Signed paired-seed contrasts
 
 Because each cap regime was run under the same 32 nominal pseudorandom seeds, one can report differences between the corresponding terminal outcomes indexed by seed, rather than relying solely on two separate sets of condition means.
 
