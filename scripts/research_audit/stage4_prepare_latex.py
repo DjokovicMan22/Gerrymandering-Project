@@ -109,11 +109,13 @@ Paper reproducibility & Graph and endpoint SHA gates; programmatic vector plots;
 \end{table}
 
 FIGURES={
-1:("figure1_terminal_EG_ECDF",.90,
+1:("figure_topology_artificial_bridges",.91,
+"Source-grounded visualization of the five artificial connections inserted by the original project's enacted-label-conditioned graph repair. Faint points are representative locations of the 4,756 Michigan precinct polygons; dashed segments join the closest points on the actual paired polygons. Labels give independently verified polygon separations in kilometers, not legal travel routes. Source JSON and polygon ZIP bytes were separately pinned and checked."),
+2:("figure1_terminal_EG_ECDF",.90,
 "Empirical cumulative distributions of efficiency gap under tighter and relaxed model constraints (32 independently seeded endpoints per regime). The vertical reference marker is the enacted plan under the same 2020 presidential-vote overlay; this is not a legal-map outlier test."),
-2:("figure2_paired_seed_EG",.71,
+3:("figure2_paired_seed_EG",.71,
 "Efficiency-gap scores by shared seed identifier across the two regimes. The dashed diagonal marks equal values. Shared seed numbers do not imply identical proposals or matched geographic plans."),
-3:("figure3_spatial_change_vs_EG",.90,
+4:("figure3_spatial_change_vs_EG",.90,
 "Endpoint efficiency gap versus the fraction of precincts reassigned from the enacted reference after optimal label matching. Candidate geography is defined by the experimental proximity graph."),
 }
 def require(ok,msg):
@@ -193,7 +195,7 @@ def prepare(s:str)->str:
     # Allow immutable source hashes to wrap without overflowing text margins.
     s=re.sub(r"`([0-9a-f]{40,64})`",
              lambda m:r"\texttt{\seqsplit{"+m.group(1)+"}}",s)
-    require(s.count(r"\begin{figure}[H]")==3 and s.count(r"\begin{table}[H]")==3,
+    require(s.count(r"\begin{figure}[H]")==4 and s.count(r"\begin{table}[H]")==3,
             "Missing academic tables or figures")
     return s
 def main():
@@ -221,7 +223,7 @@ def main():
     if result.returncode:raise RuntimeError(result.stderr[-3500:])
     latex=a.tex.read_text(encoding="utf-8")
     require(latex.count(r"\begin{equation}")>=4,"No proper numbered equations")
-    require(latex.count(r"\begin{figure}")>=3,"Missing LaTeX vector figures")
+    require(latex.count(r"\begin{figure}")>=4,"Missing LaTeX vector figures")
     require(latex.count(r"\begin{table}")>=3,"Missing LaTeX booktabs tables")
     require(r"\begin{hangparas}" in latex,"Missing bibliography hanging indents")
     print("STAGE4_PHANTOM_LATEX_SOURCE_PASS",len(latex),"bytes",
