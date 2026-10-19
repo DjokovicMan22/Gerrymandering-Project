@@ -1,5 +1,20 @@
 # Project status
 
+## Stage 3 final decision — CLOSED, SCOPED RESEARCH RESULT
+
+- [x] Source-pinned Michigan graph and original precinct polygon ZIP aligned for all 4,756 nodes.
+- [x] Reject original 5 district-conditioned artificial bridges after independently measuring distances of ~42–280 km.
+- [x] Propose district-blind source-polygon KNN3 proximity graph; independently confirm enacted plan remains connected (13 synthetic edges). **Model geography remains exploratory, NOT legally certified.**
+- [x] Explicitly seed GerryChain 1.0 RNGs, verify replay and independently rescore saved maps.
+- [x] Test both ReCom and reversible local MH multi-chain performance; document formal R-hat/ESS **FAILURES**.
+- [x] Execute 64 separate, independently validated 801-state runs, using **one endpoint per seed** across two geographic-cap regimes; all 64 accepted in reproducible finite-horizon model.
+- [x] Quantify algorithm-conditional Monte Carlo means/uncertainty; forbid neutral-legal-map p-value interpretation.
+- [x] Publish a final Stage 3 evidence report with explicit positive, negative and unresolved claims: [STAGE3_FINAL_REPORT.md](docs/research_audit/STAGE3_FINAL_REPORT.md).
+- [ ] **NOT PASSED:** adequate stationary mixing on a validated legal-plan state space; Michigan official contiguity, water/islands, VRA and communities-of-interest validation. This stronger research question is **closed as unsupported**, not quietly declared successful.
+
+**Stage 4 can begin as a bounded methodology and sensitivity manuscript based on the finished finite-horizon result. It cannot represent Stage 3 as proof of Michigan gerrymandering.** Prior week-based checklist below is a historical activity ledger, not the current Stage 3 exit gate.
+
+
 ## Week 1 — Data and graph
 
 - [x] Load Michigan and Missouri precinct shapefiles
