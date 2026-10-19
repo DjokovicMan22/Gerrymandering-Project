@@ -1,7 +1,7 @@
 {
   "status": "PASS_MANUSCRIPT_SEARCHABLE_PDF_LAYOUT",
   "source_markdown_sha256": "09acbd215ae4a3ebab4e7f52685a385b9af4d2b07122f51dea7ace9d67872192",
-  "pdf_sha256": "76a9a2993aeab4b908f64bb02c6be248d1da6a20d47e73bcd0bbab12ea4525b2",
+  "pdf_sha256": "24103c4468478b1c67c082c6e4e3aa565e058fbe817f30f58d33f824f16ee5cb",
   "pdf_bytes": 160064,
   "page_count": 15,
   "source_figure_paths": [
