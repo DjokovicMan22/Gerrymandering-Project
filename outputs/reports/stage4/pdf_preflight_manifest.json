@@ -1,0 +1,16 @@
+{
+  "status": "PASS_MANUSCRIPT_SEARCHABLE_PDF_LAYOUT",
+  "source_markdown_sha256": "09acbd215ae4a3ebab4e7f52685a385b9af4d2b07122f51dea7ace9d67872192",
+  "pdf_sha256": "76a9a2993aeab4b908f64bb02c6be248d1da6a20d47e73bcd0bbab12ea4525b2",
+  "pdf_bytes": 160064,
+  "page_count": 15,
+  "source_figure_paths": [
+    "figures/figure1_terminal_EG_ECDF.svg",
+    "figures/figure2_paired_seed_EG.svg",
+    "figures/figure3_spatial_change_vs_EG.svg"
+  ],
+  "all_three_figures_embedded": true,
+  "no_nearly_blank_pages": true,
+  "searchable_title_methods_and_results": true,
+  "note": "Layout and artifact validation only; independent scientific/peer and legal-map review remains outstanding"
+}
