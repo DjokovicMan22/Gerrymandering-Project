@@ -25,7 +25,7 @@ jobs:
           python-version: '3.11'
       - name: Install pinned analysis environment
         run: |
-          python -m pip install numpy pandas networkx scipy pytest
+          python -m pip install numpy pandas networkx scipy pytest gerrychain==1.0.0
       - name: Inventory original research packet without redistributing it
         run: |
           python - <<'PY'
@@ -62,7 +62,7 @@ jobs:
       - name: Run Stage 1-2 adversarial tests
         run: |
           if [ -f tests/test_stage12_audit.py ]; then
-            python -m pytest tests/test_stage12_audit.py -q
+            PYTHONPATH=src python -m pytest tests/test_stage12_audit.py -q
           fi
       - name: Preserve independent verification manifests
         if: always()
