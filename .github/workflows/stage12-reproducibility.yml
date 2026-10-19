@@ -53,6 +53,12 @@ jobs:
             --expected-git-blob a4dfe70818f87b97924781216f3d86a672cfc66a \
             --expected-nodes 4756 --expected-population 10077331 \
             --output outputs/research_audit/stage12_verified_graph.json
+      - name: Independently rescore all 13 enacted districts against six original archive references
+        run: |
+          python scripts/research_audit/stage12_reference_crosscheck.py \
+            --graph data/raw/mi/mi/mi.json \
+            --packet strong_paper_review_packet.zip \
+            --output outputs/research_audit/stage12_reference_reconciliation.json
       - name: Run Stage 1-2 adversarial tests
         run: |
           if [ -f tests/test_stage12_audit.py ]; then
@@ -67,5 +73,6 @@ jobs:
           if-no-files-found: warn
           path: |
             outputs/research_audit/stage12_archive.json
+            outputs/research_audit/stage12_reference_reconciliation.json
             outputs/research_audit/stage12_verified_graph.json
             data/raw/mi/mi/mi.json.provenance.json
