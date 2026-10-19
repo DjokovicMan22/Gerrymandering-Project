@@ -1,0 +1,83 @@
+name: Stage 4 submission-format PDF and visual preflight
+
+on:
+  push:
+    branches:
+      - research/stages-1-3-validation
+    paths:
+      - outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md
+      - scripts/research_audit/stage4_render_pdf.py
+      - .github/workflows/stage4-paper-pdf.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  academic-pdf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/stages-1-3-validation
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install rendering and independent PDF-inspection dependencies
+        run: |
+          python -m pip install --disable-pip-version-check markdown weasyprint pypdf
+          python -m compileall -q scripts/research_audit/stage4_render_pdf.py
+          command -v pdftoppm || sudo apt-get -qq update && sudo apt-get install -y poppler-utils
+      - name: Re-render complete scholarly paper with source-verified vector graphics
+        run: |
+          python scripts/research_audit/stage4_render_pdf.py \
+            --manuscript outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md \
+            --output outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.pdf \
+            --manifest outputs/reports/stage4/pdf_preflight_manifest.json
+      - name: Rasterize first and last page for visual page preflight
+        run: |
+          mkdir -p outputs/reports/stage4/pdf_previews
+          pdftoppm -f 1 -l 1 -scale-to 1000 -png -singlefile \
+            outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.pdf \
+            outputs/reports/stage4/pdf_previews/first_page
+          python - <<'PY'
+          import json,subprocess,pathlib
+          p=pathlib.Path("outputs/reports/stage4")
+          total=json.loads((p/"pdf_preflight_manifest.json").read_text())["page_count"]
+          subprocess.run(["pdftoppm","-f",str(total),"-l",str(total),
+            "-scale-to","1000","-png","-singlefile",
+            str(p/"when_a_random_map_is_not_a_neutral_map.pdf"),
+            str(p/"pdf_previews/last_page")],check=True)
+          for page in ("first_page.png","last_page.png"):
+              f=p/"pdf_previews"/page
+              if not f.is_file() or f.stat().st_size<5000:
+                  raise ValueError(f"Missing visual PDF page render: {page}")
+              print("PDF_PAGE_PREVIEW_OK",page,f.stat().st_size)
+          PY
+      - name: Commit submission-format PDF and preflight manifest only on development branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.pdf \
+                  outputs/reports/stage4/pdf_preflight_manifest.json
+          if git diff --cached --quiet; then
+            echo "Submission PDF is already source-synchronized."
+          else
+            git commit -m "Publish searchable Stage 4 PDF with three verified figures and page preflight"
+            git fetch origin research/stages-1-3-validation
+            git rebase origin/research/stages-1-3-validation
+            git push origin HEAD:refs/heads/research/stages-1-3-validation
+          fi
+      - name: Preserve PDF and first/last page preview checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage4-searchable-submission-pdf
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.pdf
+            outputs/reports/stage4/pdf_preflight_manifest.json
+            outputs/reports/stage4/pdf_previews/*.png
