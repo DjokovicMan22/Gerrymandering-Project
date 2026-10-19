@@ -168,6 +168,24 @@ For the descriptive indicator that an endpoint's efficiency gap is at least the 
 | Split county-plus-MCD groups | **19.94 [19.84, 20.00]** | **47.94 [47.50, 48.34]** |
 | Precincts reassigned after optimal district-label matching | **13.40% [12.05%, 14.81%]** | **29.00% [27.75%, 30.29%]** |
 
+### Figures: exact, independently checked endpoint data
+
+The following figures were generated **directly from the 64 independently verified terminal assignment metrics** in the archived successful Stage 3 workflow. The data were retrieved in a separate, read-only GitHub Actions job; the plotting script refuses a wrong graph hash, a missing seed, duplicate endpoint map hashes, unreconciled source summary means, or incorrectly asserted legality/stationarity. Each figure depicts the *fixed-horizon algorithmic law*, not a neutral legal-map sample.
+
+![Figure 1: Empirical cumulative distributions of endpoint efficiency gaps for both constraint regimes, with enacted reference shown by dotted vertical line.](figures/figure1_terminal_EG_ECDF.svg)
+
+**Figure 1.** Empirical cumulative distributions of terminal efficiency gaps in the two researcher-defined regimes (32 independent seeded endpoints per regime). The dotted reference line marks the enacted map's counterfactual 2020 presidential efficiency gap. This is *not* a legal-map outlier test.
+
+![Figure 2: Matched RNG-seed labels' terminal efficiency gaps under tighter versus relaxed caps.](figures/figure2_paired_seed_EG.svg)
+
+**Figure 2.** The 32 pairs of terminal efficiency-gap scores indexed by a common RNG seed label across the two cap conditions. The dashed diagonal indicates equal partisan scores. Common seed identifiers do *not* mean that matched trajectories use identical proposal sequences or produce comparable individual districts.
+
+![Figure 3: Endpoint efficiency gap against fraction of precincts reassigned from the enacted map.](figures/figure3_spatial_change_vs_EG.svg)
+
+**Figure 3.** Assignment movement from the reference after optimal relabeling versus terminal efficiency gap. The between-regime separation in mobility illustrates the algorithm's sensitivity to exploratory geographic caps. These geographic nodes are not necessarily legally valid districts.
+
+The exact source-scored CSV, original aggregate JSON, graph fingerprint, generated SVG and PNG images, and bootstrap comparison manifest are preserved in the [Stage 4 evidence-figure run](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39203488689). The deterministic figure generator is `scripts/research_audit/stage4_make_figures.py`.
+
 The tighter model produces terminal plans closer to the original geography by every reported fragmentation measure and yields modestly higher Democratic seat scores under the selected election layer. Mean efficiency gaps differ by about **0.0328** (3.28 percentage points of the efficiency-gap scale) between regimes, while mean Democratic seats differ by about **0.406** seats. These are differences between **specified finite-time algorithmic procedures**, not a causal estimate of how legally valid district maps would respond to relaxing real Michigan law.
 
 The geometry contrast is particularly strong. Under the closer regime, an endpoint differs from the enacted assignment at approximately **13.4%** of precinct nodes after optimal district-label matching; under the relaxed regime, **29.0%**. The chains also reject a large share of attempted geographic proposals: on average **79.22%** under closer caps and **52.83%** under relaxed caps. Lower geometric movement under tighter caps is consistent with more severe constraints on feasible proposals. However, the rejected-proposal rate is an implementation diagnostic and does not prove any particular legal or political mechanism.
@@ -179,6 +197,21 @@ The closer condition concentrates near its caps on county and county-plus-MCD sp
 The 2020-reference efficiency gap is about **+0.00333**. In the closer regime, **16 of 32** terminal simulated gaps were at least that value (50.0%; Wilson 95% interval approximately **33.6–66.4%**). In the relaxed regime, **13 of 32** met the same criterion (40.6%; Wilson interval approximately **25.5–57.7%**). Neither fraction provides a legal-map null probability. The generator is initialized *at* the enacted reference, the model topology is a geometry-proximity approximation, and the two cap regimes are researcher-selected. Consequently, no inference about intent, statutory validity or statewide partisan extremeness follows from these percentages.
 
 The findings support a different, narrower statement: **within 800 recorded ReCom transitions from the same reference and on the same experimental proximity graph, choices about fragmentation caps were associated with materially different geographic movement and distributions of partisan scores**. The experiment makes that conditional relationship observable and reproducible. It does not identify which cap choice is socially, legally or scientifically neutral.
+
+### 7.3 Paired-seed sensitivity as a secondary, model-conditional check
+
+Because each cap regime was run under the same 32 nominal pseudorandom seeds, one can report differences between the corresponding terminal outcomes indexed by seed, rather than relying solely on two separate sets of condition means. We retained the paired indexing of the original fixed-horizon experiment and drew **20,000 bootstrap resamples of entire seed-indexed endpoint pairs**, not individual correlated chain steps. A deterministic resampling seed (20261018) makes the interval calculation reproducible.
+
+**Table 2. Secondary paired-seed model contrasts.** Positive values mean the **tighter minus relaxed** finite-horizon procedure has a larger mean statistic. These intervals describe conditional simulation-procedure differences, not legal-plan probabilities or the causal effect of one isolated geographic rule.
+
+| Endpoint statistic | Mean (tighter − relaxed) | Paired bootstrap 95% interval |
+|---|---:|---:|
+| Democratic seats (2020 presidential overlay) | **+0.406** seats | **[+0.124, +0.719]** |
+| Efficiency gap (project sign convention) | **+0.03278** | **[+0.00975, +0.05631]** |
+| KNN3 graph cut edges | **−63.75** | **[−80.06, −46.91]** |
+| Reassigned precinct nodes from enacted reference | **−15.61 percentage points** | **[−17.79, −13.50]** |
+
+The paired bootstrap uses the joint seed-indexed output of the two programs. Its precision is conditional on the fixed, researcher-selected comparison and approximate independence across the 32 separate RNG seed labels. It does **not** imply identical stochastic proposals within a pair, actual matched districts, or isolation of any one cap, because the cut-edge, county-split and MCD-split caps changed simultaneously. The results nonetheless sharpen the descriptive finding: the two finite-horizon procedures have distinguishable outcomes in this executed computational experiment. They supply **no additional evidence that either procedure samples neutral, legally valid Michigan plans**.
 
 ## 8. Discussion
 
@@ -226,7 +259,7 @@ That boundary between computation and inference is the paper's central claim. Re
 
 ## References
 
-Cannon, Sarah, Moon Duchin, Dana Randall, and Parker Rule. 2026. “Spanning Trees and Redistricting: New Methods for Sampling and Validation.” *SIAM Review*. https://doi.org/10.1137/24M166944X.
+Cannon, Sarah, Moon Duchin, Dana Randall, and Parker Rule. 2026. “Spanning Trees and Redistricting: New Methods for Sampling and Validation.” *SIAM Review* 68 (2): 349–381. https://doi.org/10.1137/24M166944X.
 
 Chikina, Maria, Alan Frieze, and Wesley Pegden. 2017. “Assessing Significance in a Markov Chain without Mixing.” *Proceedings of the National Academy of Sciences* 114 (11): 2860–2864. https://doi.org/10.1073/pnas.1617540114.
 
@@ -258,4 +291,4 @@ Veomett, Ellen, with Arbie Hsu and Alusi. “Michigan JSON and Shapefile” (pro
 
 **E. Independently seeded endpoint experiment.** [Successful 64-run GitHub Actions workflow, derived CSV endpoints, JSON summary and seed replay evidence](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39180152601); [Stage 3 final empirical report](https://github.com/DjokovicMan22/Gerrymandering-Project/blob/research/stages-1-3-validation/docs/research_audit/STAGE3_FINAL_REPORT.md). The published workflow artifact contains model-specific derived scores but excludes redistributed third-party source graphs and full precinct assignment maps.
 
-**F. Status and interpretation.** This is a **methods and conditional-sensitivity manuscript**; numerical computations and scoped reproducibility checks passed, while legal-plan stationarity, authoritative geographic admissibility and an enacted-map outlier hypothesis were **not established**. This manuscript should undergo external methodological review before submission. The reported conditional bootstrap intervals and endpoint frequencies are **not** gerrymandering significance tests.
+**F. Plotting and paired contrasts.** [Stage 4 original-data graphics and paired Monte Carlo computation](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39203488689); production code in `scripts/research_audit/stage4_make_figures.py`. Input is the original Stage 3 aggregate artifact, strictly checked by SHA and seed identities. Contrasts concern the researcher-defined finite-horizon procedures only.\n\n**G. Status and interpretation.** This is a **methods and conditional-sensitivity manuscript**; numerical computations and scoped reproducibility checks passed, while legal-plan stationarity, authoritative geographic admissibility and an enacted-map outlier hypothesis were **not established**. This manuscript should undergo external methodological review before submission. The reported conditional bootstrap intervals and endpoint frequencies are **not** gerrymandering significance tests.
