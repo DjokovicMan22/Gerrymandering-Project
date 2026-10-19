@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -28,6 +29,8 @@ STATE_NAMES = {"mi": "Michigan", "mo": "Missouri"}
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state", choices=STATE_NAMES, default="mi")
+    parser.add_argument("--graph-path", type=Path, default=None,
+                        help="Explicit model graph path; must have documented source/topology provenance")
     parser.add_argument("--steps", type=int, default=1_000)
     parser.add_argument("--epsilon", type=float, default=0.02)
     parser.add_argument("--seed", type=int, default=2026)
@@ -53,7 +56,8 @@ def main() -> None:
     args = parse_args()
     dem_column = f"PRE{args.election[-2:]}D"
     rep_column = f"PRE{args.election[-2:]}R"
-    graph_path = PROJECT_ROOT / "data" / "raw" / args.state / args.state / f"{args.state}.json"
+    graph_path = args.graph_path if args.graph_path is not None else (PROJECT_ROOT / "data" / "raw" / args.state / args.state / f"{args.state}.json")
+    graph_path = graph_path.resolve()
 
     graph = load_graph(graph_path)
     partition = build_initial_partition(
@@ -87,7 +91,9 @@ def main() -> None:
     metadata = {
         "state": args.state,
         "state_name": STATE_NAMES[args.state],
-        "graph_path": str(graph_path.relative_to(PROJECT_ROOT)),
+        "graph_path": str(graph_path),
+        "graph_sha256": hashlib.sha256(graph_path.read_bytes()).hexdigest(),
+        "topology_is_exploratory_proxy": bool(args.graph_path is not None),
         "assignment_column": "CD",
         "population_column": "TOTPOP",
         "dem_column": dem_column,
@@ -104,7 +110,7 @@ def main() -> None:
         "seed": args.seed,
         "ideal_population": target_population,
         "created_utc": datetime.now(timezone.utc).isoformat(),
-        "note": "Step 0 is the enacted starting plan. Geographic proxies do not imply legal plan validity or stationary sampling.",
+        "note": "Step 0 is the enacted starting plan. Polygon KNN or other supplied graph paths are EXPERIMENTAL topology models, not legally certified Michigan redistricting adjacencies; this ordinary ReCom chain has no certified stationary distribution.",
     }
     paths = save_chain_outputs(
         plan_metrics,
