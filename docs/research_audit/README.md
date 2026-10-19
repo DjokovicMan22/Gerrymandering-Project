@@ -1,3 +1,9 @@
+# Stage 3 completed methods-result handoff (current)
+
+**Final status:** **CLOSED as a reproducible, explicitly limited finite-horizon research experiment**, with 64 independently checked endpoint maps, conditional bootstrap uncertainty, a source-matched district-blind proximity graph, and documented negative convergence results. **NOT closed as a validated neutral ensemble of legally permissible Michigan congressional maps.** For authoritative figures, methods, provenance, limits and permissible Stage 4 paper scope, read [**STAGE3_FINAL_REPORT.md**](STAGE3_FINAL_REPORT.md). [Experiment: all eight batches and aggregation PASS](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39180152601).
+
+**Interpret old audit sections below as historical unsuccessful candidate designs**, not the current final experiment. Geographic KNN3 proximity links are still unverified under Michigan's physical/island-contiguity and legal constraints; do not claim a statewide gerrymandering significance result.
+
 ## Current Stage 3 scientific gate — failed (October 18, 2026)
 
 **Do not mark Stage 3 as scientifically validated and do not treat Stage 4 as a confirmed outlier analysis yet.** The latest *eight-chain reversible Metropolis–Hastings experiment* completed **32,008 recorded sample states**, all 648 saved maps passed independent reconciliation, and the exact proposal kernel passed synthetic detailed-balance tests. Nevertheless, **neither proxy-geographic condition meets the R-hat/ESS gates**: efficiency-gap R-hat **1.568** (closer) and **2.588** (relaxed), and bulk ESS **7.1** and **4.8** versus required R-hat ≤1.01 and ESS ≥400. Means lie near the hard boundary-cut caps, which raises a separate target-distribution issue.
