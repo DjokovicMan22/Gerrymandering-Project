@@ -104,6 +104,14 @@ This construction avoids *directly* using partisan returns or enacted labels to 
 
 A general principle follows: selecting boundary conventions by how well they preserve the benchmark plan can introduce a subtle baseline-selection mechanism even when a local edge-selection routine never reads election data. An analytically legitimate neutral benchmark would require an adjacency convention grounded independently in geography and applicable law *before* assessing the enacted plan.
 
+### 4.3 An automated topology audit, not an automatic geography certificate
+
+The topology diagnosis was converted into executable checks. The `stage3-bridge-audit.yml` workflow retrieves the pinned original **4,756-node** graph, verifies its Git blob identity, reconstructs the five historical *project-added* connections, and reports which endpoints disagree on source county identifiers. **All five historical artificial bridges cross county identifiers.** That is an anomaly requiring investigation—not proof of unlawful adjacency, since legitimate county-to-county borders exist. The geometric distance audit, rather than the county labels alone, exposes why those particular bridges were unsuitable as independently justified geographic contacts.
+
+The independent component-distance experiment (`stage3-geometric-mst-candidates.yml`) constructs a minimum-spanning tree among the **six disconnected source components** using projected polygon distance and without inspecting congressional labels. Its five candidate separations range from **0 to 14.90 km**, totaling approximately **19.63 km**. This distance-minimizing solution nonetheless fails to preserve contiguity of every enacted reference district under the resulting candidate model, as recorded by `validate_candidate_topology.py`. This **distinguishes geometric optimization from reference compatibility**: optimizing proximity alone does not settle the geographic model. The subsequently tested KNN3 procedure preserved the 13 enacted reference districts with 13 added proximity links; its maximum proposed separation was 17.8 km.
+
+The `stage3-topology-gate.yml` workflow verifies that its specified source file and edge manifest match the pinned originals, checks state and reference connectivity, and emits an explicit `scientific_gate` result. Crucially, the checker **currently reports** rejection of a reference-incompatible candidate in its JSON rather than automatically certifying compliance with Michigan law; its successful GitHub Actions execution means the diagnostic **ran**, not that its geographic hypothesis **passed**. This separation of *execution status*, *geometric validity*, and *legal admissibility* is itself a useful design rule for automated research audits. A production gate should block downstream legal-neutral inference when geography is unresolved, while preserving failed checks as reproducible results.
+
 ## 5. Pillar II: The mixing illusion
 
 ### 5.1 Original archived ReCom histories
@@ -259,13 +267,35 @@ A recommendation to “validate the simulation” provides little guidance about
 
 **Case decision.** Relative to tighter caps, relaxed *composite* caps produced **15.61 percentage points more precinct reassignment**, **0.406 fewer Democratic seats**, and **0.03278 lower efficiency gap** under the fixed overlay. The tighter-minus-relaxed efficiency-gap 95% paired bootstrap interval is **[+0.00975, +0.05631]**. Since cut-edge, county-split, and county–MCD caps changed jointly, the individual effect of any one rule is not identified.
 
-### 8.4 The evidentiary consequence
+### 8.4 Operational evidence: checks tied to executable artifacts
+
+The protocol is more useful when every claim resolves to a specific test rather than a blanket statement that the repository has continuous integration. **Source integrity** is implemented through `download_source.py`, `verify_graph.py`, and `docs/data_provenance.md`: they pin the upstream Michigan JSON and polygon ZIP and reconcile all 4,756 processed precinct records. This is **processed-data provenance**; the original Census/VEST precinct joins have not been independently rerun. The graph and polygon identities are part of the audit input, not substitutes for legal-island or Voting Rights Act verification.
+
+**Topological evidence** is retained by `stage3-bridge-audit.yml`, `stage3-geometric-mst-candidates.yml`, and `stage3-topology-gate.yml`. These checks distinguish the original long-range, enacted-conditioned bridges from distance-minimizing component connectors and the KNN3 sensitivity graph. Their scientific verdicts are interpreted from the **generated audit outputs**, not inferred from a green workflow icon. Indeed, the original component-level minimum-spanning-tree proposal does *not* make every enacted reference district connected, despite being obtained from an independently specified spatial-distance objective.
+
+**Mathematical evidence** is maintained in `stage2_mathematical_validation.md`. Independent recomputation established the seat and efficiency-gap sign conventions and isolated a **one-vote-level** 2016 threshold discrepancy arising from fractional precinct-vote allocations and floating-point summation order. The lesson is not that the efficiency gap is inherently unreliable; it is that a partisan metric's implementation, threshold rules, and numerical tolerances should be independently reconciled before inference. **Sampling evidence** includes the later MH pilots, acceptance/rejection counters, and explicit warm-start assignment distances. The four-condition MH pilot accepted approximately **9.20%–15.95%** of proposals and moved only **1.7%–3.7%** of precinct assignments from warm starts after 2,000 attempts; subsequent eight-chain diagnostics failed. A separate GerryChain 1.0 RNG erratum documents how Python-global seeding failed to initialize the library-owned chain generator. It justifies a **version-specific reproducibility fix in this project**, not an assertion that other published studies are unreplayable.
+
+**Experimental configuration is preserved in executed source.** The `stage3-finite-horizon-ensemble.yml` matrix records each cohort's constraints and runs the exact parameters via explicit command-line arguments; the resulting source hashes, seeds and endpoint metrics are archived and cross-checked. The repository also contains `configs/sensitivity.yaml` and `configs/baseline.yaml`, but **both files are empty** and therefore **did not serve as experimental protocols**. The defensible configuration-as-protocol contribution is the *version-controlled, actually executed workflow plus its output manifest*, not the existence of unused YAML filenames.
+
+The Stage 4 pipeline then downloads the **specific successful 64-endpoint artifact**, refuses a mismatched graph digest, duplicate endpoint hash or missing seed, recalculates paired contrasts, and generates vector figures and genuine XeLaTeX. This is an **automated, source-linked research artifact**: the paper cannot build its figures from an unverified replacement endpoint CSV under the present checks. It is **not** a certification that the original geographic assumptions, scholarly interpretations, or all upstream inputs are correct. The distinction is exactly why the three gates are separate.
+
+**Table 3. Executable evidence underlying the baseline audit.** A green software check verifies execution or declared invariants, whereas a passed scientific gate requires sufficient evidence for the specific inferential claim.
+
+| Gate | Reproducible evidence | Finding and consequence |
+|---|---|---|
+| Geographic provenance | Pinned graph/polygon digests; bridge geometry; component-MST and KNN3 comparisons | Processed-source matching passes; legal adjacency remains unverified |
+| Numerical definitions | Independent seats, efficiency-gap and population score audits | Arithmetic reconciles; one-vote 2016 threshold-order sensitivity disclosed |
+| Sampling reliability | Seed-replay correction; distinct warmups; acceptance and spatial-distance logs; R-hat/ESS | Tested stationary-null convergence criteria fail |
+| Model-choice robustness | Executed two-regime workflow; 64 verified endpoints; paired resampling | Signed procedure contrast detected; no one-cap effect identified |
+| Typeset provenance | Input-validated figure generator; XeLaTeX build; searchable PDF audit | Reproducible output and paper layout, not scientific peer review |
+
+### 8.5 The evidentiary consequence
 
 The three gates perform distinct jobs: topology determines which district plans are representable; sampling evidence determines whether output supports a specified probability law; and sensitivity analysis measures dependence on defensible assumptions. Passing one does **not** compensate for failing another.
 
 For the present case, numerical execution is reproducible and the finite-horizon **constraint sensitivity** is quantifiable. A statewide legal neutral-map null has not passed the necessary topology and convergence conditions. This supports an actionable principle for methodological research and evaluation of expert evidence: a simulation-based baseline should be accompanied by independently verifiable graph provenance, target-law/mixing records, and model-choice sensitivity results **before its percentiles are assigned substantive authority**.
 
-We have not audited a representative sample of published studies or courtroom testimony. The broader prevalence of such failures remains a testable question for subsequent research, not a result of this Michigan case.
+The preliminary Missouri graphics in the repository are descriptive outputs of earlier exploratory work; Missouri's historic local inputs were **not byte-matched to the candidate published Missouri source**, and a matched independent ensemble audit has **not** been performed. These plots cannot be used as a second-state replication. We have not audited a representative sample of published studies or courtroom testimony. The broader prevalence of such failures remains a testable question for subsequent research, not a result of this Michigan case.
 
 ## 9. Limitations
 
