@@ -1,9 +1,9 @@
 {
   "status": "PASS_MANUSCRIPT_SEARCHABLE_PDF_LAYOUT",
-  "source_markdown_sha256": "e9ccc65e988bd9308b14dc44c17a7328701af09bb2086e0d4f5ff214aa4369af",
-  "pdf_sha256": "917a3b7ccea5fed777b4b36156e9251d6d63a84365758a16edd0dc106e2c4540",
-  "pdf_bytes": 160039,
-  "page_count": 15,
+  "source_markdown_sha256": "97ab257e06812fcdd49edaaf3813647c289ee9c4f79ece52f9fb0e2fba6b2dcc",
+  "pdf_sha256": "b41f17e552fbbcb30e361c8505a1600cf5aebbade1c27df97a81af90b5366dc2",
+  "pdf_bytes": 159336,
+  "page_count": 16,
   "source_figure_paths": [
     "figures/figure1_terminal_EG_ECDF.svg",
     "figures/figure2_paired_seed_EG.svg",
