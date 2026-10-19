@@ -115,22 +115,55 @@ def verify_against_packet(reference: dict, packet: Path) -> dict:
     return verified
 
 
+def verify_week3_district_rows(reference: dict, folder: Path) -> dict:
+    """Reconcile 26 saved district-level election rows, not just statewide EG."""
+    counts = {}
+    for year in ("2016", "2020"):
+        name = f"mi_{year}_presidential_district_metrics.csv"
+        path = folder / name
+        archived = pd.read_csv(path)
+        if len(archived) != 13 or archived["CD"].duplicated().any():
+            raise ValueError(f"{path}: expected 13 distinct district records")
+        by_district = archived.set_index(archived["CD"].astype(str))
+        rows = reference["elections"][year[-2:]]["district_vote_and_population_summaries"]
+        if set(by_district.index) != {r["district"] for r in rows}:
+            raise ValueError(f"{path}: district labels mismatch")
+        for row in rows:
+            old = by_district.loc[row["district"]]
+            for old_col, key in (("dem_votes", "dem_votes"), ("rep_votes", "rep_votes")):
+                if not math.isclose(float(old[old_col]), float(row[key]),
+                                    rel_tol=0, abs_tol=1e-6):
+                    raise ValueError(f"{path}: district {row['district']} {old_col} mismatch")
+            share = row["dem_votes"] / (row["dem_votes"] + row["rep_votes"])
+            if not math.isclose(float(old["dem_share"]), share, rel_tol=0, abs_tol=1e-9):
+                raise ValueError(f"{path}: district {row['district']} vote share mismatch")
+            winner = "Democratic" if row["dem_votes"] > row["rep_votes"] else (
+                "Republican" if row["rep_votes"] > row["dem_votes"] else "Tie")
+            if str(old["winner"]) != winner:
+                raise ValueError(f"{path}: district {row['district']} winner mismatch")
+        counts[year] = 13
+    return counts
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--graph", type=Path, required=True)
     ap.add_argument("--packet", type=Path, required=True)
     ap.add_argument("--output", type=Path, required=True)
+    ap.add_argument("--week3-table-dir", type=Path, default=Path("outputs/tables/week3"))
     args = ap.parse_args()
     source_digest = digest(args.graph)
     if source_digest["git_blob_sha1"] != GRAPH_GIT_BLOB:
         raise ValueError("Input graph bytes do not match pinned original source")
     reference = score_graph(read_graph(args.graph))
     verified = verify_against_packet(reference, args.packet)
+    week3 = verify_week3_district_rows(reference, args.week3_table_dir)
     payload = {
         "graph_sha256": source_digest["sha256"],
         "graph_git_blob_sha1": GRAPH_GIT_BLOB,
         "independently_computed_reference": reference,
         "original_archive_step0_files_crosschecked": verified,
+        "saved_Week3_district_rows_independently_reconciled": week3,
         "all_six_2016_2020_archived_references_match": len(verified) == 6,
         "2016_roundoff_warning": "2016 processed precinct votes are fractional; the historical floor-half-plus-one wasted-vote rule may change by one vote depending on floating tally order. Deltas recorded for each archive reference; this is not evidence of an election-level difference.",
         "original_transition_histories_replayed": False,
@@ -139,7 +172,8 @@ def main() -> None:
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, indent=2, allow_nan=False), encoding="utf-8")
-    print("STAGE12_INDEPENDENT_REFERENCE_RECONCILIATION_PASS", len(verified))
+    print("STAGE12_INDEPENDENT_REFERENCE_RECONCILIATION_PASS", len(verified),
+          "and", sum(week3.values()), "Week3 district rows")
     for yr, data in reference["elections"].items():
         print("REFERENCE", yr, data["dem_seats"], data["efficiency_gap"],
               data["dem_votes"], data["rep_votes"])
