@@ -1,0 +1,44 @@
+% Stage 4 journal typography — XeLaTeX / STIX family.
+% Restrained typesetting: no colored boxes, no decorative graphics, no oversized headings.
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{needspace}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{ragged2e}
+\usepackage{setspace}
+\usepackage{xurl}
+\setstretch{1.11}
+\setlength{\parindent}{1.25em}
+\setlength{\parskip}{0pt plus 1pt}
+\setlength{\emergencystretch}{2em}
+\titlespacing*{\section}{0pt}{1.65\baselineskip}{.48\baselineskip}
+\titlespacing*{\subsection}{0pt}{1.2\baselineskip}{.38\baselineskip}
+\titleformat{\section}{\large\bfseries}{\thesection}{.7em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{.7em}{}
+\titleformat{\subsubsection}{\normalsize\itshape}{\thesubsubsection}{.7em}{}
+\captionsetup[table]{font=small,labelfont=bf,labelsep=period,
+  justification=raggedright,singlelinecheck=false,skip=5pt}
+\captionsetup[figure]{font=small,labelfont=bf,labelsep=period,
+  justification=raggedright,singlelinecheck=false,skip=5pt}
+\setlength{\textfloatsep}{13pt plus 2pt minus 2pt}
+\setlength{\floatsep}{11pt plus 2pt minus 1pt}
+\setlength{\intextsep}{11pt plus 2pt minus 1pt}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.20}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\footnotesize\textsc{Redistricting simulation methods}}
+\fancyfoot[C]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{13.5pt}
+\urlstyle{same}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=black,
+  citecolor=black,pdfauthor={Research manuscript},pdftitle={When a Random Map Is Not a Neutral Map}}
+\AtBeginDocument{\RaggedBottom}
