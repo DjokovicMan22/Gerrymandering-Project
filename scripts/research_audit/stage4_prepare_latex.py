@@ -147,7 +147,7 @@ def prepare(s:str)->str:
     # Allow immutable source hashes to wrap without overflowing text margins.
     s=re.sub(r"`([0-9a-f]{40,64})`",
              lambda m:r"\texttt{\seqsplit{"+m.group(1)+"}}",s)
-    require(s.count(r"\begin{figure}[tbp]")==3 and s.count(r"\begin{table}[H]")==2,
+    require(s.count(r"\begin{figure}[H]")==3 and s.count(r"\begin{table}[H]")==2,
             "Missing academic tables or figures")
     return s
 def main():
