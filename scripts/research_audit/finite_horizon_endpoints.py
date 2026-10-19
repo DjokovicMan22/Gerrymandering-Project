@@ -117,13 +117,14 @@ def experiment(args)->list[dict]:
             "endpoint_max_population_deviation":float(last["max_population_deviation"]),
             "recorded_states_changed":int(plans["state_changed_since_previous"].sum()),
             "geographic_attempts":attempted,
+            "extra_proposal_calls_beyond_recorded_transitions":attempted-(args.total_steps-1),
             "geographic_rejections":geo_rejections,
             "geographic_rejection_fraction":geo_rejections/max(1,attempted),
             "independently_rescored_endpoint":True,
             "legal_and_stationary_map_distribution_certified":False,
         }
-        if attempted!=args.total_steps-1:
-            raise ValueError("Unexpected proposal-attempt tally; cannot compare fixed steps")
+        if attempted < args.total_steps-1:
+            raise ValueError("Proposal count below recorded transition count; chain audit invalid")
         rows.append(row)
         print("INDEPENDENT_FINITE_HORIZON_ENDPOINT",json.dumps(row),flush=True)
     args.output.parent.mkdir(parents=True,exist_ok=True)
