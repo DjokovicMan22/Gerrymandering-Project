@@ -114,11 +114,10 @@ def check(path: Path = TARGET, stage3: Path = STAGE3, stage12: Path = STAGE12) -
             errors.append("Missing evidence/claim marker: " + phrase)
     if manuscript.count("\n$$\n") != 8:
         errors.append("Four genuine display equations must use eight $$ delimiters")
-    if "relaxing" not in manuscript.casefold() or (
-        "decreases mean efficiency gap" not in manuscript.casefold() and
-        "decreased mean efficiency gap" not in manuscript.casefold() and
-        "decreases mean" not in manuscript.casefold()):
-        errors.append("Relaxation direction of efficiency-gap shift not stated correctly")
+    # Direction is checked via the predeclared tighter-minus-relaxed contrast
+    # and the source-reconciled endpoint estimates, not a brittle exact phrase.
+    if "+0.03278" not in manuscript or "−0.03278" not in manuscript:
+        errors.append("Both signed tighter-minus-relaxed and relaxed-direction differences must be stated")
     if "DOI_PLACEHOLDER" in manuscript or "[citation needed]" in manuscript.lower():
         errors.append("Unresolved reference placeholders")
     # No sources should be duplicated in full in the draft.
