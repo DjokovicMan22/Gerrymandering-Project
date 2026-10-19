@@ -140,9 +140,9 @@ def prepare(s:str)->str:
     # The abstract is wrapped in a raw TeX environment. A literal percent
     # would comment out everything following it on the TeX input line;
     # escape it explicitly rather than silently truncate the contribution.
-    abstract_start=s.index(r"\\begin{abstract}")
-    abstract_end=s.index(r"\\end{abstract}",abstract_start)
-    abstract=s[abstract_start:abstract_end].replace("%",r"\\%")
+    abstract_start=s.index(r"\begin{abstract}")
+    abstract_end=s.index(r"\end{abstract}",abstract_start)
+    abstract=s[abstract_start:abstract_end].replace("%",r"\%")
     s=s[:abstract_start]+abstract+s[abstract_end:]
     # Avoid orphaned/unnumbered internal plotting section above figures.
     s=s.replace("### Original-data figures {.unnumbered}","")
