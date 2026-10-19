@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/stage4-journal-latex.yml
       - scripts/research_audit/stage4_journal_figures.py
+      - scripts/research_audit/stage4_topology_map.py
       - scripts/research_audit/stage4_prepare_latex.py
       - scripts/research_audit/stage4_journal_typography.tex
       - outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md
@@ -37,7 +38,8 @@ jobs:
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended \
             texlive-lang-english fonts-stix poppler-utils latexmk lmodern
-          python -m pip install numpy pandas matplotlib pymupdf
+          python -m pip install -e ".[dev]"
+          python -m pip install matplotlib pymupdf geopandas pyogrio "shapely>=2.0"
           python -m compileall -q scripts/research_audit/stage4_journal_figures.py scripts/research_audit/stage4_prepare_latex.py
           fc-match STIX
           fc-match 'STIX Math'
@@ -48,6 +50,40 @@ jobs:
           github-token: ${{ github.token }}
           name: stage3-finite-horizon-final-methodological-outcomes
           path: outputs/reports/stage4/original_scored_endpoints
+      - name: Obtain original source-verified Michigan graph and polygon archive
+        run: |
+          python scripts/research_audit/download_source.py --acknowledge-source-terms
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.request,hashlib
+          url="https://raw.githubusercontent.com/eveomett-states/Michigan/main/mi.zip"
+          req=urllib.request.Request(url,headers={"User-Agent":"redistricting-source-audit/1.0"})
+          data=urllib.request.urlopen(req,timeout=120).read()
+          blob=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\\x00"+data).hexdigest()
+          if blob!="07bce18dabbcca9d549e28995a8156fd6978d7db":
+              raise ValueError("Source polygon ZIP changed; refuse topology depiction")
+          dest=Path("data/raw/mi/original_precincts.zip")
+          dest.parent.mkdir(parents=True,exist_ok=True)
+          dest.write_bytes(data)
+          print("VERIFIED_ORIGINAL_MICHIGAN_POLYGON_ZIP",len(data),"bytes",blob)
+          PY
+      - name: Reconstruct and render all five actual artificial graph connections from source GIS
+        run: |
+          python scripts/research_audit/stage4_topology_map.py \\
+            --graph data/raw/mi/mi/mi.json \\
+            --zip data/raw/mi/original_precincts.zip \\
+            --out-dir outputs/reports/stage4/figures
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("outputs/reports/stage4/figures/stage4_topology_figure_manifest.json").read_text())
+          assert report["status"]=="PASS_SOURCE_VERIFIED_FIVE_BRIDGES_VISUALIZED"
+          assert report["precinct_count"]==4756
+          assert report["not_a_legal_contiguity_map"] is True
+          assert len(report["connections"])==5
+          assert min(x["distance_km"] for x in report["connections"])>35
+          assert max(x["distance_km"] for x in report["connections"])>270
+          PY
       - name: Generate restrained, original-data, vector print graphics
         run: |
           python scripts/research_audit/stage4_journal_figures.py \
@@ -82,12 +118,12 @@ jobs:
           doc=fitz.open(root/"phantom_baseline.pdf")
           if tex.count(r"\begin{equation}")<4:raise ValueError("Missing numbered LaTeX equations")
           if tex.count(r"\begin{table}")<2:raise ValueError("Missing booktabs tables")
-          if tex.count(r"\begin{figure}")<3:raise ValueError("Missing original-data figure floats")
+          if tex.count(r"\begin{figure}")<4:raise ValueError("Missing source-topology and three original-data figure floats")
           if not 12<=len(doc)<=38:raise ValueError("PDF page count out of plausible range")
           pages=[p.get_text() for p in doc]
           if min(len(p.strip()) for p in pages)<40:raise ValueError("Nearly blank page detected")
           combined=" ".join(" ".join(p.split()) for p in pages).lower()
-          for token in ["the phantom baseline","geographic","mixing","32","0.03278",
+          for token in ["the phantom baseline","geographic","mixing","32","0.03278","42","280",
                         "gate a","gate b","gate c","references",
                         "the experiments identify how a reproducible computational baseline"]:
               if token not in combined:raise ValueError("Searchable PDF missing "+token)
@@ -106,6 +142,7 @@ jobs:
             "numbered_equations":tex.count(r"\begin{equation}"),
             "booktabs_tables":tex.count(r"\begin{table}"),
             "vector_figure_floats":tex.count(r"\begin{figure}"),
+            "topology_gis_fingerprint":"07bce18dabbcca9d549e28995a8156fd6978d7db",
             "pdf_sha256":hashlib.sha256((root/"phantom_baseline.pdf").read_bytes()).hexdigest(),
             "latex_sha256":hashlib.sha256(tex.encode()).hexdigest(),
             "preview_pages":previews,
@@ -127,6 +164,7 @@ jobs:
                   outputs/reports/stage4/figures/figure*.svg \
                   outputs/reports/stage4/figures/figure*.png \
                   outputs/reports/stage4/figures/stage4_journal_figure_manifest.json \
+                  outputs/reports/stage4/figures/stage4_topology_figure_manifest.json \
                   outputs/reports/stage4/latex_previews/
           if git diff --cached --quiet; then
             echo "Identical journal artifacts already committed"
@@ -148,5 +186,6 @@ jobs:
             outputs/reports/stage4/phantom_baseline.pdf
             outputs/reports/stage4/phantom_latex_build_manifest.json
             outputs/reports/stage4/figures/figure*
+            outputs/reports/stage4/figures/stage4_topology_figure_manifest.json
             outputs/reports/stage4/latex_previews/*.png
             outputs/reports/stage4/_journal_build/*.log
