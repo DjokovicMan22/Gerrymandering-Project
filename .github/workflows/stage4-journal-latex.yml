@@ -59,7 +59,7 @@ jobs:
           url="https://raw.githubusercontent.com/eveomett-states/Michigan/main/mi.zip"
           req=urllib.request.Request(url,headers={"User-Agent":"redistricting-source-audit/1.0"})
           data=urllib.request.urlopen(req,timeout=120).read()
-          blob=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\\x00"+data).hexdigest()
+          blob=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\x00"+data).hexdigest()
           if blob!="07bce18dabbcca9d549e28995a8156fd6978d7db":
               raise ValueError("Source polygon ZIP changed; refuse topology depiction")
           dest=Path("data/raw/mi/original_precincts.zip")
@@ -69,9 +69,9 @@ jobs:
           PY
       - name: Reconstruct and render all five actual artificial graph connections from source GIS
         run: |
-          python scripts/research_audit/stage4_topology_map.py \\
-            --graph data/raw/mi/mi/mi.json \\
-            --zip data/raw/mi/original_precincts.zip \\
+          python scripts/research_audit/stage4_topology_map.py \
+            --graph data/raw/mi/mi/mi.json \
+            --zip data/raw/mi/original_precincts.zip \
             --out-dir outputs/reports/stage4/figures
           python - <<'PY'
           import json
