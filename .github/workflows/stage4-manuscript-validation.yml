@@ -1,0 +1,55 @@
+name: Stage 4 manuscript evidence and bibliography audit
+
+on:
+  push:
+    branches:
+      - research/stages-1-3-validation
+    paths:
+      - outputs/reports/stage4/**
+      - scripts/research_audit/stage4_verify_manuscript.py
+      - docs/research_audit/STAGE3_FINAL_REPORT.md
+      - docs/research_audit/STAGE12_FINAL_VERIFICATION.md
+      - .github/workflows/stage4-manuscript-validation.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  research-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile manuscript verifier
+        run: python -m compileall -q scripts/research_audit/stage4_verify_manuscript.py
+      - name: Check full manuscript against final independently audited Stage 1-3 source reports
+        run: |
+          python scripts/research_audit/stage4_verify_manuscript.py \
+            --manuscript outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md \
+            --stage3-report docs/research_audit/STAGE3_FINAL_REPORT.md \
+            --stage12-report docs/research_audit/STAGE12_FINAL_VERIFICATION.md \
+            --output outputs/reports/stage4/manuscript_integrity_manifest.json
+      - name: Mark manuscript as evidence-checked, not legally/stationarily certified
+        run: |
+          python - <<'PY'
+          import json,os
+          p='outputs/reports/stage4/manuscript_integrity_manifest.json'
+          meta=json.load(open(p))
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+            f.write(f"**{meta['status']}**; {meta['word_count']:,} words, {meta['sections_verified']} core sections, {meta['bibliographic_sources_checked']} bibliography identifiers.\n\n")
+            f.write('**Scope:** model-conditional finite-horizon research, NOT a stationary or legal Michigan null map distribution. Numerical consistency does not mean externally reviewed scientific validity.\n')
+          PY
+      - name: Preserve independently evidence-reconciled manuscript and review manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage4-evidence-checked-manuscript
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md
+            outputs/reports/stage4/manuscript_integrity_manifest.json
