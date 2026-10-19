@@ -27,7 +27,9 @@ ZIP_HASH="07bce18dabbcca9d549e28995a8156fd6978d7db"
 
 
 def build(g,polys,matching,k):
-    # Rank from the same 50-neighbor pool used by the source sensitivity audit.\n    # A search stopping at K candidates can change the selected top-K edges.\n    proposals=contacts(g,list(polys.geometry),matching,50)
+    # Rank from the same 50-neighbor pool used by the source sensitivity audit.
+    # A search stopping at K candidates can change the selected top-K edges.
+    proposals=contacts(g,list(polys.geometry),matching,50)
     prepared=g.copy()
     chosen=[]
     seen=set()
