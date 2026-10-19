@@ -1,0 +1,61 @@
+{
+  "display_version": "journal typography 2.0; print/greyscale compatible; no panel titles or intrusive footers",
+  "original_64_endpoints_sha256": "beba3320c3ae73bbbab192e797faaac629a4dd5bb30d098ff6d1123c25a2e32c",
+  "original_aggregate_sha256": "47708168dfa831d97daaaa020fe4740735d3ee75bd2b27ac3869caa282f4ffd1",
+  "input_verified_by": "stage4_make_figures.validate_inputs",
+  "original_model_graph_sha256": "14355742f58291f4c26267982de07a21037c347f7598a68f032e0d68ea1d542c",
+  "figures": [
+    "figure1_terminal_EG_ECDF.pdf",
+    "figure1_terminal_EG_ECDF.png",
+    "figure1_terminal_EG_ECDF.svg",
+    "figure2_paired_seed_EG.pdf",
+    "figure2_paired_seed_EG.png",
+    "figure2_paired_seed_EG.svg",
+    "figure3_spatial_change_vs_EG.pdf",
+    "figure3_spatial_change_vs_EG.png",
+    "figure3_spatial_change_vs_EG.svg"
+  ],
+  "statistical_summary": {
+    "n_seed_labels_per_condition": 32,
+    "rng_seed_range": "10001-10032",
+    "reference_conditioning": "Both runs start at the enacted map",
+    "estimand": "difference of expected 800-transition endpoint metrics, conditional on the exact KNN3 model and two exploratory cap regimes",
+    "paired_seed_caution": "Pairing is by predeclared seed identifier, NOT geographic plan matching or identical proposal streams; differences are algorithm-conditional and not a causal attribution to any single cap.",
+    "paired_mean_difference": {
+      "endpoint_dem_seats": {
+        "unit": "raw units",
+        "mean_closer_minus_relaxed": 0.40625,
+        "paired_bootstrap_95pct_CI_closer_minus_relaxed": [
+          0.12421875000000071,
+          0.71875
+        ]
+      },
+      "endpoint_efficiency_gap": {
+        "unit": "raw units",
+        "mean_closer_minus_relaxed": 0.03277826137578358,
+        "paired_bootstrap_95pct_CI_closer_minus_relaxed": [
+          0.00974770394084242,
+          0.056309408783102345
+        ]
+      },
+      "endpoint_cut_edges": {
+        "unit": "raw units",
+        "mean_closer_minus_relaxed": -63.75,
+        "paired_bootstrap_95pct_CI_closer_minus_relaxed": [
+          -80.0625,
+          -46.90546875000007
+        ]
+      },
+      "endpoint_fraction_precincts_different_from_reference": {
+        "unit": "percentage points",
+        "mean_closer_minus_relaxed": -15.605945121951223,
+        "paired_bootstrap_95pct_CI_closer_minus_relaxed": [
+          -17.78610242325484,
+          -13.496750814760302
+        ]
+      }
+    },
+    "not_a_neutral_map_inference": true
+  },
+  "inference_scope": "fixed-horizon experimental model comparison only; NOT a legally neutral map sampling distribution"
+}
