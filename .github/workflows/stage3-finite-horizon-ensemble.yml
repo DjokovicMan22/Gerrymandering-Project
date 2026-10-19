@@ -6,6 +6,9 @@ on:
       - research/stages-1-3-validation
     paths:
       - .github/workflows/stage3-finite-horizon-ensemble.yml
+      - scripts/research_audit/build_geometric_knn_graph.py
+      - scripts/research_audit/finite_horizon_endpoints.py
+      - scripts/research_audit/analyze_finite_horizon.py
   workflow_dispatch:
 
 permissions:
