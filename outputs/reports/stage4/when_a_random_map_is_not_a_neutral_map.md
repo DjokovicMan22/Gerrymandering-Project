@@ -175,7 +175,7 @@ For the descriptive indicator that an endpoint's efficiency gap is at least the 
 
 ### Figures: exact, independently checked endpoint data
 
-The following figures were generated **directly from the 64 independently verified terminal assignment metrics** in the archived successful Stage 3 workflow. The data were retrieved in a separate, read-only GitHub Actions job; the plotting script refuses a wrong graph hash, a missing seed, duplicate endpoint map hashes, unreconciled source summary means, or incorrectly asserted legality/stationarity. Each figure depicts the *fixed-horizon algorithmic law*, not a neutral legal-map sample.
+Figures 1–3 present empirical terminal outcomes from the **64 independently verified endpoint maps**. Together, they show how the constraint regimes affect the efficiency-gap distribution, the correspondence between seed-indexed runs, and spatial movement from the enacted reference.
 
 ![Figure 1: Empirical cumulative distributions of endpoint efficiency gaps for both constraint regimes, with enacted reference shown by dotted vertical line.](figures/figure1_terminal_EG_ECDF.svg)
 
@@ -189,7 +189,7 @@ The following figures were generated **directly from the 64 independently verifi
 
 **Figure 3.** Assignment movement from the reference after optimal relabeling versus terminal efficiency gap. The between-regime separation in mobility illustrates the algorithm's sensitivity to exploratory geographic caps. These geographic nodes are not necessarily legally valid districts.
 
-The figures are regenerated without embedded titles or footers using the source-checked 64-map artifact and the print-ready renderer `scripts/research_audit/stage4_journal_figures.py`. The archived original model scores, source hashes, and sensitivity estimates are unchanged.
+Detailed data fingerprints, source-checked plotting code, and figure-generation logs are supplied in the reproducibility appendix.
 
 The tighter model produces terminal plans closer to the original geography by every reported fragmentation measure and yields modestly higher Democratic seat scores under the selected election layer. Mean efficiency gaps differ by about **0.0328** (3.28 percentage points of the efficiency-gap scale) between regimes, while mean Democratic seats differ by about **0.406** seats. These are differences between **specified finite-time algorithmic procedures**, not a causal estimate of how legally valid district maps would respond to relaxing real Michigan law.
 
