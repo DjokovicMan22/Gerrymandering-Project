@@ -1,5 +1,6 @@
 # Detecting Gerrymandering with Metrics and Ensembles
 
+> **Current research disposition (18 October 2026):** [Stage 3 completed as a reproducible 64-map finite-horizon methods and sensitivity study](docs/research_audit/STAGE3_FINAL_REPORT.md). **The intended stationary ensemble of legally valid Michigan maps was NOT validated**; R-hat/ESS and geography checks disproved its readiness. No gerrymandering significance or legal conclusion is supported. This branch is a research-development branch; the original `main` is unchanged. See the [successful terminal experiment](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39180152601).\n\n
 This repository studies enacted congressional maps in Michigan and Missouri. It begins with precinct-level geography and election data, implements compactness and partisan metrics, and will culminate in GerryChain ensembles that compare enacted maps with many legally constrained alternatives.
 
 ## Current scope
