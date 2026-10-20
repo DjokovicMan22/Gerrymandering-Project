@@ -5,6 +5,10 @@
 **Current manuscript:** [When a Random Map Is Not a Neutral Map](../../outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md).  
 **Reading/submission PDF:** [15-page searchable typeset PDF](../../outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.pdf).
 
+## 19 October 2026 publication-layout update
+
+**Current authoritative paper:** [The Phantom Baseline — 16-page XeLaTeX PDF](../../outputs/reports/stage4/phantom_baseline.pdf) and [fully editable `.tex` source](../../outputs/reports/stage4/phantom_baseline.tex). The prior title and 15-page/three-figure description below refer to the original review draft; they are superseded by this update. The revised paper contains **four source-backed figures** (one real GIS topology map and three endpoint statistics plots), **three `booktabs` tables**, **four numbered math displays**, and a three-gate diagnostic protocol. The [final passing typesetting and scientific input audit](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39359458520) rendered **16 searchable pages**. Original graph and ZIP blob hashes were rechecked during topology rendering, all five historic project-added edges were measured from polygons, and source-score digests were reconciled before statistical plotting. This is a model-fragility study rather than legal-plan probability inference; external scholarly review is still required.
+
 ## 1. Revision completed
 
 The manuscript now contains the full research argument and supporting material:
