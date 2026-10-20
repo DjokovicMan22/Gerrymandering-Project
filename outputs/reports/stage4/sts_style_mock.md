@@ -112,9 +112,7 @@ I also examined a local boundary-edge Metropolis–Hastings transition rule. Fro
 
 
 $$
-
 \alpha(x,y)=\min\!\left\{1,\frac{q(y,x)}{q(x,y)}\right\}.
-
 $$
 
 
@@ -145,9 +143,7 @@ For the enacted starting assignment $x_0$, experimental graph $G_{\mathrm{KNN3}}
 
 
 $$
-
 Q_{c,800}(A)=\Pr\!\left[X_{800}\in A\mid X_0=x_0,G=G_{\mathrm{KNN3}},P=P_c\right].
-
 $$
 
 
