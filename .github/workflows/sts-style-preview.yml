@@ -1,0 +1,87 @@
+name: Competition-format research report illustrative PDF
+on:
+  push:
+    branches:
+      - research/competition-style-preview
+    paths:
+      - .github/workflows/sts-style-preview.yml
+      - scripts/research_audit/sts_mock_header.tex
+      - outputs/reports/stage4/sts_style_mock.md
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  typeset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install TeX, Pandoc, PDF analyzer
+        run: |
+          sudo apt-get -qq update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended fonts-texgyre latexmk poppler-utils
+          python -m pip install pymupdf
+      - name: Build 11pt 1.5-spaced, one-inch-margin mock PDF
+        run: |
+          mkdir -p outputs/reports/stage4
+          pandoc outputs/reports/stage4/sts_style_mock.md \
+            --from=markdown+raw_tex+tex_math_dollars+pipe_tables \
+            --standalone --number-sections \
+            --pdf-engine=xelatex \
+            --resource-path=outputs/reports/stage4 \
+            -V fontsize=11pt \
+            -V geometry:margin=1in \
+            -V mainfont='TeX Gyre Termes' \
+            --include-in-header=scripts/research_audit/sts_mock_header.tex \
+            -o outputs/reports/stage4/sts_style_mock.pdf
+          pdfinfo outputs/reports/stage4/sts_style_mock.pdf | head -18
+      - name: Check pagination figures disclosure and text
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import fitz, hashlib, json
+          f=Path("outputs/reports/stage4/sts_style_mock.pdf")
+          with fitz.open(f) as d:
+           pages=[x.get_text() for x in d]
+           text="\n".join(pages)
+           headings=["The Phantom Baseline","Abstract","Introduction","Research Design","Geographic Topology","Sampling","Fixed-Horizon Sensitivity","Adversarial Evidence Ledger","Scope of the Audit","Conclusion","References"]
+           missing=[h for h in headings if h.lower() not in text.lower()]
+           if missing: raise SystemExit("Missing headings "+str(missing))
+           if "AI-assisted" not in text: raise SystemExit("Must disclose AI-assisted mock status")
+           if "Supplementary Figure S1" not in text: raise SystemExit("Missing Missouri visual credit")
+           if text.count("Figure 1") < 1: raise SystemExit("Missing first figure")
+           if len(d)>25: raise SystemExit("Too long for a 20-body-page comparison preview; pages="+str(len(d)))
+           if f.stat().st_size>4_000_000: raise SystemExit("PDF exceeds STS upload limit")
+           firstbody=next((i for i,p in enumerate(pages) if "1. Introduction" in p or "Introduction" in p and i>=2),None)
+           bibstart=next((i for i,p in enumerate(pages) if "References" in p and i>3),None)
+           bodypages= (bibstart-firstbody) if firstbody is not None and bibstart is not None else None
+           if bodypages is None or bodypages>20: raise SystemExit("Body page limit not verified: "+str((firstbody,bibstart,bodypages)))
+           p=d[0].get_pixmap(matrix=fitz.Matrix(1.25,1.25),alpha=False)
+           p.save("outputs/reports/stage4/sts_mock_preview_first.png")
+           d[min(4,len(d)-1)].get_pixmap(matrix=fitz.Matrix(1.25,1.25),alpha=False).save("outputs/reports/stage4/sts_mock_preview_body.png")
+           report={"status":"PASS_AI_ASSISTED_FORMAT_MOCK","page_count":len(d),"body_pages_before_references":bodypages,"firstbody_page_index":firstbody,"references_page_index":bibstart,"size_bytes":f.stat().st_size,"pdf_sha256":hashlib.sha256(f.read_bytes()).hexdigest(),"note":"not independently authored or eligible for STS submission"}
+           Path("outputs/reports/stage4/sts_mock_build_manifest.json").write_text(json.dumps(report,indent=2))
+           print(json.dumps(report,indent=2))
+          PY
+      - name: Commit generated PDF and visual preflight
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add outputs/reports/stage4/sts_style_mock.pdf outputs/reports/stage4/sts_mock_preview_first.png outputs/reports/stage4/sts_mock_preview_body.png outputs/reports/stage4/sts_mock_build_manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Render research report competition-format style study and validate pagination"
+            git fetch origin research/competition-style-preview
+            git rebase origin/research/competition-style-preview
+            git push origin HEAD:refs/heads/research/competition-style-preview
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: competition-format-illustrative-pdf
+          path: |
+            outputs/reports/stage4/sts_style_mock.pdf
+            outputs/reports/stage4/sts_mock_build_manifest.json
+            outputs/reports/stage4/sts_mock_preview_*.png
+          retention-days: 30
+          if-no-files-found: warn
