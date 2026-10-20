@@ -1,0 +1,10 @@
+{
+  "status": "PASS_AI_ASSISTED_FORMAT_MOCK",
+  "page_count": 14,
+  "body_pages_before_references": 11,
+  "firstbody_page_index": 2,
+  "references_page_index": 13,
+  "size_bytes": 748251,
+  "pdf_sha256": "43929b521c1a62596b9a09b1b90f74fb2a84122fdf8b221715e4cfa11d2894a1",
+  "note": "not independently authored or eligible for STS submission"
+}
