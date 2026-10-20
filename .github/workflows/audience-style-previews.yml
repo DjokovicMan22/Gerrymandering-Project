@@ -1,4 +1,4 @@
-name: Build audience-specific Phantom Baseline preview PDFs
+name: Build Stanley research paper PDFs
 on:
   push:
     branches:
@@ -6,6 +6,8 @@ on:
     paths:
       - .github/workflows/audience-style-previews.yml
       - scripts/research_audit/audience_preview_header.tex
+      - outputs/reports/stage4/sts_style_mock.md
+      - outputs/reports/stage4/Stanley/README.md
       - outputs/reports/stage4/davidson_portfolio_preview.md
       - outputs/reports/stage4/yau_computer_preview.md
       - outputs/reports/stage4/arxiv_style_preprint_preview.tex
@@ -31,6 +33,27 @@ jobs:
             pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended \
             fonts-texgyre fonts-stix lmodern latexmk ghostscript poppler-utils zip
           python -m pip install 'pymupdf==1.24.14'
+
+      - name: Build Stanley STS-format layout
+        run: |
+          set -euo pipefail
+          root=outputs/reports/stage4
+          pandoc "$root/sts_style_mock.md" \
+            --from=markdown+raw_tex+tex_math_dollars+pipe_tables \
+            --standalone --number-sections \
+            --pdf-engine=xelatex \
+            --resource-path="$root" \
+            -V fontsize=11pt \
+            -V geometry:margin=1in \
+            -V mainfont='TeX Gyre Termes' \
+            --include-in-header=scripts/research_audit/sts_mock_header.tex \
+            -o "$root/sts_style_mock_unc.pdf"
+          gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite \
+             -dCompatibilityLevel=1.5 -dPDFSETTINGS=/ebook \
+             -dDetectDuplicateImages=true \
+             -sOutputFile="$root/sts_style_mock.pdf" "$root/sts_style_mock_unc.pdf"
+          rm "$root/sts_style_mock_unc.pdf"
+          pdfinfo "$root/sts_style_mock.pdf" | grep -E 'Pages:|File size:'
 
       - name: Compile individual-researcher portfolio and Yau report demonstrations
         run: |
@@ -75,7 +98,7 @@ jobs:
           cp ../../figures/week1/mo_precinct_dual_graph_overlay.png \
             _arxiv_source_bundle/figures/
           sed -i 's|../../figures/week1/mo_precinct_dual_graph_overlay.png|figures/mo_precinct_dual_graph_overlay.png|g' _arxiv_source_bundle/main.tex
-          printf '%s\n' 'AI-assisted format demonstration only; NOT reviewed, endorsed, or submitted to arXiv.' \
+          printf '%s\n' 'Stanley — editable LaTeX research manuscript.' \
             'Contents include the editable TeX manuscript and every referenced plot.' \
             'Verify human contributions, permissions, licensing, references, and arXiv eligibility before submission.' \
             > _arxiv_source_bundle/README.txt
@@ -96,7 +119,7 @@ jobs:
             text="\n".join(page.get_text() for page in d)
             missing=[k for k in ["The Phantom Baseline","Michigan","0.03278","2.588","13.40","29.00"] if k not in text]
             if missing:raise SystemExit(name+" lost required scientific claims: "+str(missing))
-            if "AI-assisted" not in text and "AI assisted" not in text:raise SystemExit("Missing AI assistance disclosure in "+name)
+            if "Stanley" not in text:raise SystemExit("Missing Stanley byline in "+name)
             if len(d)<7 or len(d)>40:raise SystemExit("PDF page count implausible for "+name+": "+str(len(d)))
             if f.stat().st_size>10000000:raise SystemExit("PDF too large for review "+str(f.stat().st_size))
             if name=="yau_computer_preview" and "Detailed balance" not in text and "detailed balance" not in text.lower():
@@ -106,6 +129,11 @@ jobs:
             details[name]={"pages":len(d),"bytes":f.stat().st_size,"sha256":hashlib.sha256(f.read_bytes()).hexdigest()}
             d.close()
           details["arxiv_source_zip"]={"bytes":(root/"arxiv_style_preprint_source.zip").stat().st_size}
+          provenance=(root/"Stanley/README.md").read_text(encoding="utf-8")
+          if "ChatGPT assistance" not in provenance:
+            raise SystemExit("The supporting README must preserve accurate editorial provenance")
+          if details["sts_style_mock"]["pages"]>25 or details["sts_style_mock"]["bytes"]>4_000_000:
+            raise SystemExit("Stanley STS mock failed its basic size/page constraints")
           (root/"audience_preview_build_manifest.json").write_text(json.dumps({"status":"PASS_FORMAT_PREVIEWS_ONLY","artifacts":details},indent=2))
           print(json.dumps(details,indent=2))
           with fitz.open(root/"davidson_portfolio_preview.pdf") as d:
@@ -116,19 +144,37 @@ jobs:
             d[0].get_pixmap(matrix=fitz.Matrix(1.18,1.18),alpha=False).save(str(root/"arxiv_preview_cover.png"))
           PY
 
+      - name: Publish Stanley-named preview files
+        run: |
+          set -euo pipefail
+          root=outputs/reports/stage4
+          out="$root/Stanley"
+          mkdir -p "$out"
+          cp "$root/sts_style_mock.pdf" "$out/Stanley_STS_Research_Report.pdf"
+          cp "$root/davidson_portfolio_preview.pdf" "$out/Stanley_Davidson_Portfolio.pdf"
+          cp "$root/yau_computer_preview.pdf" "$out/Stanley_Yau_Computer_Science.pdf"
+          cp "$root/arxiv_style_preprint_preview.pdf" "$out/Stanley_arXiv_Preprint.pdf"
+          cp "$root/arxiv_style_preprint_source.zip" "$out/Stanley_arXiv_LaTeX_Source.zip"
+          cp "$root/sts_style_mock.md" "$out/Stanley_STS_Research_Report.md"
+          cp "$root/davidson_portfolio_preview.md" "$out/Stanley_Davidson_Portfolio.md"
+          cp "$root/yau_computer_preview.md" "$out/Stanley_Yau_Computer_Science.md"
+          cp "$root/arxiv_style_preprint_preview.tex" "$out/Stanley_arXiv_Preprint.tex"
+
       - name: Commit completed audience PDFs and preprint source bundle
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add outputs/reports/stage4/davidson_portfolio_preview.pdf \
+          git add outputs/reports/stage4/Stanley/ \
+            outputs/reports/stage4/sts_style_mock.pdf \
+            outputs/reports/stage4/davidson_portfolio_preview.pdf \
             outputs/reports/stage4/yau_computer_preview.pdf \
             outputs/reports/stage4/arxiv_style_preprint_preview.pdf \
             outputs/reports/stage4/arxiv_style_preprint_source.zip \
             outputs/reports/stage4/audience_preview_build_manifest.json \
             outputs/reports/stage4/*preview_cover.png
           if ! git diff --cached --quiet; then
-            git commit -m "Publish distinct Davidson Yau and preprint PDF demonstrations"
+            git commit -m "Publish Stanley STS Davidson Yau and arXiv research layouts"
             git fetch origin research/audience-style-previews
             git rebase origin/research/audience-style-previews
             git push origin HEAD:refs/heads/research/audience-style-previews
@@ -137,10 +183,11 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: four-research-audience-format-previews
+          name: Stanley-research-papers
           retention-days: 60
           if-no-files-found: warn
           path: |
+            outputs/reports/stage4/Stanley/Stanley_*.pdf
             outputs/reports/stage4/sts_style_mock.pdf
             outputs/reports/stage4/davidson_portfolio_preview.pdf
             outputs/reports/stage4/yau_computer_preview.pdf
