@@ -62,7 +62,7 @@ REQUIRED_SECTIONS = [
     "## 5. Pillar II", "## 6. Pillar III",
     "## 7. Results", "## 8. Baseline reliability",
     "### 8.1 Gate A", "### 8.2 Gate B", "### 8.3 Gate C",
-    "## 9. Limitations", "## 10. Conclusion", "## References",
+    "## 9. Scope of the Audit and Boundaries of Inference", "## 10. Conclusion", "## References",
     "## Reproducibility and evidence appendix",
 ]
 REQUIRED_REFERENCES = [
@@ -100,6 +100,8 @@ def check(path: Path = TARGET, stage3: Path = STAGE3, stage12: Path = STAGE12) -
             errors.append(f"Stage 1-2 value {identifier}={datum} absent from both documents")
         if datum not in manuscript:
             errors.append(f"Stage 1-2 value {identifier}={datum} absent from draft")
+    if manuscript.count("![Exploratory Missouri precinct dual-graph overlay (unverified)](../../figures/week1/mo_precinct_dual_graph_overlay.png)") != 1:
+        errors.append("Exploratory Missouri inset missing, duplicated, or mislinked")
     # Stage 1–2 report renders exact 2016 difference with additional decimals.
     # Reject statements that promote algorithmic frequencies into neutral-map p-values.
     required_prose = [
