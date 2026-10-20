@@ -22,7 +22,7 @@
 \end{center}
 When I attempted to evaluate a computational redistricting baseline for Michigan, three different obstacles demanded an explanation. The underlying precinct graph required artificial connections to become usable. Long Markov-chain runs produced extensive numerical output without convincing convergence. Finally, changing geographic-fragmentation caps shifted simulated political outcomes. These problems raised one methodological question: what evidence is needed before a map ensemble can serve as a neutral comparison?
 
-I audited the processed 4,756-precinct Michigan graph, examined the geometry of its artificial connections, studied mixing in both recombination and locally reversible Markov chains, and evaluated a fixed-horizon sensitivity experiment with 64 independently verified terminal maps. The historical graph-repair procedure used enacted district labels to add five connections between polygons separated by approximately 42–280 km. Tested recombination and local Metropolis–Hastings configurations failed prespecified convergence diagnostics; for one relaxed MH condition, efficiency-gap \(\widehat R\) reached 2.588 and bulk effective sample size was 4.8. In the finite-horizon comparison, relaxing three geographic-proxy caps increased average precinct reassignment from 13.40% to 29.00% and decreased mean Democratic seats by 0.406 and efficiency gap by 0.03278. The paired-bootstrap 95% interval for the tighter-minus-relaxed efficiency-gap contrast was [+0.00975, +0.05631].
+I audited the processed 4,756-precinct Michigan graph, examined the geometry of its artificial connections, studied mixing in both recombination and locally reversible Markov chains, and evaluated a fixed-horizon sensitivity experiment with 64 independently verified terminal maps. The historical graph-repair procedure used enacted district labels to add five connections between polygons separated by approximately 42–280 km. Tested recombination and local Metropolis–Hastings configurations failed prespecified convergence diagnostics; for one relaxed MH condition, efficiency-gap $\widehat R$ reached 2.588 and bulk effective sample size was 4.8. In the finite-horizon comparison, relaxing three geographic-proxy caps increased average precinct reassignment from 13.40% to 29.00% and decreased mean Democratic seats by 0.406 and efficiency gap by 0.03278. The paired-bootstrap 95% interval for the tighter-minus-relaxed efficiency-gap contrast was [+0.00975, +0.05631].
 
 These are conditional algorithmic findings, not estimates from a certified distribution of legally permissible Michigan districts. They motivate a three-gate audit: independently validate the geographic graph, demonstrate target-specific sampler reliability, and measure sensitivity to consequential modeling choices.
 
@@ -46,9 +46,9 @@ The result is an audit with a definite stopping rule. If geographic adjacency la
 
 ## 2.1 What the simulation is allowed to claim
 
-I represent precincts by vertices of a graph \(G=(V,E)\). An edge records a chosen adjacency relation. A district assignment \(x\) gives each precinct one of 13 congressional labels. For a geographic-cap regime \(c\), the implemented state space \(S_c(G)\) includes assignments that meet the code's connectedness, population and fragmentation requirements. This is a *modeled* feasible set, not the set of all Michigan-legal congressional maps.
+I represent precincts by vertices of a graph $G=(V,E)$. An edge records a chosen adjacency relation. A district assignment $x$ gives each precinct one of 13 congressional labels. For a geographic-cap regime $c$, the implemented state space $S_c(G)$ includes assignments that meet the code's connectedness, population and fragmentation requirements. This is a *modeled* feasible set, not the set of all Michigan-legal congressional maps.
 
-The distinction between a graph and the real state is essential. A generated plan may be contiguous in \(G\) even when its connectivity depends on edges without geographic or legal justification. Conversely, removing an edge may exclude a plan that is geographically valid under a special shoreline or island convention. A probability distribution defined over the wrong set of maps cannot be rescued by improving its numerical precision.
+The distinction between a graph and the real state is essential. A generated plan may be contiguous in $G$ even when its connectivity depends on edges without geographic or legal justification. Conversely, removing an edge may exclude a plan that is geographically valid under a special shoreline or island convention. A probability distribution defined over the wrong set of maps cannot be rescued by improving its numerical precision.
 
 I use efficiency gap and Democratic seats scored from a counterfactual 2020 presidential-vote overlay as *outcomes*, not as definitions of legal validity. The enacted 2021 Michigan congressional plan scores seven Democratic seats and approximately +0.0033332 efficiency gap under the project's sign convention. Those are historical-data overlays, not observed congressional election results under the later district boundaries (Stephanopoulos and McGhee 2015).
 
@@ -78,9 +78,9 @@ It is not a small cartographic issue. It changes what the algorithm regards as p
 
 ## 3.2 A distance-based alternative is not automatically neutral
 
-I examined a separate proximity-based construction. A minimum-spanning tree among disconnected components reduced the total candidate connection distance to approximately 19.63 km, but did not preserve connectivity for every enacted district. The next sensitivity experiment considered \(K\) nearest contacts with \(K=1,3,10,25,50\). The smallest tested value meeting the graph-connectivity and reference-representability tests was \(K=3\): thirteen added candidate edges, none longer than approximately 17.8 km.
+I examined a separate proximity-based construction. A minimum-spanning tree among disconnected components reduced the total candidate connection distance to approximately 19.63 km, but did not preserve connectivity for every enacted district. The next sensitivity experiment considered $K$ nearest contacts with $K=1,3,10,25,50$. The smallest tested value meeting the graph-connectivity and reference-representability tests was $K=3$: thirteen added candidate edges, none longer than approximately 17.8 km.
 
-The KNN3 alternative does not select individual edges using enacted district labels. However, the overall choice of \(K=3\) followed checks against the enacted reference. That is still a selection decision. Nor does proximity independently establish legal adjacency under Michigan's shoreline, island, or county rules. I therefore use this graph to expose sensitivity, not to certify the lawful universe of maps.
+The KNN3 alternative does not select individual edges using enacted district labels. However, the overall choice of $K=3$ followed checks against the enacted reference. That is still a selection decision. Nor does proximity independently establish legal adjacency under Michigan's shoreline, island, or county rules. I therefore use this graph to expose sensitivity, not to certify the lawful universe of maps.
 
 ## 3.3 Missouri as a follow-up test, not a replication
 
@@ -102,7 +102,7 @@ The historic ReCom archive contained substantial simulation output. In one 2020 
 
 Those archives cannot be promoted retroactively into valid draws from a new, more restrictive target. I preserved the historical calculations while declining to interpret their recorded percentiles as probabilities under the final model.
 
-After correcting random-number initialization, the audit ran eight explicitly seeded ReCom chains, each recording 4,001 states across two geographic-cap regimes. The scalar diagnostics still failed. Efficiency-gap rank-normalized \(\widehat R\) was 1.733 with bulk effective sample size 9.4 under closer constraints; under relaxed constraints those values were 1.139 and 20.4. The prespecified standards were \(\widehat R\le 1.01\) and bulk effective sample size at least 400.
+After correcting random-number initialization, the audit ran eight explicitly seeded ReCom chains, each recording 4,001 states across two geographic-cap regimes. The scalar diagnostics still failed. Efficiency-gap rank-normalized $\widehat R$ was 1.733 with bulk effective sample size 9.4 under closer constraints; under relaxed constraints those values were 1.139 and 20.4. The prespecified standards were $\widehat R\le 1.01$ and bulk effective sample size at least 400.
 
 Thousands of saved observations yielded very little effective information about the reported statistic. The chain moved. The inference did not become reliable.
 
@@ -110,9 +110,13 @@ Thousands of saved observations yielded very little effective information about 
 
 I also examined a local boundary-edge Metropolis–Hastings transition rule. From the current map, it proposes a one-precinct boundary flip or a two-precinct label swap, checks the modeled population and connectedness conditions, and accepts feasible proposals with the correction
 
-\[
+
+$$
+
 \alpha(x,y)=\min\!\left\{1,\frac{q(y,x)}{q(x,y)}\right\}.
-\]
+
+$$
+
 
 A small-graph exact enumeration verified detailed balance for that implementation. Its invariant law is uniform only on each accessible communicating component of labeled, proxy-feasible assignments. It does not prove that the chain can reach every feasible assignment, or that its stationary law is substantively desirable.
 
@@ -122,7 +126,7 @@ Pilot acceptance across tested runs was 9.20%–15.95%. After 2,000 attempted tr
 
 | Efficiency-gap diagnostic | Closer MH condition | Relaxed MH condition |
 |:---|---:|---:|
-| Rank-normalized \(\widehat R\) | 1.568 | 2.588 |
+| Rank-normalized $\widehat R$ | 1.568 | 2.588 |
 | Bulk effective sample size | 7.1 | 4.8 |
 
 \noindent{\footnotesize\textit{Table 1 credit.} Derived from the executed eight-chain reversible-MH diagnostic report, computed using Python and rank-normalized MCMC diagnostics (Vehtari et al. 2021). The 2,000-step pilot rejection counts come from a separate experiment.}
@@ -137,11 +141,15 @@ The broader lesson is precise. Detailed balance concerns the distribution a vali
 
 The mixing failures led me to frame the final experiment around a quantity that could actually be measured: the output of a **specified algorithm after 800 transitions from the enacted reference**, rather than a claimed equilibrium distribution over all lawful maps.
 
-For the enacted starting assignment \(x_0\), experimental graph \(G_{\mathrm{KNN3}}\), cap regime \(c\), and implemented transition procedure \(P_c\), I define
+For the enacted starting assignment $x_0$, experimental graph $G_{\mathrm{KNN3}}$, cap regime $c$, and implemented transition procedure $P_c$, I define
 
-\[
+
+$$
+
 Q_{c,800}(A)=\Pr\!\left[X_{800}\in A\mid X_0=x_0,G=G_{\mathrm{KNN3}},P=P_c\right].
-\]
+
+$$
+
 
 This distribution exists as a finite-horizon property of the code. It need not be a legal or neutral baseline. The distinction prevents the central interpretive error of the historical archive.
 
