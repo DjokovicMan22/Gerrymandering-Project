@@ -3,26 +3,26 @@
   "artifacts": {
     "sts_style_mock": {
       "pages": 14,
-      "bytes": 748251,
-      "sha256": "43929b521c1a62596b9a09b1b90f74fb2a84122fdf8b221715e4cfa11d2894a1"
+      "bytes": 742186,
+      "sha256": "ecfd557b85f51102b70fb84f3befefc443cf307a1b58aba16a808c89c4966465"
     },
     "davidson_portfolio_preview": {
       "pages": 14,
-      "bytes": 748469,
-      "sha256": "cd15dcf5148c5f4ebee9b697f7cc1c28b93c57b2d0e3c61f333761bcb70b713d"
+      "bytes": 747550,
+      "sha256": "f0c8333bf8b93c2502b7b1f7739b9dfee7d695bd56236279f4e71cccfad27bcc"
     },
     "yau_computer_preview": {
       "pages": 14,
-      "bytes": 750372,
-      "sha256": "5d2349e0efd52bf4b8adedf736ada397e0fe36bd76e948a8ff081b036e98f88c"
+      "bytes": 748867,
+      "sha256": "7691aabc26a1d7f3c40f185eeb423df96035f93ef6d54578ca84a6e1d2de9f26"
     },
     "arxiv_style_preprint_preview": {
       "pages": 19,
-      "bytes": 889973,
-      "sha256": "39aa0fe988a59ab543401f0a1ae46c132a53468373afc53a8cf2e62419e0ad12"
+      "bytes": 889162,
+      "sha256": "c2b0867d5054970223f120ea94e388674d17b0e60d36666ef00d5a0d2fdf0a21"
     },
     "arxiv_source_zip": {
-      "bytes": 4404946
+      "bytes": 4404731
     }
   }
 }
