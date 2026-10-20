@@ -1,0 +1,150 @@
+name: Build audience-specific Phantom Baseline preview PDFs
+on:
+  push:
+    branches:
+      - research/audience-style-previews
+    paths:
+      - .github/workflows/audience-style-previews.yml
+      - scripts/research_audit/audience_preview_header.tex
+      - outputs/reports/stage4/davidson_portfolio_preview.md
+      - outputs/reports/stage4/yau_computer_preview.md
+      - outputs/reports/stage4/arxiv_style_preprint_preview.tex
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: audience-format-previews
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install reproducible typesetting and PDF validation
+        run: |
+          sudo apt-get -qq update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended \
+            fonts-texgyre fonts-stix lmodern latexmk ghostscript poppler-utils zip
+          python -m pip install 'pymupdf==1.24.14'
+
+      - name: Compile individual-researcher portfolio and Yau report demonstrations
+        run: |
+          set -euo pipefail
+          root=outputs/reports/stage4
+          for audience in davidson_portfolio yau_computer; do
+            pandoc "$root/${audience}_preview.md" \
+              --from=markdown+raw_tex+tex_math_dollars+pipe_tables \
+              --standalone --pdf-engine=xelatex \
+              --resource-path="$root" \
+              -V fontsize=11pt \
+              -V geometry:margin=0.88in \
+              -V mainfont='TeX Gyre Termes' \
+              --include-in-header=scripts/research_audit/audience_preview_header.tex \
+              -o "$root/${audience}_preview_unc.pdf"
+            gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dCompatibilityLevel=1.5 \
+               -dPDFSETTINGS=/ebook -dDetectDuplicateImages=true \
+               -sOutputFile="$root/${audience}_preview.pdf" \
+               "$root/${audience}_preview_unc.pdf"
+            rm "$root/${audience}_preview_unc.pdf"
+            pdfinfo "$root/${audience}_preview.pdf" | grep -E 'Pages:|File size:'
+          done
+
+      - name: Compile full first-person preprint and package its real source graphics
+        run: |
+          set -euo pipefail
+          cd outputs/reports/stage4
+          mkdir -p _arxiv_preview_build
+          latexmk -xelatex -interaction=nonstopmode -halt-on-error -file-line-error \
+            -outdir=_arxiv_preview_build arxiv_style_preprint_preview.tex
+          gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dCompatibilityLevel=1.5 \
+             -dPDFSETTINGS=/ebook -dDetectDuplicateImages=true \
+             -sOutputFile=arxiv_style_preprint_preview.pdf \
+             _arxiv_preview_build/arxiv_style_preprint_preview.pdf
+          mkdir -p _arxiv_source_bundle/figures
+          cp arxiv_style_preprint_preview.tex _arxiv_source_bundle/main.tex
+          cp figures/figure_topology_artificial_bridges.pdf \
+            figures/figure1_terminal_EG_ECDF.pdf \
+            figures/figure2_paired_seed_EG.pdf \
+            figures/figure3_spatial_change_vs_EG.pdf \
+            _arxiv_source_bundle/figures/
+          cp ../../figures/week1/mo_precinct_dual_graph_overlay.png \
+            _arxiv_source_bundle/figures/
+          sed -i 's|../../figures/week1/mo_precinct_dual_graph_overlay.png|figures/mo_precinct_dual_graph_overlay.png|g' _arxiv_source_bundle/main.tex
+          printf '%s\n' 'AI-assisted format demonstration only; NOT reviewed, endorsed, or submitted to arXiv.' \
+            'Contents include the editable TeX manuscript and every referenced plot.' \
+            'Verify human contributions, permissions, licensing, references, and arXiv eligibility before submission.' \
+            > _arxiv_source_bundle/README.txt
+          ( cd _arxiv_source_bundle && zip -qr ../arxiv_style_preprint_source.zip . )
+          pdfinfo arxiv_style_preprint_preview.pdf | grep -E 'Pages:|File size:'
+
+      - name: Validate all four distinct formats and scientific markers
+        run: |
+          python - <<'PY'
+          import fitz,json,hashlib,pathlib
+          root=pathlib.Path("outputs/reports/stage4")
+          names=["sts_style_mock","davidson_portfolio_preview","yau_computer_preview","arxiv_style_preprint_preview"]
+          details={}
+          for name in names:
+            f=root/(name+".pdf")
+            if not f.is_file():raise SystemExit("Missing expected PDF "+str(f))
+            d=fitz.open(f)
+            text="\n".join(page.get_text() for page in d)
+            missing=[k for k in ["The Phantom Baseline","Michigan","0.03278","2.588","13.40","29.00"] if k not in text]
+            if missing:raise SystemExit(name+" lost required scientific claims: "+str(missing))
+            if "AI-assisted" not in text and "AI assisted" not in text:raise SystemExit("Missing AI assistance disclosure in "+name)
+            if len(d)<7 or len(d)>40:raise SystemExit("PDF page count implausible for "+name+": "+str(len(d)))
+            if f.stat().st_size>10000000:raise SystemExit("PDF too large for review "+str(f.stat().st_size))
+            if name=="yau_computer_preview" and "Detailed balance" not in text and "detailed balance" not in text.lower():
+              raise SystemExit("Yau theoretical appendix missing")
+            if name=="davidson_portfolio_preview" and "Visual portfolio" not in text:
+              raise SystemExit("Davidson visual portfolio index missing")
+            details[name]={"pages":len(d),"bytes":f.stat().st_size,"sha256":hashlib.sha256(f.read_bytes()).hexdigest()}
+            d.close()
+          details["arxiv_source_zip"]={"bytes":(root/"arxiv_style_preprint_source.zip").stat().st_size}
+          (root/"audience_preview_build_manifest.json").write_text(json.dumps({"status":"PASS_FORMAT_PREVIEWS_ONLY","artifacts":details},indent=2))
+          print(json.dumps(details,indent=2))
+          with fitz.open(root/"davidson_portfolio_preview.pdf") as d:
+            d[0].get_pixmap(matrix=fitz.Matrix(1.18,1.18),alpha=False).save(str(root/"davidson_preview_cover.png"))
+          with fitz.open(root/"yau_computer_preview.pdf") as d:
+            d[0].get_pixmap(matrix=fitz.Matrix(1.18,1.18),alpha=False).save(str(root/"yau_preview_cover.png"))
+          with fitz.open(root/"arxiv_style_preprint_preview.pdf") as d:
+            d[0].get_pixmap(matrix=fitz.Matrix(1.18,1.18),alpha=False).save(str(root/"arxiv_preview_cover.png"))
+          PY
+
+      - name: Commit completed audience PDFs and preprint source bundle
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add outputs/reports/stage4/davidson_portfolio_preview.pdf \
+            outputs/reports/stage4/yau_computer_preview.pdf \
+            outputs/reports/stage4/arxiv_style_preprint_preview.pdf \
+            outputs/reports/stage4/arxiv_style_preprint_source.zip \
+            outputs/reports/stage4/audience_preview_build_manifest.json \
+            outputs/reports/stage4/*preview_cover.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish distinct Davidson Yau and preprint PDF demonstrations"
+            git fetch origin research/audience-style-previews
+            git rebase origin/research/audience-style-previews
+            git push origin HEAD:refs/heads/research/audience-style-previews
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: four-research-audience-format-previews
+          retention-days: 60
+          if-no-files-found: warn
+          path: |
+            outputs/reports/stage4/sts_style_mock.pdf
+            outputs/reports/stage4/davidson_portfolio_preview.pdf
+            outputs/reports/stage4/yau_computer_preview.pdf
+            outputs/reports/stage4/arxiv_style_preprint_preview.pdf
+            outputs/reports/stage4/arxiv_style_preprint_source.zip
+            outputs/reports/stage4/audience_preview_build_manifest.json
+            outputs/reports/stage4/*preview_cover.png
