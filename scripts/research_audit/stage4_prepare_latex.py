@@ -169,6 +169,26 @@ def prepare(s:str)->str:
              rf"\includegraphics[width={width:.2f}\linewidth]{{figures/{stem}.pdf}}"+"\n"+
              r"\caption{"+caption+"}\n"+rf"\label{{fig:stage4-{n}}}"+"\n"+r"\end{figure}")
         s=s[:found[0].start()]+fig+s[found[0].end():]
+    # The Missouri display is a descriptive, unverified exploratory inset.
+    # It is deliberately unnumbered and must not shift the four audited
+    # Michigan figure references or imply cross-state replication.
+    mo_pattern=(r"(?m)^!\\[Exploratory Missouri precinct dual-graph overlay "
+                r"\\(unverified\\)\\]\\(\\.\\./\\.\\./figures/week1/"
+                r"mo_precinct_dual_graph_overlay\\.png\\)\\n"
+                r"\\*\\*Supplementary Figure S1\\.\\*\\* [^\\n]*")
+    mo_matches=list(re.finditer(mo_pattern,s))
+    require(len(mo_matches)==1,"Expected exactly one exploratory Missouri overlay")
+    mo_figure=(r"\\begin{figure}[H]"+"\\n"+r"\\centering"+"\\n"+
+               r"\\includegraphics[width=0.76\\linewidth,height=0.56\\textheight,keepaspectratio]"
+               r"{../../figures/week1/mo_precinct_dual_graph_overlay.png}"+"\\n"+
+               r"\\par\\smallskip"+"\\n"+
+               r"{\\footnotesize \\textbf{Supplementary Figure S1.} "
+               "Exploratory Missouri precinct dual-graph overlay from prior work. "
+               "Its source bytes, graph components and inserted adjacency were "
+               "not independently verified under this audit; the visual does "
+               "not establish Missouri replication or national prevalence.}"+"\\n"+
+               r"\\end{figure}")
+    s=s[:mo_matches[0].start()]+mo_figure+s[mo_matches[0].end():]
     mark="## References {.unnumbered}"
     s=s.replace(mark,mark+"\n\n"+r"\begingroup\small"+
                 "\n"+r"\setlength{\parindent}{0pt}"+
@@ -196,7 +216,7 @@ def prepare(s:str)->str:
     # Allow immutable source hashes to wrap without overflowing text margins.
     s=re.sub(r"`([0-9a-f]{40,64})`",
              lambda m:r"\texttt{\seqsplit{"+m.group(1)+"}}",s)
-    require(s.count(r"\begin{figure}[H]")==4 and s.count(r"\begin{table}[H]")==3,
+    require(s.count(r"\begin{figure}[H]")==5 and s.count(r"\begin{table}[H]")==3,
             "Missing academic tables or figures")
     return s
 def main():
