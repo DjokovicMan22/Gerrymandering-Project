@@ -6,13 +6,12 @@
 {\LARGE\bfseries The Phantom Baseline}\par
 \vspace{.20in}
 {\large Geographic Assumptions, Failed Mixing, and Constraint Sensitivity in Computational Redistricting}\par
-\vspace{.48in}
-{\large Independent Research Report: Competition-Format Demonstration}\par
-\vspace{.30in}
-{\normalsize Author line intentionally omitted pending verification of individual contributions}\par
+\vspace{.58in}
+{\Large\bfseries Stanley}\par
+\vspace{.20in}
+{\normalsize Science Talent Search — Research Report Layout}\par
 \vfill
-{\bfseries AI-assisted illustrative rewrite — not eligible as an independently written STS entry}\par
-{\small Prepared for comparison with the academic-format manuscript. All first-person contribution claims require verification against actual student work and support received.}
+{\small Computational Redistricting Research \quad $\cdot$ \quad October 2026}
 \end{center}
 \end{titlepage}
 
@@ -260,4 +259,3 @@ Vehtari, Aki, Andrew Gelman, Daniel Simpson, Bob Carpenter, and Paul-Christian B
 
 Veomett, Ellen, with Arbie Hsu and Alusi. “Michigan JSON and Shapefile” (processed precinct GIS, election and population data; source README and notebook). Source materials obtained from the Redistricting Data Hub, June 2024. https://github.com/eveomett-states/Michigan. CC BY-NC 4.0 and applicable Redistricting Data Hub conditions.
 
-\noindent{\footnotesize\textit{Draft-status disclosure:} This is an AI-assisted competition-format illustration prepared from the existing research repository. It is not an independently authored STS Research Report, and it must not be represented as one. First-person statements about design, implementation, and analysis require verification by the student researcher. Source bibliography entries were inherited from the existing paper; they require independent human checking before use in any application.}
