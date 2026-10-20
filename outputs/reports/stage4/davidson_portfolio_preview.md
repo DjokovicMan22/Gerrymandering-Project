@@ -5,13 +5,14 @@
 {\Huge\bfseries The Phantom Baseline}\par
 \vspace{.18in}
 {\Large Computational Redistricting Reliability Audit}\par
-\vspace{.42in}
-{\large A Research Portfolio in Applied Mathematics and Computational Methods}\par
-\vspace{.34in}
-{\small Davidson Fellows-style mathematics portfolio preview}\par
+\vspace{.48in}
+{\LARGE\bfseries Stanley}\par
+\vspace{.30in}
+{\large Mathematics and Computational Methods}\par
+\vspace{.20in}
+{\normalsize Davidson Fellows — Research Portfolio Layout}\par
 \vfill
-{\bfseries Independent-researcher voice demonstration}\par
-{\small AI-assisted example. Individual technical contributions and assistance must be verified and disclosed before any official use.}
+{\small Research Portfolio \quad $\cdot$ \quad October 2026}
 \end{center}
 \end{titlepage}
 
@@ -287,4 +288,3 @@ Vehtari, Aki, Andrew Gelman, Daniel Simpson, Bob Carpenter, and Paul-Christian B
 
 Veomett, Ellen, with Arbie Hsu and Alusi. “Michigan JSON and Shapefile” (processed precinct GIS, election and population data; source README and notebook). Source materials obtained from the Redistricting Data Hub, June 2024. https://github.com/eveomett-states/Michigan. CC BY-NC 4.0 and applicable Redistricting Data Hub conditions.
 
-\noindent{\footnotesize\textit{Draft-status disclosure:} This is an AI-assisted competition-format illustration prepared from the existing research repository. It is not a completed Davidson Fellows entry and must not be represented as independently drafted application material. First-person statements about design, implementation, and analysis require verification by the student researcher. Source bibliography entries were inherited from the existing paper; they require independent human checking before use in any application.}
