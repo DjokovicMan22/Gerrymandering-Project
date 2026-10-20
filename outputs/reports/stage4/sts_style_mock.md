@@ -54,7 +54,7 @@ I use efficiency gap and Democratic seats scored from a counterfactual 2020 pres
 
 ## 2.2 Provenance before inference
 
-The processed Michigan input has 4,756 precinct nodes and 12,378 graph edges. I compared the processed graph and precinct-polygon archive with identifiable public source files attributed to Veomett and collaborators. The source graph's Git blob identity is \`a4dfe70818f87b97924781216f3d86a672cfc66a\`; the polygon archive's corresponding identifier is \`07bce18dabbcca9d549e28995a8156fd6978d7db\`. Source checks reconciled population, district and county fields across all 4,756 processed records.
+The processed Michigan input has 4,756 precinct nodes and 12,378 graph edges. I compared the processed graph and precinct-polygon archive with identifiable public source files attributed to Veomett and collaborators. The source graph's Git blob identity is `a4dfe70818f87b97924781216f3d86a672cfc66a`; the polygon archive's corresponding identifier is `07bce18dabbcca9d549e28995a8156fd6978d7db`. Source checks reconciled population, district and county fields across all 4,756 processed records.
 
 This does not mean I independently reconstructed every upstream Census or VEST join. I did not. Byte identity verifies which processed file entered an experiment. It does not verify every decision that produced that file. I retained that boundary throughout the analysis.
 
