@@ -77,13 +77,8 @@ def main():
                 color=RED,lw=1.35,ls=(0,(3.2,1.8)),zorder=4,solid_capstyle="round")
         ax.scatter([a.x/1000,b.x/1000],[a.y/1000,b.y/1000],
                    s=17,facecolors="white",edgecolors=RED,linewidths=1.0,zorder=5)
-        midx=(a.x+b.x)/2000;midy=(a.y+b.y)/2000
-        shifts={1:(-18,10),2:(4,-15),3:(6,11),4:(-18,-13),5:(5,10)}
-        ax.annotate(f"{index}. {km:.0f} km",(midx,midy),
-                    xytext=shifts[index],textcoords="offset points",fontsize=8,
-                    color=INK,ha="center",va="center",
-                    bbox={"boxstyle":"square,pad=0.13","facecolor":PAPER,
-                          "edgecolor":"none","alpha":.93},zorder=6)
+        # Keep distances in the formal numbered figure caption. Five nearby
+        # overlapping inline labels obscure the original geography at print size.
         output.append({"label":index,"node_a":u,"node_b":v,
                        "distance_km":round(km,6),
                        "same_enacted_district":bool(row["same_enacted_district"]),
