@@ -111,7 +111,7 @@ Paper reproducibility & Graph and endpoint SHA gates; programmatic vector plots;
 
 FIGURES={
 1:("figure_topology_artificial_bridges",.91,
-"Source-grounded visualization of the five artificial connections inserted by the original project's enacted-label-conditioned graph repair. Faint points are representative locations of the 4,756 Michigan precinct polygons; dashed segments join the closest points on the actual paired polygons. Labels give independently verified polygon separations in kilometers, not legal travel routes. Source JSON and polygon ZIP bytes were separately pinned and checked."),
+"Source-grounded visualization of the five artificial connections inserted by the original project's enacted-label-conditioned graph repair. Faint points are representative locations of the 4,756 Michigan precinct polygons; dashed segments join the closest points on the actual paired polygons. The five source-measured shortest polygon gaps are 42.3, 117.3, 134.3, 169.7 and 280.2 km. Source JSON and polygon ZIP bytes were pinned and independently verified; these lines are not legal land or water routes."),
 2:("figure1_terminal_EG_ECDF",.90,
 "Empirical cumulative distributions of efficiency gap under tighter and relaxed model constraints (32 independently seeded endpoints per regime). The vertical reference marker is the enacted plan under the same 2020 presidential-vote overlay; this is not a legal-map outlier test."),
 3:("figure2_paired_seed_EG",.71,
