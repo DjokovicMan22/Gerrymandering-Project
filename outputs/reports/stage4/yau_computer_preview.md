@@ -253,17 +253,17 @@ The proposed standard is practical: publish an adversarial computational ledger,
 
 Let $C$ be a communicating component of the finite set of feasible labeled district assignments under fixed geographic model $G$ and cap regime $c$. Let $q(x,y)$ denote the actual proposal probability of selecting $y$ from $x$, including the multiplicity of boundary-edge orientations that lead to the same map. The implemented acceptance rule is
 
-$
+$$
 \alpha(x,y)=\min\!\left(1,\frac{q(y,x)}{q(x,y)}\right).
-$
+$$
 
 For distinct $x,y\in C$ with positive forward and reverse proposal probabilities, take the uniform candidate invariant law $\pi(x)=1/|C|$. Then
 
-$
+$$
 \pi(x)q(x,y)\alpha(x,y)
 =\frac{\min\{q(x,y),q(y,x)\}}{|C|}
 =\pi(y)q(y,x)\alpha(y,x).
-$
+$$
 
 Holding self-loops absorb invalid proposals and rejections. These identities establish detailed balance for the specified local transition operator, assuming the stated finite model and correct implementation of $q$. Exact enumeration on a small graph checked the implemented rule. It **does not** establish whether all feasible assignments form one communicating class, whether a practical chain mixes adequately, or whether the conditional uniform law is an appropriate legal neutral-map distribution. The proposal is also distinct from Cannon et al.'s spanning-tree-based reversible ReCom law.
 
