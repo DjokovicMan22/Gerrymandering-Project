@@ -157,7 +157,7 @@ def prepare(s:str)->str:
     # The audit-implementation table must use the same numbered booktabs
     # standard as the outcome tables; never leave Pandoc pipe-table defaults.
     a=s.find("**Table 3.")
-    b=s.find("### 8.5 The evidentiary consequence",a)
+    b=s.find("### The evidentiary consequence",a)
     require(a>0 and b>a and "| Geographic provenance" in s[a:b],
             "Executable audit evidence table or final-section boundary changed")
     s=s[:a]+TABLE_3+"\n\n"+s[b:]
