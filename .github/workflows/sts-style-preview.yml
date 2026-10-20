@@ -19,7 +19,7 @@ jobs:
       - name: Install TeX, Pandoc, PDF analyzer
         run: |
           sudo apt-get -qq update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended fonts-texgyre latexmk poppler-utils
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended fonts-texgyre lmodern latexmk poppler-utils
           python -m pip install pymupdf
       - name: Build 11pt 1.5-spaced, one-inch-margin mock PDF
         run: |
