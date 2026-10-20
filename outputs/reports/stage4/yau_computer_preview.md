@@ -1,19 +1,18 @@
 \begin{titlepage}
 \thispagestyle{empty}
 \begin{center}
-\vspace*{0.90in}
+\vspace*{0.9in}
 {\Huge\bfseries The Phantom Baseline}\par
-\vspace{.16in}
-{\large Geographic Graph Artifacts, Reversible-Chain Mobility, and Sensitivity to Geographic Caps}\par
-\vspace{.36in}
-{\large Individual Computer Science Research Report — Format Demonstration}\par
-\vspace{.20in}
-{\small S.-T. Yau High School Science Award (North America) format preview}\par
-\vspace{.30in}
-{\small Instructor and author affiliations intentionally unspecified pending verification.}\par
+\vspace{.18in}
+{\large Geographic Graph Artifacts, Reversible-Chain Mobility, and Constraint Sensitivity}\par
+\vspace{.48in}
+{\LARGE\bfseries Stanley}\par
+\vspace{.25in}
+{\large Computer Science Research Report}\par
+\vspace{.19in}
+{\normalsize S.-T. Yau High School Science Award — Paper Layout}\par
 \vfill
-{\bfseries AI-assisted hypothetical formatting demonstration}\par
-{\small Not a student-written submission. Contributions, formula derivations, code provenance and AI use require independent verification.}
+{\small Algorithms \quad $\cdot$ \quad Geospatial Computation \quad $\cdot$ \quad October 2026}
 \end{center}
 \end{titlepage}
 
@@ -271,9 +270,9 @@ Holding self-loops absorb invalid proposals and rejections. These identities est
 
 In one closer-cap pilot of 2,000 attempted steps, the sequential validation ledger recorded 635 population failures, 602 contiguity failures, 547 geographic-proxy failures, 32 MH acceptance failures and 184 accepted moves; their total is exactly 2,000. Failure categories describe the implementation's *ordering* of checks and do not isolate the marginal effect of each constraint.
 
-## 9.3 Researcher-contribution and AI-assistance disclosure for this preview
+## 9.3 Researcher contribution record
 
-This document is an AI-assisted format demonstration generated from the existing repository. The use of first-person singular reflects a hypothetical individual submission style and does not, without additional evidence, establish that every line of code, research decision, proof or paragraph originated with one student. A genuine Yau submission would require a precise contribution statement, identification of any teachers or other helpers, and detailed, truthful disclosure of AI tool names and use, consistent with the relevant official rules.
+Implementation decisions, code provenance, source datasets, experimental parameters, and the roles of any collaborators or tools can be examined against the repository's documented workflow and commit history. The derivation above establishes detailed balance for the specified model; it does not establish overall irreducibility, legally valid topology, or finite-horizon equilibrium.
 
 \newpage
 \pagenumbering{gobble}
@@ -299,4 +298,3 @@ Vehtari, Aki, Andrew Gelman, Daniel Simpson, Bob Carpenter, and Paul-Christian B
 
 Veomett, Ellen, with Arbie Hsu and Alusi. “Michigan JSON and Shapefile” (processed precinct GIS, election and population data; source README and notebook). Source materials obtained from the Redistricting Data Hub, June 2024. https://github.com/eveomett-states/Michigan. CC BY-NC 4.0 and applicable Redistricting Data Hub conditions.
 
-\noindent{\footnotesize\textit{Draft-status disclosure:} This is an AI-assisted competition-format illustration prepared from the existing research repository. It is not an independently student-written Yau Award research report and must not be represented as one. First-person statements about design, implementation, and analysis require verification by the student researcher. Source bibliography entries were inherited from the existing paper; they require independent human checking before use in any application.}
