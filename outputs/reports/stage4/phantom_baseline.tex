@@ -280,7 +280,15 @@ The distinction between \emph{a mathematically known invariant law} and
 \emph{empirical exploration of it} underlies this paper. A theoretically
 reversible chain can be immobile. An active chain can have an unknown
 target. Neither output should automatically be treated as a sample of
-legal maps.
+legal maps. The literature supplies different mathematical objects
+rather than a single algorithmic guarantee: the reversible
+spanning-tree-weighted law discussed by Cannon et al.~(2026) is not the
+uniform-within-communicating-class law targeted by our separately
+implemented local boundary-edge Metropolis--Hastings (MH) kernel.
+Failure of the latter to mix cannot falsify the former's reversibility
+theorem. It can demonstrate the practical gap between verifying detailed
+balance for a specified kernel and obtaining informative finite-budget
+samples from that kernel.
 
 \hypertarget{interpretation-of-partisan-scores}{%
 \subsection{Interpretation of partisan
@@ -359,6 +367,19 @@ calculations were independently reproduced by summing graph-node vote
 fields and reconciled against six saved initial-chain rows and 26
 district-level election rows.
 
+Provenance must extend from input identity to reported output. The
+processed source graph and polygon archive are checked against their
+specified Git blob hashes; the regenerated 13-edge KNN3 sensitivity
+graph is identified by SHA-256
+\texttt{\seqsplit{14355742f58291f4c26267982de07a21037c347f7598a68f032e0d68ea1d542c}}.
+The finite-horizon workflow records endpoint assignment hashes and RNG
+seeds, independently rescores terminal plans, and produces a derived
+data artifact used by the Stage 4 vector-figure pipeline. This reduces
+opportunities for undocumented manual substitution between simulation
+and visualization. Content digests alone cannot verify the correctness
+of the upstream joins, the choice of model, or the interpretation of a
+figure; they establish file identity, not inferential validity.
+
 \hypertarget{independent-computational-checks}{%
 \subsection{Independent computational
 checks}\label{independent-computational-checks}}
@@ -372,9 +393,16 @@ and Reock compactness scores were independently recalculated for all 13
 reference districts from source-matched polygons; the Reock check used
 GEOS/Shapely's minimum-bounding-radius routine rather than the project's
 earlier randomized enclosing-circle implementation. At the code level,
-new adversarial tests reject malformed step indices, impossible seat
-counts, invalid population deviations, nonfinite precinct vote counts
-and other corrupt inputs.
+new adversarial tests deliberately introduce and reject malformed step
+indices, impossible seat counts, invalid population deviations,
+nonfinite precinct vote counts and other corrupt inputs. The checks test
+how analysis code fails when supplied invalid evidence rather than
+merely confirming that a nominally valid analysis completes. Separately,
+the finite-horizon experiment independently validates all 64 terminal
+assignments, and the longer mixing pilots independently verify their
+archived periodic snapshots. These are materially different coverage
+claims: the CI suite does not independently rescore every intermediate
+state at every MCMC step.
 
 These checks support the numerical and engineering claims made in
 subsequent sections. They cannot recover the full precinct assignments
@@ -421,6 +449,21 @@ boundary-driven Markov chains. In addition, conditioning the
 construction of \texttt{E} on the enacted label \texttt{CD} undermines a
 comparison intended to treat the enacted map as an external object
 evaluated against alternatives.
+
+Cross-state scope. The geographic danger should not be dismissed merely
+because Michigan has a distinctive shoreline and islands, but this case
+does not measure its prevalence nationally. The repository contains an
+early
+\href{https://github.com/DjokovicMan22/Gerrymandering-Project/blob/research/stages-1-3-validation/outputs/figures/week1/mo_precinct_dual_graph_overlay.png}{Missouri
+precinct dual-graph overlay}, useful as a \emph{visual prompt for a
+second-state audit}. Its original local inputs have not been
+byte-matched to a verified Missouri research dataset, nor have its graph
+components and synthetic-edge requirements been independently evaluated
+under the present protocol. It therefore cannot establish that Missouri
+exhibits the same failure, much less that topological contamination is
+universal. The transferable claim is the audit requirement: exceptional
+adjacency must be independently justified wherever a precinct graph is
+used.
 
 \hypertarget{geometric-repair-reference-compatibility-and-selection-bias}{%
 \subsection{Geometric repair, reference compatibility and selection
@@ -778,6 +821,20 @@ is consistent with more severe constraints on feasible proposals.
 However, the rejected-proposal rate is an implementation diagnostic and
 does not prove any particular legal or political mechanism.
 
+Read together, Table 1, Figure 4 and the paired-seed contrast in Table 2
+provide a concrete account of the tested algorithmic sensitivity. Mean
+distance from the enacted assignment increases from 13.40\% to 29.00\%
+of precinct nodes under optimal relabeling, while the relaxed regime
+also has 63.75 more cut edges on average. Over the same change in
+composite cap regime, mean Democratic seats decrease by 0.406 and mean
+efficiency gap decreases by 0.03278. Thus increased feasible
+fragmentation, increased terminal geographic movement and a signed
+partisan-score shift co-occur within the fixed 800-transition procedure.
+Figure 4 visualizes movement and efficiency gap for individual
+endpoints; Table 2 quantifies a mean regime contrast. Neither
+establishes that geographic movement mediates the partisan change or
+that any one administrative cap is the causal driver.
+
 The closer condition concentrates near its caps on county and
 county-plus-MCD splits (means 17.97 of 18 and 19.94 of 20). The relaxed
 condition approaches its much larger bounds (means 23.81 of 24 and 47.94
@@ -931,6 +988,22 @@ R-hat 1.733 with bulk ESS 9.4 in one condition; local MH yielded R-hat
 usable stationary neutral ensemble. They do not imply a universal
 failure of all redistricting samplers.
 
+Theoretical guarantee versus operational mobility. DeFord, Duchin, and
+Solomon (2021) motivate recombination moves, while Cannon et al.~(2026)
+establish reversibility for a particular spanning-tree-targeting
+construction. Our reversible local MH implementation instead targets a
+uniform distribution within each reachable component of a proxy-feasible
+labeled-map space. In its initial four-chain pilot, acceptance ranged
+from 9.20\% to 15.95\% after 2,000 proposals per chain; in the
+subsequent eight-chain study, acceptance varied from 8.20\% to 16.75\%,
+while the relaxed-regime efficiency-gap diagnostic reached R-hat 2.588
+and bulk ESS about 4.8 after 4,001 recorded states per chain. The
+acceptance and convergence figures come from different runs, and neither
+evaluates Cannon et al.'s spanning-tree kernel directly. Their joint
+methodological lesson is narrower and stronger than a claim that
+mathematics failed: detailed balance need not imply adequate mobility or
+finite-time convergence under restrictive geographic proxies.
+
 \hypertarget{gate-c-quantify-sensitivity-to-declared-constraint-alternatives}{%
 \subsection{Gate C --- Quantify sensitivity to declared constraint
 alternatives}\label{gate-c-quantify-sensitivity-to-declared-constraint-alternatives}}
@@ -997,26 +1070,60 @@ initialize the library-owned chain generator. It justifies a
 version-specific reproducibility fix in this project, not an assertion
 that other published studies are unreplayable.
 
-Experimental configuration is preserved in executed source. The
-\texttt{stage3-finite-horizon-ensemble.yml} matrix records each cohort's
-constraints and runs the exact parameters via explicit command-line
-arguments; the resulting source hashes, seeds and endpoint metrics are
-archived and cross-checked. The repository also contains
-\texttt{configs/sensitivity.yaml} and \texttt{configs/baseline.yaml},
-but both files are empty and therefore did not serve as experimental
-protocols. The defensible configuration-as-protocol contribution is the
-\emph{version-controlled, actually executed workflow plus its output
-manifest}, not the existence of unused YAML filenames.
+The executed automation is the experimental protocol. The
+version-controlled \texttt{stage3-finite-horizon-ensemble.yml} matrix
+specifies the two regimes' exact cap triples---(760, 18, 20) and (850,
+24, 49)---alongside 32 seeds per regime, the 801-recorded-state run
+length, ±0.5\% population tolerance, source-download checks and
+independent terminal validation. Its command-line invocations,
+separately captured dependency inventories, seed replay, graph
+fingerprints, final assignment hashes and aggregated outputs provide a
+checkable chain of computational provenance. In particular, the final
+aggregation rejects missing or duplicated seed identities and mismatched
+graph or reference-score metadata. This is
+configuration-as-executed-code, not a handwritten description
+retrofitted after the fact.
+
+The source graph is pinned by an exact Git blob identity, the derived
+KNN3 graph by SHA-256, and terminal assignments by SHA-256. These
+digests and versioned workflow files detect input/output substitution
+when the matching checks are run; they do not make a mutable Git branch
+cryptographically immutable, constitute signed attestation, or fix every
+transitive dependency to a reproducible container image. The protocol
+was fixed for the final aggregate after exploratory pilot work, so the
+experiment is reproducible but not independently preregistered.
+
+Proposed adversarial evidence standard. A credible simulation-based
+redistricting claim should publish an executable ledger that (i) checks
+original data and model-graph identities, (ii) deliberately rejects
+malformed population, district and election records, (iii) reproduces
+declared RNG behavior, (iv) validates archived map assignments against
+contiguity and modeled constraints, and (v) records failures of
+target-specific mixing or sensitivity gates. The present project
+implements these checks at different levels, including all independently
+retained terminal maps and selected periodic snapshots---not an
+independent legal-geography audit and not independent rescoring of every
+state of every chain. A court or research reviewer should be able to
+inspect such an evidence ledger before relying on a simulated
+percentile; whether any particular testimony is legally admissible is a
+matter for applicable evidentiary law, not a conclusion this
+computational study can impose.
 
 The Stage 4 pipeline then downloads the specific successful 64-endpoint
 artifact, refuses a mismatched graph digest, duplicate endpoint hash or
 missing seed, recalculates paired contrasts, and generates vector
 figures and genuine XeLaTeX. This is an automated, source-linked
 research artifact: the paper cannot build its figures from an unverified
-replacement endpoint CSV under the present checks. It is not a
-certification that the original geographic assumptions, scholarly
-interpretations, or all upstream inputs are correct. The distinction is
-exactly why the three gates are separate.
+replacement endpoint CSV under the present checks. The published
+\texttt{outputs/figures/week1/mi\_week1\_summary\_dashboard.png} is an
+earlier programmatically generated descriptive summary, while the Stage
+4 figures are generated from the source-audited endpoint artifact.
+Automating the path from simulation scores to plotted distributions
+reduces unrecorded manual aggregation choices; reproducibility still
+depends on inspecting the aggregation and plotting source and its
+assumptions. It is not a certification that the original geographic
+assumptions, scholarly interpretations, or all upstream inputs are
+correct. The distinction is exactly why the three gates are separate.
 
 \begin{table}[H]
 \centering
@@ -1068,14 +1175,16 @@ should be accompanied by independently verifiable graph provenance,
 target-law/mixing records, and model-choice sensitivity results before
 its percentiles are assigned substantive authority.
 
-The preliminary Missouri graphics in the repository are descriptive
-outputs of earlier exploratory work; Missouri's historic local inputs
-were not byte-matched to the candidate published Missouri source, and a
-matched independent ensemble audit has not been performed. These plots
-cannot be used as a second-state replication. We have not audited a
-representative sample of published studies or courtroom testimony. The
-broader prevalence of such failures remains a testable question for
-subsequent research, not a result of this Michigan case.
+The preliminary
+\href{https://github.com/DjokovicMan22/Gerrymandering-Project/blob/research/stages-1-3-validation/outputs/figures/week1/mo_precinct_dual_graph_overlay.png}{Missouri
+precinct graph overlay} and related graphics are descriptive outputs of
+earlier exploratory work; Missouri's historic local inputs were not
+byte-matched to the candidate published Missouri source, and a matched
+independent graph-component and ensemble audit has not been performed.
+These plots cannot be used as a second-state replication. We have not
+audited a representative sample of published studies or courtroom
+testimony. The broader prevalence of such failures remains a testable
+question for subsequent research, not a result of this Michigan case.
 
 \hypertarget{limitations}{%
 \section{Limitations}\label{limitations}}
@@ -1138,11 +1247,15 @@ distribution over legally permissible maps.
 Our practical contribution is a three-gate audit with falsifiable
 refusal conditions: validate synthetic geography independently,
 demonstrate target-specific sampler reliability, and quantify
-sensitivity to consequential constraints. Redistricting research and the
-evaluation of expert evidence should require these records before
-treating an empirical ensemble percentile as an objective neutral
-baseline. Establishing how widely such checks are absent from published
-or litigated analyses requires a separate systematic study.
+sensitivity to consequential constraints. We propose a corresponding
+adversarial computational evidence ledger---versioned executable
+parameters, input/output digests, corruption-rejection tests,
+seed-replay evidence, independently checked map snapshots and
+transparently reported failed diagnostics. Redistricting research and
+the evaluation of expert evidence should require such inspectable
+records before treating an empirical ensemble percentile as an objective
+neutral baseline. Establishing how widely such checks are absent from
+published or litigated analyses requires a separate systematic study.
 
 \hypertarget{references}{%
 \section*{References}\label{references}}
