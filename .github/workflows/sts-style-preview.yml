@@ -19,7 +19,7 @@ jobs:
       - name: Install TeX, Pandoc, PDF analyzer
         run: |
           sudo apt-get -qq update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended fonts-texgyre lmodern latexmk poppler-utils
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended fonts-texgyre lmodern ghostscript latexmk poppler-utils
           python -m pip install pymupdf
       - name: Build 11pt 1.5-spaced, one-inch-margin mock PDF
         run: |
@@ -34,6 +34,13 @@ jobs:
             -V mainfont='TeX Gyre Termes' \
             --include-in-header=scripts/research_audit/sts_mock_header.tex \
             -o outputs/reports/stage4/sts_style_mock.pdf
+          gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dCompatibilityLevel=1.5 \
+             -dPDFSETTINGS=/ebook -dDetectDuplicateImages=true \
+             -dCompressFonts=true -dDownsampleColorImages=true \
+             -dColorImageResolution=180 -dGrayImageResolution=180 \
+             -sOutputFile=outputs/reports/stage4/sts_style_mock_compressed.pdf \
+             outputs/reports/stage4/sts_style_mock.pdf
+          mv outputs/reports/stage4/sts_style_mock_compressed.pdf outputs/reports/stage4/sts_style_mock.pdf
           pdfinfo outputs/reports/stage4/sts_style_mock.pdf | head -18
       - name: Check pagination figures disclosure and text
         run: |
