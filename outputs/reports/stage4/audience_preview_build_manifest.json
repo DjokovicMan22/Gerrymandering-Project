@@ -1,0 +1,28 @@
+{
+  "status": "PASS_FORMAT_PREVIEWS_ONLY",
+  "artifacts": {
+    "sts_style_mock": {
+      "pages": 14,
+      "bytes": 748251,
+      "sha256": "43929b521c1a62596b9a09b1b90f74fb2a84122fdf8b221715e4cfa11d2894a1"
+    },
+    "davidson_portfolio_preview": {
+      "pages": 14,
+      "bytes": 748469,
+      "sha256": "cd15dcf5148c5f4ebee9b697f7cc1c28b93c57b2d0e3c61f333761bcb70b713d"
+    },
+    "yau_computer_preview": {
+      "pages": 14,
+      "bytes": 750372,
+      "sha256": "5d2349e0efd52bf4b8adedf736ada397e0fe36bd76e948a8ff081b036e98f88c"
+    },
+    "arxiv_style_preprint_preview": {
+      "pages": 19,
+      "bytes": 889973,
+      "sha256": "39aa0fe988a59ab543401f0a1ae46c132a53468373afc53a8cf2e62419e0ad12"
+    },
+    "arxiv_source_zip": {
+      "bytes": 4404946
+    }
+  }
+}
