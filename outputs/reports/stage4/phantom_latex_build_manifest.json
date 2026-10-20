@@ -1,19 +1,19 @@
 {
   "status": "PASS_TRUE_XELATEX_SCIENTIFIC_MANUSCRIPT",
   "title": "The Phantom Baseline",
-  "pages": 18,
+  "pages": 19,
   "numbered_equations": 4,
   "booktabs_tables": 3,
-  "vector_figure_floats": 4,
+  "vector_figure_floats": 5,
   "topology_gis_fingerprint": "07bce18dabbcca9d549e28995a8156fd6978d7db",
-  "pdf_sha256": "e5034e0a8bad3e8e44faa31f42b917e2a37cf69be3e21afcb3eebb1e116319a8",
-  "latex_sha256": "7ae06b53a8441f5662ea02f893263b06a098150063f6ebf315bb858074763da7",
+  "pdf_sha256": "4997b50e701e063b8fe33e81167b05851245476cb887aa95f41983861812ed1e",
+  "latex_sha256": "6f0dc311f53ea65c16b69dbe4f5124ee7481eddac197f8627f3d36e5bfff5f1c",
   "preview_pages": {
     "first": 0,
-    "last": 17,
+    "last": 18,
     "equations": 1,
-    "results": 8,
-    "figure": 8
+    "results": 9,
+    "figure": 9
   },
   "limitation": "model-conditional experiments; no validated legal neutral map null"
 }
