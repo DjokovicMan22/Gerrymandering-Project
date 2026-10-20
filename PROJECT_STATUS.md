@@ -1,17 +1,16 @@
 # Project status
 
-## Stage 4 — Full manuscript, source figures and PDF now ready for external scholarly review
+## Stage 4 — The Phantom Baseline, successfully compiled and visually inspected
 
-- [x] Wrote the 6,600-word research-methods and geographic-sensitivity manuscript [**When a Random Map Is Not a Neutral Map**](outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md).
-- [x] Independent evidence gate checked original Stage 1–3 numerical results and the draft's limits.
-- [x] Reconstructed three full publication-style SVG/PNG figures directly from the original 64-map Stage 3 terminal-map score artifact; committed them, source generator and provenance manifest.
-- [x] Added 20,000-resample *paired-seed* sensitivity comparison of Democratic seats, efficiency gap, proxy cut edges and spatial movement; explicitly **not a legally neutral-map test**.
-- [x] Produced [**15-page academic PDF**](outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.pdf) containing all three vector figures; PDF text, page count, first/last page previews and graph provenance passed automated verification.
-- [x] [Literature metadata checks and reviewer-style submission-readiness review](docs/research_audit/STAGE4_SUBMISSION_READINESS.md).
-- [ ] **External statistical/methodological peer review and venue-specific copyediting**. No legal neutral-map stationary distribution has been established; do not call the paper a proof of illegal or intentional Michigan gerrymandering.
+- [x] **Rewritten manuscript**: [The Phantom Baseline: Geographic Assumptions, Mixing Failures, and Constraint Sensitivity in Computational Redistricting](outputs/reports/stage4/when_a_random_map_is_not_a_neutral_map.md). The argument is a **three-axis forensic diagnostic** with executable reliability gates, not an original-project bug diary.
+- [x] **Authoritative reading PDF:** [16-page STIX/XeLaTeX PDF](outputs/reports/stage4/phantom_baseline.pdf). [Editable source](outputs/reports/stage4/phantom_baseline.tex).
+- [x] **Four evidence-linked vector figures:** one exact-GIS reconstructed map of the five synthetic edges (measured 42.26–280.19 km), plus three graphics derived from the archived, individually validated 64-map experiment.
+- [x] **Three journal-formatted `booktabs` tables**, four numbered display equations, searchable text, figure manifests, rendered page previews, and source/paper hashes.
+- [x] **Signed 32-pair bootstrap stress test:** tighter-minus-relaxed efficiency gap **+0.03278**, paired 95% interval **[+0.00975, +0.05631]**. Relaxed caps *decrease* mean Democratic seats by **0.406** and increase precinct reassignment by **15.61 percentage points**.
+- [x] **All latest checks successful:** [journal PDF workflow](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39359458520), [research audit](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39359458615), and [Michigan empirical smoke test](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39359458586).
+- [ ] **External methodological peer review** and target-journal style submission. Geographic/statistical legality of an enacted-map neutral outlier test has not been established, nor was a second-state replication performed.
 
-**GitHub evidence:** [real-data figures](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39203727983), [source-verified PDF](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39204046502), [numeric manuscript gate](https://github.com/DjokovicMan22/Gerrymandering-Project/actions/runs/39203675742). Original `main` remains unchanged.
-
+Only the `research/stages-1-3-validation` development branch was modified. Original `main` remains unchanged.
 
 ## Stage 3 final decision — CLOSED, SCOPED RESEARCH RESULT
 
