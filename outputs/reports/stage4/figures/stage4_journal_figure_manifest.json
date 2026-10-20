@@ -13,7 +13,10 @@
     "figure2_paired_seed_EG.svg",
     "figure3_spatial_change_vs_EG.pdf",
     "figure3_spatial_change_vs_EG.png",
-    "figure3_spatial_change_vs_EG.svg"
+    "figure3_spatial_change_vs_EG.svg",
+    "figure_topology_artificial_bridges.pdf",
+    "figure_topology_artificial_bridges.png",
+    "figure_topology_artificial_bridges.svg"
   ],
   "statistical_summary": {
     "n_seed_labels_per_condition": 32,

@@ -1,0 +1,106 @@
+{
+  "status": "PASS_SOURCE_VERIFIED_FIVE_BRIDGES_VISUALIZED",
+  "original_graph_git_blob": "a4dfe70818f87b97924781216f3d86a672cfc66a",
+  "source_polygon_zip_git_blob": "07bce18dabbcca9d549e28995a8156fd6978d7db",
+  "source_graph_sha256": "8e9e91ff663f57fb7d6ca84eb205bb6ceb30ea54299cb5823799b17d5082fb2d",
+  "source_polygon_zip_sha256": "e084a9491af8998250b06a5676e5727fcb07b33a747a952fb1babd41d5e72283",
+  "crs": "EPSG:32616",
+  "precinct_count": 4756,
+  "plot_points": "representative point for each original polygon",
+  "bridge_segment_definition": "nearest points on original polygons of each originally project-added graph connection",
+  "not_a_legal_contiguity_map": true,
+  "not_a_redistricting_null_model": true,
+  "annotation": "Short dashed lines are diagrammatic existing project synthetic edges, not water/road/passable or legal adjacency",
+  "connections": [
+    {
+      "label": 1,
+      "node_a": 12,
+      "node_b": 0,
+      "distance_km": 280.193377,
+      "same_enacted_district": true,
+      "same_source_county": false,
+      "nearest_segment_endpoints_projected_km": [
+        [
+          524.8455,
+          5111.7164
+        ],
+        [
+          765.2194,
+          4967.7418
+        ]
+      ]
+    },
+    {
+      "label": 2,
+      "node_a": 374,
+      "node_b": 0,
+      "distance_km": 169.73614,
+      "same_enacted_district": true,
+      "same_source_county": false,
+      "nearest_segment_endpoints_projected_km": [
+        [
+          617.6216,
+          5051.5584
+        ],
+        [
+          765.2194,
+          4967.7418
+        ]
+      ]
+    },
+    {
+      "label": 3,
+      "node_a": 1772,
+      "node_b": 0,
+      "distance_km": 134.311453,
+      "same_enacted_district": true,
+      "same_source_county": false,
+      "nearest_segment_endpoints_projected_km": [
+        [
+          687.1561,
+          5077.0381
+        ],
+        [
+          765.2194,
+          4967.7418
+        ]
+      ]
+    },
+    {
+      "label": 4,
+      "node_a": 1765,
+      "node_b": 0,
+      "distance_km": 117.307563,
+      "same_enacted_district": true,
+      "same_source_county": false,
+      "nearest_segment_endpoints_projected_km": [
+        [
+          702.0473,
+          5066.5868
+        ],
+        [
+          765.2194,
+          4967.7418
+        ]
+      ]
+    },
+    {
+      "label": 5,
+      "node_a": 4169,
+      "node_b": 2300,
+      "distance_km": 42.260954,
+      "same_enacted_district": true,
+      "same_source_county": false,
+      "nearest_segment_endpoints_projected_km": [
+        [
+          817.6829,
+          4672.2624
+        ],
+        [
+          776.1303,
+          4664.5569
+        ]
+      ]
+    }
+  ]
+}
